@@ -1,4 +1,5 @@
 import { IInsightFacade, InsightDataset, InsightDatasetKind, InsightResult } from "./IInsightFacade";
+import * as fs from "fs-extra";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -28,14 +29,14 @@ export default class InsightFacade implements IInsightFacade {
 		throw new Error(`InsightFacadeImpl::listDatasets is unimplemented!`);
 	}
 
-	// public async parseZip(name: string): Promise<string> {
-	// 	// throw new Error(`InsightFacadeImpl::parseZip is unimplemented!`);
-	// 	try {
-	// 		const filePath = `test/resources/archives/${name}`;
-	// 		const buffer = await fs.readFile(filePath);
-	// 		return buffer.toString("base64");
-	// 	} catch (err) {
-	// 		throw new InsightError(`parseZip threw unexpected error: ${err}`);
-	// 	}
-	// }
+	public async parseZip(name: string): Promise<string> {
+		// throw new Error(`InsightFacadeImpl::parseZip is unimplemented!`);
+		try {
+			const filePath = `test/resources/archives/${name}`;
+			const buffer = await fs.readFile(filePath);
+			return buffer.toString("base64");
+		} catch (err) {
+			throw new InsightError(`parseZip threw unexpected error: ${err}`);
+		}
+	}
 }
