@@ -8,11 +8,50 @@ import JSZip = require("jszip");
  *
  */
 export default class InsightFacade implements IInsightFacade {
+	private ids: string[];
+	private datasets: string[];
+
+	constructor() {
+		this.ids = [];
+		this.datasets = []; // should we write content into json file for persistence?
+	}
+
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
-		// TODO: Remove this once you implement the methods!
-		throw new Error(
-			`InsightFacadeImpl::addDataset() is unimplemented! - id=${id}; content=${content?.length}; kind=${kind}`
-		);
+		try {
+			// *******************************************************************************************************************
+			// check id
+			// *******************************************************************************************************************
+			if (id.length === 0) {
+				throw new Error("Empty id");
+			}
+			if (id.includes("_")) {
+				throw new Error("Underscore in id");
+			}
+			if (/^\s*$/.test(id)) {
+				throw new Error("Only whitespace in id");
+			}
+			this.ids.push(id);
+			// *******************************************************************************************************************
+			// check valid zip content
+			// *******************************************************************************************************************
+			const zip = new JSZip();
+			const folder = await zip.loadAsync(content);
+
+			if (!folder.folder("courses")) {
+				throw new Error("zip file does not contain a 'courses' folder");
+			}
+
+			// num files == numRows
+			const files = Object.keys(folder.files).filter((path) => !path.endsWith("/"));
+
+			if (files.length === 0) {
+				throw new Error("'courses' folder is empty");
+			}
+
+			// NEED TO IMPLEMENT THE InsightDataset?????? Also got to figure out persistence data structure
+		} catch (err) {
+			throw new InsightError(`addDataset threw unexpected error: ${err}`);
+		}
 	}
 
 	public async removeDataset(id: string): Promise<string> {
@@ -30,7 +69,7 @@ export default class InsightFacade implements IInsightFacade {
 		throw new Error(`InsightFacadeImpl::listDatasets is unimplemented!`);
 	}
 
-	public async parseZip(name: string): Promise<string> {
+	private async parseZip(name: string): Promise<string> {
 		const filePath = `../test/resources/archives/${name}`;
 		const buffer = await fs.readFile(filePath);
 
