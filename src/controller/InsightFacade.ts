@@ -1,5 +1,6 @@
-import { IInsightFacade, InsightDataset, InsightDatasetKind, InsightResult } from "./IInsightFacade";
+import { IInsightFacade, InsightError, InsightDataset, InsightDatasetKind, InsightResult } from "./IInsightFacade";
 import * as fs from "fs-extra";
+import JSZip = require("jszip");
 
 /**
  * This is the main programmatic entry point for the project.
@@ -30,13 +31,22 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async parseZip(name: string): Promise<string> {
-		// throw new Error(`InsightFacadeImpl::parseZip is unimplemented!`);
-		try {
-			const filePath = `test/resources/archives/${name}`;
-			const buffer = await fs.readFile(filePath);
-			return buffer.toString("base64");
-		} catch (err) {
-			throw new InsightError(`parseZip threw unexpected error: ${err}`);
+		const filePath = `../test/resources/archives/${name}`;
+		const buffer = await fs.readFile(filePath);
+
+		const zip = new JSZip();
+		const folder = await zip.loadAsync(buffer);
+
+		if (!folder.folder("courses")) {
+			throw new InsightError("parseZip threw unexpected error: zip file does not contain a 'courses' folder");
 		}
+
+		const files = Object.keys(folder.files).filter((path) => !path.endsWith("/"));
+
+		if (files.length === 0) {
+			throw new InsightError("parseZip threw unexpected error: 'courses' folder is empty");
+		}
+
+		return buffer.toString("base64");
 	}
 }
