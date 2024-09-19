@@ -110,4 +110,17 @@ export interface IInsightFacade {
 	 * The promise should fulfill an array of currently added InsightDatasets, and will only fulfill.
 	 */
 	listDatasets(): Promise<InsightDataset[]>;
+
+	/**
+	 * Converts zip contents into a Base64 string.
+	 *
+	 * @param path	The path to the zip file.
+	 *
+	 * If file at path is not a zip or there is no file at path, throw InsightError.
+	 *
+	 * @return Promise <String>
+	 * The promise should fulfill a base64 string, and will only fulfill.
+	 */
+	// parseZip(name: string): Promise<string>;
+	// parseZip(name: string): Promise<string>;
 }
