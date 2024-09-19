@@ -1,5 +1,4 @@
 import { IInsightFacade, InsightError, InsightDataset, InsightDatasetKind, InsightResult } from "./IInsightFacade";
-import * as fs from "fs-extra";
 import JSZip = require("jszip");
 
 /**
@@ -9,11 +8,11 @@ import JSZip = require("jszip");
  */
 export default class InsightFacade implements IInsightFacade {
 	private ids: string[];
-	private datasets: string[];
+	private datasetsMeta: InsightDataset[];
 
 	constructor() {
 		this.ids = [];
-		this.datasets = []; // should we write content into json file for persistence?
+		this.datasetsMeta = []; // should we write content into json file for persistence?
 	}
 
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
@@ -22,13 +21,13 @@ export default class InsightFacade implements IInsightFacade {
 			// check id
 			// *******************************************************************************************************************
 			if (id.length === 0) {
-				throw new Error("Empty id");
+				throw new Error("empty id");
 			}
 			if (id.includes("_")) {
-				throw new Error("Underscore in id");
+				throw new Error("underscore in id");
 			}
 			if (/^\s*$/.test(id)) {
-				throw new Error("Only whitespace in id");
+				throw new Error("only whitespace in id");
 			}
 			this.ids.push(id);
 			// *******************************************************************************************************************
@@ -41,17 +40,28 @@ export default class InsightFacade implements IInsightFacade {
 				throw new Error("zip file does not contain a 'courses' folder");
 			}
 
-			// num files == numRows
 			const files = Object.keys(folder.files).filter((path) => !path.endsWith("/"));
 
 			if (files.length === 0) {
 				throw new Error("'courses' folder is empty");
 			}
-
-			// NEED TO IMPLEMENT THE InsightDataset?????? Also got to figure out persistence data structure
+			// *******************************************************************************************************************
+			// instantiate InsightDataset with metadata for current dataset, add to this.datasets
+			// *******************************************************************************************************************
+			const datasetMeta: InsightDataset = {
+				id: id,
+				kind: kind,
+				numRows: files.length,
+			};
+			this.datasetsMeta.push(datasetMeta);
 		} catch (err) {
 			throw new InsightError(`addDataset threw unexpected error: ${err}`);
 		}
+
+		// *******************************************************************************************************************
+		// return promise object that resolves into list of ids
+		// *******************************************************************************************************************
+		return this.ids;
 	}
 
 	public async removeDataset(id: string): Promise<string> {
