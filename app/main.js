@@ -36,27 +36,54 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+var IInsightFacade_1 = require("../src/controller/IInsightFacade");
 var fs = require("fs-extra");
+var JSZip = require("jszip");
 function main(name) {
     return __awaiter(this, void 0, void 0, function () {
-        var filePath, buffer, err_1;
+        var filePath, buffer, zip, folder, files, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    _a.trys.push([0, 2, , 3]);
+                    _a.trys.push([0, 3, , 4]);
                     filePath = "../test/resources/archives/".concat(name);
                     return [4 /*yield*/, fs.readFile(filePath)];
                 case 1:
                     buffer = _a.sent();
-                    return [2 /*return*/, buffer.toString("base64")];
+                    zip = new JSZip();
+                    return [4 /*yield*/, zip.loadAsync(buffer)];
                 case 2:
+                    folder = _a.sent();
+                    if (!folder.folder("courses")) {
+                        throw new IInsightFacade_1.InsightError("Zip file does not contain a 'courses' folder");
+                    }
+                    files = Object.keys(folder.files).filter(function (path) { return !path.endsWith("/"); });
+                    if (files.length === 0) {
+                        throw new IInsightFacade_1.InsightError("Folder is empty");
+                    }
+                    return [2 /*return*/, buffer.toString("base64")];
+                case 3:
                     err_1 = _a.sent();
                     throw err_1;
-                case 3: return [2 /*return*/];
+                case 4: return [2 /*return*/];
             }
         });
     });
 }
-// Usage
-main("small_comm.zip")
-    .then(function (result) { return console.log(result); })["catch"](function (err) { return console.error("Unexpected Error:", err); });
+// // should work
+// main("small_comm.zip")
+// 	.then((output) => {
+// 		console.log(output);
+// 	})
+// 	.catch((err) => console.error("Unexpected Error:", err));
+// // no courses
+// main("no_courses_folder.zip")
+// 	.then((output) => {
+// 		console.log(output);
+// 	})
+// 	.catch((err) => console.error("Unexpected Error:", err));
+// no courses
+main("empty_courses_folder.zip")
+    .then(function (output) {
+    console.log(output);
+})["catch"](function (err) { return console.error("Unexpected Error:", err); });
