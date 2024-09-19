@@ -32,7 +32,7 @@ export default class InsightFacade implements IInsightFacade {
 			}
 			this.ids.push(id);
 			// *******************************************************************************************************************
-			// check valid zip content
+			// check valid zip content (just put parsing logic here)
 			// *******************************************************************************************************************
 			const zip = new JSZip();
 			const folder = await zip.loadAsync(content);
@@ -67,25 +67,5 @@ export default class InsightFacade implements IInsightFacade {
 	public async listDatasets(): Promise<InsightDataset[]> {
 		// TODO: Remove this once you implement the methods!
 		throw new Error(`InsightFacadeImpl::listDatasets is unimplemented!`);
-	}
-
-	private async parseZip(name: string): Promise<string> {
-		const filePath = `../test/resources/archives/${name}`;
-		const buffer = await fs.readFile(filePath);
-
-		const zip = new JSZip();
-		const folder = await zip.loadAsync(buffer);
-
-		if (!folder.folder("courses")) {
-			throw new InsightError("parseZip threw unexpected error: zip file does not contain a 'courses' folder");
-		}
-
-		const files = Object.keys(folder.files).filter((path) => !path.endsWith("/"));
-
-		if (files.length === 0) {
-			throw new InsightError("parseZip threw unexpected error: 'courses' folder is empty");
-		}
-
-		return buffer.toString("base64");
 	}
 }
