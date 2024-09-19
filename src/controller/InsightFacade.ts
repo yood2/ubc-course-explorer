@@ -8,11 +8,11 @@ import JSZip = require("jszip");
  */
 export default class InsightFacade implements IInsightFacade {
 	private ids: string[];
-	private datasetsMeta: InsightDataset[];
+	private datasets: InsightDataset[];
 
 	constructor() {
 		this.ids = [];
-		this.datasetsMeta = []; // should we write content into json file for persistence?
+		this.datasets = []; // this just holds metadata. should we write actual contents into json file for persistence?
 	}
 
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
@@ -31,7 +31,7 @@ export default class InsightFacade implements IInsightFacade {
 			}
 			this.ids.push(id);
 			// *******************************************************************************************************************
-			// check valid zip content (just put parsing logic here)
+			// check valid zip content (i just put parsing logic here but might want to refactor later)
 			// *******************************************************************************************************************
 			const zip = new JSZip();
 			const folder = await zip.loadAsync(content);
@@ -48,12 +48,15 @@ export default class InsightFacade implements IInsightFacade {
 			// *******************************************************************************************************************
 			// instantiate InsightDataset with metadata for current dataset, add to this.datasets
 			// *******************************************************************************************************************
-			const datasetMeta: InsightDataset = {
+			const dataset: InsightDataset = {
 				id: id,
 				kind: kind,
 				numRows: files.length,
 			};
-			this.datasetsMeta.push(datasetMeta);
+			this.datasets.push(dataset);
+			// *******************************************************************************************************************
+			// NEXT: Implement a actual datastructure that we put the real contents into (data structure we can query easily)
+			// *******************************************************************************************************************
 		} catch (err) {
 			throw new InsightError(`addDataset threw unexpected error: ${err}`);
 		}
@@ -75,7 +78,6 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async listDatasets(): Promise<InsightDataset[]> {
-		// TODO: Remove this once you implement the methods!
-		throw new Error(`InsightFacadeImpl::listDatasets is unimplemented!`);
+		return this.datasets;
 	}
 }
