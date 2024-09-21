@@ -1,0 +1,13 @@
+{
+	"title": "Contains over 5000 results",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_dept": "*a*"
+			}
+		},
+		"OPTIONS": { "COLUMNS": ["sections_dept", "sections_id", "sections_avg"] }
+	},
+	"errorExpected": true,
+	"expected": "ResultTooLargeError"
+}

@@ -1,0 +1,98 @@
+{
+	"title": "references second dataset",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"GT": {
+						"section1_avg": 75
+					}
+				},
+				{
+					"IS": {
+						"section1_id": "210"
+					}
+				},
+				{
+					"IS": {
+						"section1_dept": "cpsc"
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": ["section1_dept", "section1_id", "section1_avg"]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"section1_dept": "cpsc",
+			"section1_id": "210",
+			"section1_avg": 75.01
+		},
+		{
+			"section1_dept": "cpsc",
+			"section1_id": "210",
+			"section1_avg": 75.17
+		},
+		{
+			"section1_dept": "cpsc",
+			"section1_id": "210",
+			"section1_avg": 75.26
+		},
+		{
+			"section1_dept": "cpsc",
+			"section1_id": "210",
+			"section1_avg": 75.33
+		},
+		{
+			"section1_dept": "cpsc",
+			"section1_id": "210",
+			"section1_avg": 75.81
+		},
+		{
+			"section1_dept": "cpsc",
+			"section1_id": "210",
+			"section1_avg": 75.81
+		},
+		{
+			"section1_dept": "cpsc",
+			"section1_id": "210",
+			"section1_avg": 76.04
+		},
+		{
+			"section1_dept": "cpsc",
+			"section1_id": "210",
+			"section1_avg": 76.32
+		},
+		{
+			"section1_dept": "cpsc",
+			"section1_id": "210",
+			"section1_avg": 77.64
+		},
+		{
+			"section1_dept": "cpsc",
+			"section1_id": "210",
+			"section1_avg": 77.64
+		},
+		{
+			"section1_dept": "cpsc",
+			"section1_id": "210",
+			"section1_avg": 78.79
+		},
+		{
+			"section1_dept": "cpsc",
+			"section1_id": "210",
+			"section1_avg": 78.79
+		},
+		{
+			"section1_dept": "cpsc",
+			"section1_id": "210",
+			"section1_avg": 78.98
+		},
+		{ "section1_dept": "cpsc", "section1_id": "210", "section1_avg": 81 },
+		{ "section1_dept": "cpsc", "section1_id": "210", "section1_avg": 81.5 },
+		{ "section1_dept": "cpsc", "section1_id": "210", "section1_avg": 86.15 }
+	]
+}

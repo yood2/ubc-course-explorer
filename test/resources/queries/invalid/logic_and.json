@@ -1,0 +1,18 @@
+{
+	"title": "AND is used incorrectly",
+	"input": {
+		"WHERE": {
+			"AND": {
+				"AND": [
+					{ "LT": { "sections_avg": 65 } },
+					{ "IS": { "sections_instructor": "*is" } }
+				]
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept", "sections_id"]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
