@@ -1,0 +1,13 @@
+{
+	"title": "OR doesn't have any filters",
+	"input": {
+		"WHERE": {
+			"OR": []
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept", "sections_id"]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
