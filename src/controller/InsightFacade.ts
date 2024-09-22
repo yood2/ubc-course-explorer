@@ -1,4 +1,5 @@
 import { IInsightFacade, InsightError, InsightDataset, InsightDatasetKind, InsightResult } from "./IInsightFacade";
+import JSZip = require("jszip");
 import * as fs from "fs-extra";
 
 /**
@@ -7,6 +8,7 @@ import * as fs from "fs-extra";
  *
  */
 
+// might not need this but i can refactor addDataset to utilize this
 export interface Section {
 	uuid: string;
 	id: string;
@@ -197,9 +199,7 @@ export default class InsightFacade implements IInsightFacade {
 
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		try {
-			// *******************************************************************************************************************
-			// check id
-			// *******************************************************************************************************************
+			// id validity checks
 			if (id.length === 0) {
 				throw new Error("empty id");
 			}
@@ -211,49 +211,71 @@ export default class InsightFacade implements IInsightFacade {
 			}
 			this.ids.push(id);
 
-			// ===================== filler code to avoid lint error ===============================
-			if (content === "") {
-				throw new Error("empty content");
+			// zip manipulations
+			const zip = new JSZip();
+			const folder = await zip.loadAsync(content, { base64: true });
+
+			const fileNames = Object.keys(folder.files);
+
+			if (!("courses/" in folder.files)) {
+				throw new Error("zip file does not contain a 'courses' folder");
 			}
 
-			if (kind !== InsightDatasetKind.Sections) {
-				throw new Error("kind should be sections!");
+			if (Object.keys(folder.files).length < 2) {
+				throw new Error("'courses' folder is empty");
 			}
 
-			// *******************************************************************************************************************
-			// check valid zip content (i just put parsing logic here but might want to refactor later)
-			// *******************************************************************************************************************
-			// const zip = new JSZip();
-			// const folder = await zip.loadAsync(content);
+			const courseFiles = fileNames.filter((fileName) => fileName.startsWith("courses/") && fileName !== "courses/");
 
-			// if (!folder.folder("courses")) {
-			// 	throw new Error("zip file does not contain a 'courses' folder");
-			// }
+			let results: { [key: string]: any } = {};
+			let totalRows = 0;
 
-			// const files = Object.keys(folder.files).filter((path) => !path.endsWith("/"));
+			for (const fileName of courseFiles) {
+				const file = folder.file(fileName);
+				if (file) {
+					let fileContent = await file.async("string");
+					const sections = JSON.parse(fileContent).result;
+					for (const curr of sections) {
+						results[curr.id] = {
+							id: curr.Course,
+							title: curr.Title,
+							instructor: curr.Professor,
+							dept: curr.Subject,
+							year: curr.Year,
+							avg: curr.Avg,
+							pass: curr.Pass,
+							fail: curr.Fail,
+							audit: curr.Audit,
+						};
+						totalRows++;
+					}
+				} else {
+					console.log("failed?");
+				}
+			}
 
-			// if (files.length === 0) {
-			// 	throw new Error("'courses' folder is empty");
-			// }
-			// // *******************************************************************************************************************
-			// // instantiate InsightDataset with metadata for current dataset, add to this.datasets
-			// // *******************************************************************************************************************
-			// const dataset: InsightDataset = {
-			// 	id: id,
-			// 	kind: kind,
-			// 	numRows: files.length,
-			// };
-			// this.datasets.push(dataset);
-			// *******************************************************************************************************************
-			// NEXT: Implement a actual datastructure that we put the real contents into (data structure we can query easily)
-			// *******************************************************************************************************************
+			// file writing
+			const filePath = `data/${id}.json`;
+			fs.writeFile(filePath, JSON.stringify(results), (err) => {
+				if (err) {
+					console.error(err);
+				} else {
+					console.log("success");
+				}
+			});
+
+			// metadata
+			const dataset: InsightDataset = {
+				id: id,
+				kind: kind,
+				numRows: totalRows,
+			};
+
+			this.datasets.push(dataset);
 		} catch (err) {
 			throw new InsightError(`addDataset threw unexpected error: ${err}`);
 		}
 
-		// *******************************************************************************************************************
-		// return promise object that resolves into list of ids
-		// *******************************************************************************************************************
 		return this.ids;
 	}
 

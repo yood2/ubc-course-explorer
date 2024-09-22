@@ -32,6 +32,16 @@ describe("InsightFacade", function () {
 	let sections: string;
 	let facade: IInsightFacade;
 
+	describe("Daniel's Tests", function () {
+		// testing add dataset makes stuff
+		it.only("should make a new folder called data in root and make a new file called 1.json", async function () {
+			facade = new InsightFacade();
+			sections = await getContentFromArchives("small_comm.zip");
+			const result = await facade.addDataset("poop", sections, InsightDatasetKind.Sections);
+			console.log(result);
+		});
+	});
+
 	// ========== Adding to dataset tests ===================
 	describe("addDataset", function () {
 		let section1: string;
