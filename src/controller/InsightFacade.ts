@@ -199,6 +199,7 @@ export default class InsightFacade implements IInsightFacade {
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		try {
 			// id validity checks
+			id = removeForbiddenCharacters(id);
 			if (id.length === 0) {
 				throw new Error("empty id");
 			}
@@ -208,14 +209,19 @@ export default class InsightFacade implements IInsightFacade {
 			if (/^\s*$/.test(id)) {
 				throw new Error("only whitespace in id");
 			}
+
 			this.ids.push(id);
 
 			// zip
 			const { sections, totalRows } = await processZipContent(content);
 
+			const output = {
+				sections: sections,
+			};
+
 			// file writing
 			const filePath = `data/${id}.json`;
-			fs.writeFile(filePath, JSON.stringify(sections), (err) => {
+			fs.writeFile(filePath, JSON.stringify(output), (err) => {
 				if (err) {
 					throw new Error("Unexpected error: unable to write file");
 				}
