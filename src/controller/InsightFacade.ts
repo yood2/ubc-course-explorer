@@ -196,24 +196,25 @@ export default class InsightFacade implements IInsightFacade {
 		this.datasets = []; // this just holds metadata. should we write actual contents into json file for persistence?
 	}
 
-	public getIds(): string[] {
-		return this.ids;
+	public checkId(id: string): boolean {
+		// id validity checks
+		id = removeForbiddenCharacters(id);
+		if (id.length === 0) {
+			throw new Error("empty id");
+		}
+		if (id.includes("_")) {
+			throw new Error("underscore in id");
+		}
+		if (/^\s*$/.test(id)) {
+			throw new Error("only whitespace in id");
+		}
+		return true;
 	}
 
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		try {
-			// id validity checks
-			id = removeForbiddenCharacters(id);
-			if (id.length === 0) {
-				throw new Error("empty id");
-			}
-			if (id.includes("_")) {
-				throw new Error("underscore in id");
-			}
-			if (/^\s*$/.test(id)) {
-				throw new Error("only whitespace in id");
-			}
-
+			// id validity
+			this.checkId(id);
 			this.ids.push(id);
 
 			// zip
@@ -249,16 +250,8 @@ export default class InsightFacade implements IInsightFacade {
 	public async removeDataset(id: string): Promise<string> {
 		try {
 			// id validity checks
-			id = removeForbiddenCharacters(id);
-			if (id.length === 0) {
-				throw new Error("empty id");
-			}
-			if (id.includes("_")) {
-				throw new Error("underscore in id");
-			}
-			if (/^\s*$/.test(id)) {
-				throw new Error("only whitespace in id");
-			}
+			this.checkId(id);
+
 			if (!this.ids.includes(id)) {
 				throw new Error("id not found");
 			}
