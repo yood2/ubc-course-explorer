@@ -1,0 +1,22 @@
+{
+	"title": "Contains only 2 sections and WHERE is empty",
+	"input": {
+		"WHERE": {},
+		"OPTIONS": {
+			"COLUMNS": ["section3_dept", "section3_id", "section3_avg"]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"section3_dept": "cpsc",
+			"section3_id": "210",
+			"section3_avg": 76.04
+		},
+		{
+			"section3_dept": "cpsc",
+			"section3_id": "210",
+			"section3_avg": 71.05
+		}
+	]
+}
