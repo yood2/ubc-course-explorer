@@ -1,6 +1,6 @@
 import { IInsightFacade, InsightError, InsightDataset, InsightDatasetKind, InsightResult } from "./IInsightFacade";
-import JSZip = require("jszip");
 import * as fs from "fs-extra";
+import { processZipContent } from "./ZipUtil";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -8,9 +8,7 @@ import * as fs from "fs-extra";
  *
  */
 
-// might not need this but i can refactor addDataset to utilize this
 export interface Section {
-	uuid: string;
 	id: string;
 	title: string;
 	instructor: string;
@@ -211,56 +209,14 @@ export default class InsightFacade implements IInsightFacade {
 			}
 			this.ids.push(id);
 
-			// zip manipulations
-			const zip = new JSZip();
-			const folder = await zip.loadAsync(content, { base64: true });
-
-			const fileNames = Object.keys(folder.files);
-
-			if (!("courses/" in folder.files)) {
-				throw new Error("zip file does not contain a 'courses' folder");
-			}
-
-			if (Object.keys(folder.files).length < 2) {
-				throw new Error("'courses' folder is empty");
-			}
-
-			const courseFiles = fileNames.filter((fileName) => fileName.startsWith("courses/") && fileName !== "courses/");
-
-			let results: { [key: string]: any } = {};
-			let totalRows = 0;
-
-			for (const fileName of courseFiles) {
-				const file = folder.file(fileName);
-				if (file) {
-					let fileContent = await file.async("string");
-					const sections = JSON.parse(fileContent).result;
-					for (const curr of sections) {
-						results[curr.id] = {
-							id: curr.Course,
-							title: curr.Title,
-							instructor: curr.Professor,
-							dept: curr.Subject,
-							year: curr.Year,
-							avg: curr.Avg,
-							pass: curr.Pass,
-							fail: curr.Fail,
-							audit: curr.Audit,
-						};
-						totalRows++;
-					}
-				} else {
-					console.log("failed?");
-				}
-			}
+			// zip
+			const { results, totalRows } = await processZipContent(content);
 
 			// file writing
 			const filePath = `data/${id}.json`;
 			fs.writeFile(filePath, JSON.stringify(results), (err) => {
 				if (err) {
-					console.error(err);
-				} else {
-					console.log("success");
+					throw new Error("Unexpected error: unable to write file");
 				}
 			});
 
