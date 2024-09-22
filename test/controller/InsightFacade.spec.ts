@@ -34,10 +34,10 @@ describe("InsightFacade", function () {
 
 	describe("Daniel's Tests", function () {
 		// testing add dataset makes stuff
-		it.only("should make a new folder called data in root and make a new file called 1.json", async function () {
+		it.only("should make a new folder called data in root and make a new file called test.json", async function () {
 			facade = new InsightFacade();
 			sections = await getContentFromArchives("pair.zip");
-			const result = await facade.addDataset("poop", sections, InsightDatasetKind.Sections);
+			const result = await facade.addDataset("test", sections, InsightDatasetKind.Sections);
 			console.log(result);
 		});
 	});

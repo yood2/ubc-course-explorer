@@ -33,7 +33,8 @@ function validateZipStructure(folder: JSZip): void {
 	if (!("courses/" in folder.files)) {
 		throw new Error("Zip file does not contain a 'courses' folder");
 	}
-	if (Object.keys(folder.files).length < 2) {
+	const minFiles = 2;
+	if (Object.keys(folder.files).length < minFiles) {
 		throw new Error("'courses' folder is empty");
 	}
 }
@@ -43,24 +44,20 @@ function getCourseFiles(folder: JSZip): JSZip.JSZipObject[] {
 }
 
 async function processCoursesData(courseFiles: JSZip.JSZipObject[]): Promise<ProcessResult> {
-	const sections: Section[] = [];
-	let totalRows = 0;
-
-	for (const file of courseFiles) {
+	const fileProcessingPromises = courseFiles.map(async (file) => {
 		try {
 			const fileContent = await file.async("string");
 			const preSections: PreProcessedSection[] = JSON.parse(fileContent).result;
-
-			for (const preSection of preSections) {
-				if (isValidCourseSection(preSection)) {
-					sections.push(processCourseSection(preSection));
-					totalRows++;
-				}
-			}
+			return preSections.filter(isValidCourseSection).map(processCourseSection);
 		} catch (error) {
 			console.error(`Failed to process file ${file.name}:`, error);
+			return [];
 		}
-	}
+	});
+
+	const processedSections = await Promise.all(fileProcessingPromises);
+	const sections: Section[] = processedSections.flat();
+	const totalRows = sections.length;
 
 	return { sections, totalRows };
 }
