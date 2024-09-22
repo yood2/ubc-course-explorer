@@ -32,13 +32,19 @@ describe("InsightFacade", function () {
 	let sections: string;
 	let facade: IInsightFacade;
 
-	describe("Daniel's Tests", function () {
-		// testing add dataset makes stuff
-		it.only("should make a new folder called data in root and make a new file called test.json", async function () {
+	describe.only("Daniel's Tests", function () {
+		before(async function () {
 			facade = new InsightFacade();
 			sections = await getContentFromArchives("pair.zip");
-			const result = await facade.addDataset("test", sections, InsightDatasetKind.Sections);
-			console.log(result);
+		});
+
+		// testing add dataset makes stuff
+		it("should make a new file called test.json", async function () {
+			await facade.addDataset("test", sections, InsightDatasetKind.Sections);
+		});
+
+		it("should make a new folder called data in root and make a new file called test.json", async function () {
+			await facade.removeDataset("test");
 		});
 	});
 
