@@ -9,6 +9,7 @@ import { processZipContent } from "./ZipUtil";
  */
 
 export interface Section {
+	uuid: string;
 	id: string;
 	title: string;
 	instructor: string;
@@ -210,11 +211,11 @@ export default class InsightFacade implements IInsightFacade {
 			this.ids.push(id);
 
 			// zip
-			const { results, totalRows } = await processZipContent(content);
+			const { sections, totalRows } = await processZipContent(content);
 
 			// file writing
 			const filePath = `data/${id}.json`;
-			fs.writeFile(filePath, JSON.stringify(results), (err) => {
+			fs.writeFile(filePath, JSON.stringify(sections), (err) => {
 				if (err) {
 					throw new Error("Unexpected error: unable to write file");
 				}

@@ -1,4 +1,5 @@
 import JSZip = require("jszip");
+import { Section } from "./InsightFacade";
 
 interface PreProcessedSection {
 	id: string;
@@ -13,20 +14,8 @@ interface PreProcessedSection {
 	Audit: string;
 }
 
-interface ProcessedSection {
-	id: string;
-	title: string;
-	instructor: string;
-	dept: string;
-	year: string;
-	avg: string;
-	pass: string;
-	fail: string;
-	audit: string;
-}
-
 interface ProcessResult {
-	results: Record<string, ProcessedSection>;
+	sections: Section[];
 	totalRows: number;
 }
 
@@ -54,17 +43,17 @@ function getCourseFiles(folder: JSZip): JSZip.JSZipObject[] {
 }
 
 async function processCoursesData(courseFiles: JSZip.JSZipObject[]): Promise<ProcessResult> {
-	const results: Record<string, ProcessedSection> = {};
+	const sections: Section[] = [];
 	let totalRows = 0;
 
 	for (const file of courseFiles) {
 		try {
 			const fileContent = await file.async("string");
-			const sections: PreProcessedSection[] = JSON.parse(fileContent).result;
+			const preSections: PreProcessedSection[] = JSON.parse(fileContent).result;
 
-			for (const section of sections) {
-				if (isValidCourseSection(section)) {
-					results[section.id] = processCourseSection(section);
+			for (const preSection of preSections) {
+				if (isValidCourseSection(preSection)) {
+					sections.push(processCourseSection(preSection));
 					totalRows++;
 				}
 			}
@@ -73,7 +62,7 @@ async function processCoursesData(courseFiles: JSZip.JSZipObject[]): Promise<Pro
 		}
 	}
 
-	return { results, totalRows };
+	return { sections, totalRows };
 }
 
 function isValidCourseSection(section: PreProcessedSection): boolean {
@@ -91,16 +80,17 @@ function isValidCourseSection(section: PreProcessedSection): boolean {
 	);
 }
 
-function processCourseSection(section: PreProcessedSection): ProcessedSection {
+function processCourseSection(section: PreProcessedSection): Section {
 	return {
+		uuid: section.id.toString(),
 		id: section.Course,
 		title: section.Title,
 		instructor: section.Professor,
 		dept: section.Subject,
-		year: section.Year,
-		avg: section.Avg,
-		pass: section.Pass,
-		fail: section.Fail,
-		audit: section.Audit,
+		year: parseInt(section.Year, 10),
+		avg: parseFloat(section.Avg),
+		pass: parseInt(section.Pass, 10),
+		fail: parseInt(section.Fail, 10),
+		audit: parseInt(section.Audit, 10),
 	};
 }
