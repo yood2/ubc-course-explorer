@@ -1,5 +1,6 @@
 import { IInsightFacade, InsightError, InsightDataset, InsightDatasetKind, InsightResult } from "./IInsightFacade";
 import * as fs from "fs-extra";
+import { processZipContent } from "./ZipUtil";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -197,9 +198,8 @@ export default class InsightFacade implements IInsightFacade {
 
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		try {
-			// *******************************************************************************************************************
-			// check id
-			// *******************************************************************************************************************
+			// id validity checks
+			id = removeForbiddenCharacters(id);
 			if (id.length === 0) {
 				throw new Error("empty id");
 			}
@@ -209,51 +209,36 @@ export default class InsightFacade implements IInsightFacade {
 			if (/^\s*$/.test(id)) {
 				throw new Error("only whitespace in id");
 			}
+
 			this.ids.push(id);
 
-			// ===================== filler code to avoid lint error ===============================
-			if (content === "") {
-				throw new Error("empty content");
-			}
+			// zip
+			const { sections, totalRows } = await processZipContent(content);
 
-			if (kind !== InsightDatasetKind.Sections) {
-				throw new Error("kind should be sections!");
-			}
+			const output = {
+				sections: sections,
+			};
 
-			// *******************************************************************************************************************
-			// check valid zip content (i just put parsing logic here but might want to refactor later)
-			// *******************************************************************************************************************
-			// const zip = new JSZip();
-			// const folder = await zip.loadAsync(content);
+			// file writing
+			const filePath = `data/${id}.json`;
+			fs.writeFile(filePath, JSON.stringify(output), (err) => {
+				if (err) {
+					throw new Error("Unexpected error: unable to write file");
+				}
+			});
 
-			// if (!folder.folder("courses")) {
-			// 	throw new Error("zip file does not contain a 'courses' folder");
-			// }
+			// metadata
+			const dataset: InsightDataset = {
+				id: id,
+				kind: kind,
+				numRows: totalRows,
+			};
 
-			// const files = Object.keys(folder.files).filter((path) => !path.endsWith("/"));
-
-			// if (files.length === 0) {
-			// 	throw new Error("'courses' folder is empty");
-			// }
-			// // *******************************************************************************************************************
-			// // instantiate InsightDataset with metadata for current dataset, add to this.datasets
-			// // *******************************************************************************************************************
-			// const dataset: InsightDataset = {
-			// 	id: id,
-			// 	kind: kind,
-			// 	numRows: files.length,
-			// };
-			// this.datasets.push(dataset);
-			// *******************************************************************************************************************
-			// NEXT: Implement a actual datastructure that we put the real contents into (data structure we can query easily)
-			// *******************************************************************************************************************
+			this.datasets.push(dataset);
 		} catch (err) {
 			throw new InsightError(`addDataset threw unexpected error: ${err}`);
 		}
 
-		// *******************************************************************************************************************
-		// return promise object that resolves into list of ids
-		// *******************************************************************************************************************
 		return this.ids;
 	}
 
