@@ -22,31 +22,9 @@ export interface ITestQuery {
 	expected: any;
 }
 
-/*
-- try hitting all the errors:
-- reject query if it is not an object type
-- add then remove something chained together
-*/
-
 describe("InsightFacade", function () {
 	let sections: string;
 	let facade: IInsightFacade;
-
-	// describe.only("Daniel's Tests", function () {
-	// 	before(async function () {
-	// 		facade = new InsightFacade();
-	// 		sections = await getContentFromArchives("pair.zip");
-	// 	});
-
-	// 	// testing add dataset makes stuff
-	// 	it("should make a new file called test.json", async function () {
-	// 		await facade.addDataset("test", sections, InsightDatasetKind.Sections);
-	// 	});
-
-	// 	it("should make a new folder called data in root and make a new file called test.json", async function () {
-	// 		await facade.removeDataset("test");
-	// 	});
-	// });
 
 	// ========== Adding to dataset tests ===================
 	describe("addDataset", function () {
@@ -688,6 +666,7 @@ describe("InsightFacade", function () {
 			const { input, expected, errorExpected } = await loadTestQuery(this.test.title);
 
 			let orderFlag = false;
+			let order = "";
 
 			if (input !== null && typeof input === "object") {
 				// only need OPTIONS in object as we're just checking if order exists in this block of code
@@ -696,6 +675,7 @@ describe("InsightFacade", function () {
 				// Check if the ORDER key exists in OPTIONS
 				if (hasOptions.OPTIONS && "ORDER" in hasOptions.OPTIONS) {
 					orderFlag = true; // Set flag to true if ORDER exists
+					order = hasOptions.OPTIONS.ORDER as string;
 				}
 			}
 
@@ -703,8 +683,12 @@ describe("InsightFacade", function () {
 				const result: InsightResult[] = await facade.performQuery(input);
 
 				if (!errorExpected) {
+					expect(result.length).to.equal(expected.length);
 					if (orderFlag === true) {
-						expect(result).to.deep.equal(expected);
+						expect(result).to.deep.members(expected);
+						for (let i = 0; i < result.length; i++) {
+							expect(result[i][order]).to.equal(expected[i][order]);
+						}
 					} else {
 						expect(result).to.deep.members(expected);
 					}
@@ -746,6 +730,7 @@ describe("InsightFacade", function () {
 		it("[invalid/query_too_big.json] Contains over 5000 results", checkQuery);
 		it("[invalid/exactly_5001.json] Contains exactly 5001 results", checkQuery);
 		it("[invalid/multi_datasets.json] query references multiple datasets", checkQuery);
+		it("[invalid/order_not_in_columns.json] order is not in columns", checkQuery);
 
 		// invalid logic operators
 		it("[invalid/logic_and.json] AND is used incorrectly", checkQuery);
