@@ -1,4 +1,11 @@
-import { IInsightFacade, InsightError, InsightDataset, InsightDatasetKind, InsightResult } from "./IInsightFacade";
+import {
+	IInsightFacade,
+	InsightError,
+	NotFoundError,
+	InsightDataset,
+	InsightDatasetKind,
+	InsightResult,
+} from "./IInsightFacade";
 import * as fs from "fs-extra";
 import { processZipContent } from "./ZipUtil";
 
@@ -189,11 +196,11 @@ function removeForbiddenCharacters(filename: string): string {
 
 export default class InsightFacade implements IInsightFacade {
 	private ids: string[];
-	private datasets: InsightDataset[];
+	private metadata: InsightDataset[];
 
 	constructor() {
 		this.ids = [];
-		this.datasets = []; // this just holds metadata. should we write actual contents into json file for persistence?
+		this.metadata = [];
 	}
 
 	public checkId(id: string): boolean {
@@ -211,40 +218,49 @@ export default class InsightFacade implements IInsightFacade {
 		return true;
 	}
 
+	public isBase64(str: string): boolean {
+		if (str === "" || str.trim() === "") {
+			return false;
+		}
+		// Check if the string only contains valid base64 characters
+		return /^[A-Za-z0-9+/]*={0,2}$/.test(str) && btoa(atob(str)) === str;
+	}
+
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		try {
-			// id validity
 			this.checkId(id);
-			this.ids.push(id);
+			if (this.ids.includes(id)) {
+				throw new InsightError("Id already exists");
+			}
 
-			// zip
+			if (kind === "rooms") {
+				throw new InsightError("Incorrect InsightDatasetKind");
+			}
+
 			const { sections, totalRows } = await processZipContent(content);
 
-			const output = {
-				sections: sections,
-			};
+			const output = { sections };
 
-			// file writing
+			await fs.promises.mkdir("data/", { recursive: true });
 			const filePath = `data/${id}.json`;
-			fs.writeFile(filePath, JSON.stringify(output), (err) => {
-				if (err) {
-					throw new Error("Unexpected error: unable to write file");
-				}
-			});
+			await fs.promises.writeFile(filePath, JSON.stringify(output));
 
-			// metadata
 			const dataset: InsightDataset = {
-				id: id,
-				kind: kind,
+				id,
+				kind,
 				numRows: totalRows,
 			};
 
-			this.datasets.push(dataset);
+			this.metadata.push(dataset);
+			this.ids.push(id);
+
+			return this.ids;
 		} catch (err) {
+			if (err instanceof InsightError) {
+				throw err;
+			}
 			throw new InsightError(`addDataset threw unexpected error: ${err}`);
 		}
-
-		return this.ids;
 	}
 
 	public async removeDataset(id: string): Promise<string> {
@@ -253,11 +269,19 @@ export default class InsightFacade implements IInsightFacade {
 			this.checkId(id);
 
 			if (!this.ids.includes(id)) {
-				throw new Error("id not found");
+				throw new NotFoundError("id not found");
 			}
+
 			await fs.remove(`data/${id}.json`);
+
+			const indexToRemove = this.ids.indexOf(id);
+			this.ids.splice(indexToRemove, 1);
 		} catch (err) {
-			throw new InsightError(`removeDataset threw unexpected error: ${err}`);
+			if (err instanceof NotFoundError) {
+				throw err;
+			} else {
+				throw new InsightError(`removeDataset threw unexpected error: ${err}`);
+			}
 		}
 
 		return id;
@@ -294,7 +318,7 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async listDatasets(): Promise<InsightDataset[]> {
-		return this.datasets;
+		return this.metadata;
 	}
 
 	/*

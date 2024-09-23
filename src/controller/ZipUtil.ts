@@ -30,10 +30,11 @@ export async function processZipContent(content: string): Promise<ProcessResult>
 }
 
 function validateZipStructure(folder: JSZip): void {
-	if (!("courses/" in folder.files)) {
+	const length = 8;
+	if (!Object.keys(folder.files)[0].slice(0, length).includes("courses/")) {
 		throw new Error("Zip file does not contain a 'courses' folder");
 	}
-	const minFiles = 2;
+	const minFiles = 1;
 	if (Object.keys(folder.files).length < minFiles) {
 		throw new Error("'courses' folder is empty");
 	}
@@ -48,10 +49,18 @@ async function processCoursesData(courseFiles: JSZip.JSZipObject[]): Promise<Pro
 		try {
 			const fileContent = await file.async("string");
 			const preSections: PreProcessedSection[] = JSON.parse(fileContent).result;
-			return preSections.filter(isValidCourseSection).map(processCourseSection);
-		} catch (error) {
-			console.error(`Failed to process file ${file.name}:`, error);
-			return [];
+			const processedSections: Section[] = [];
+
+			for (const section of preSections) {
+				if (!isValidCourseSection(section)) {
+					throw new Error(`Invalid course section in file ${file.name}`);
+				}
+				processedSections.push(processCourseSection(section));
+			}
+
+			return processedSections;
+		} catch (err) {
+			throw new Error(`Error processing file ${file.name}: ${(err as Error).message}`);
 		}
 	});
 
@@ -63,18 +72,10 @@ async function processCoursesData(courseFiles: JSZip.JSZipObject[]): Promise<Pro
 }
 
 function isValidCourseSection(section: PreProcessedSection): boolean {
-	return !!(
-		section.id &&
-		section.Course &&
-		section.Title &&
-		section.Professor &&
-		section.Subject &&
-		section.Year &&
-		section.Avg &&
-		section.Pass &&
-		section.Fail &&
-		section.Audit
-	);
+	const requiredFields = ["id", "Course", "Title", "Professor", "Subject", "Year", "Avg", "Pass", "Fail", "Audit"];
+
+	const sectionKeys = Object.keys(section);
+	return requiredFields.every((field) => sectionKeys.includes(field));
 }
 
 function processCourseSection(section: PreProcessedSection): Section {

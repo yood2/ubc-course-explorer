@@ -32,21 +32,21 @@ describe("InsightFacade", function () {
 	let sections: string;
 	let facade: IInsightFacade;
 
-	describe.only("Daniel's Tests", function () {
-		before(async function () {
-			facade = new InsightFacade();
-			sections = await getContentFromArchives("pair.zip");
-		});
+	// describe.only("Daniel's Tests", function () {
+	// 	before(async function () {
+	// 		facade = new InsightFacade();
+	// 		sections = await getContentFromArchives("pair.zip");
+	// 	});
 
-		// testing add dataset makes stuff
-		it("should make a new file called test.json", async function () {
-			await facade.addDataset("test", sections, InsightDatasetKind.Sections);
-		});
+	// 	// testing add dataset makes stuff
+	// 	it("should make a new file called test.json", async function () {
+	// 		await facade.addDataset("test", sections, InsightDatasetKind.Sections);
+	// 	});
 
-		it("should make a new folder called data in root and make a new file called test.json", async function () {
-			await facade.removeDataset("test");
-		});
-	});
+	// 	it("should make a new folder called data in root and make a new file called test.json", async function () {
+	// 		await facade.removeDataset("test");
+	// 	});
+	// });
 
 	// ========== Adding to dataset tests ===================
 	describe("addDataset", function () {
@@ -308,8 +308,8 @@ describe("InsightFacade", function () {
 			try {
 				const result: string[] = await facade.addDataset("section", sections, InsightDatasetKind.Sections);
 				expect(result).to.include("section");
-			} catch (_) {
-				expect.fail("Should not throw an error");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
 			}
 		});
 
@@ -333,50 +333,47 @@ describe("InsightFacade", function () {
 				expect(result4).to.include("section1");
 				expect(result4).to.include("section2");
 				expect(result4).to.include("section3");
-			} catch (_) {
-				expect.fail("Should not throw an error");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
 			}
 		});
 
 		it("should successfully add the same dataset after it is removed", async function () {
 			try {
-				const result1: string[] = await facade.addDataset("section0", sections, InsightDatasetKind.Sections);
-				const result2: string[] = await facade.addDataset("section1", section1, InsightDatasetKind.Sections);
-				const result3: string[] = await facade.addDataset("section2", section2, InsightDatasetKind.Sections);
-
-				await facade.removeDataset("section0");
-				await facade.removeDataset("section2");
-
-				const result4: string[] = await facade.addDataset("section2", section2, InsightDatasetKind.Sections);
-
-				const result5: string[] = await facade.addDataset("section5", sections, InsightDatasetKind.Sections);
-
 				const sizeTwo = 2;
 				const sizeThree = 3;
 
+				const result1: string[] = await facade.addDataset("section0", sections, InsightDatasetKind.Sections);
 				expect(result1.length).to.equal(1);
 				expect(result1).to.include("section0");
 
+				const result2: string[] = await facade.addDataset("section1", section1, InsightDatasetKind.Sections);
 				expect(result2.length).to.equal(sizeTwo);
 				expect(result2).to.include("section0");
 				expect(result2).to.include("section1");
 
+				const result3: string[] = await facade.addDataset("section2", section2, InsightDatasetKind.Sections);
 				expect(result3.length).to.equal(sizeThree);
 				expect(result3).to.include("section0");
 				expect(result3).to.include("section1");
 				expect(result3).to.include("section2");
 
+				await facade.removeDataset("section0");
+				await facade.removeDataset("section2");
+
+				const result4: string[] = await facade.addDataset("section2", section2, InsightDatasetKind.Sections);
 				expect(result4.length).to.equal(sizeTwo);
 				expect(result4).to.include("section1");
 				expect(result4).to.include("section2");
 				expect(result4).to.not.include("section0");
 
+				const result5: string[] = await facade.addDataset("section5", sections, InsightDatasetKind.Sections);
 				expect(result5.length).to.equal(sizeThree);
 				expect(result5).to.include("section5");
 				expect(result5).to.include("section1");
 				expect(result5).to.include("section2");
-			} catch (_) {
-				expect.fail("Should not throw an error");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
 			}
 		});
 	});
