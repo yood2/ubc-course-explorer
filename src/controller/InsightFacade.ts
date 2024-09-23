@@ -5,9 +5,11 @@ import {
 	InsightDataset,
 	InsightDatasetKind,
 	InsightResult,
+	ResultTooLargeError,
 } from "./IInsightFacade";
 import * as fs from "fs-extra";
 import { processZipContent } from "./ZipUtil";
+import { validateQuery, matchQuery, parseOptions } from "./QueryUtil";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -37,126 +39,7 @@ export interface Query {
 	};
 }
 
-const mfields: string[] = ["avg", "pass", "fail", "audit", "year"];
-const sfields: string[] = ["dept", "id", "instructor", "title", "uuid"];
-
-/**
- * Checks if columns is valid
- *
- * @param columns refers to columns field in given query
- * @throws Error if columns is not valid
- */
-function validateColumns(columns: string[]): void {
-	if (!Array.isArray(columns) || columns.some((col) => typeof col !== "string") || columns.length === 0) {
-		throw new InsightError("COLUMNS must be an array of strings and not empty.");
-	}
-
-	// make sure datasetID exists
-	const datasetID: string = columns[0].split("_")[0];
-	if (datasetID === "") {
-		throw new InsightError("Dataset ID must exist in query");
-	}
-
-	// check if COLUMNS only contains valid keys
-	columns.forEach((col) => {
-		const colParts = col.split("_");
-		const two = 2;
-
-		// make sure order has exactly one underscore
-		if (colParts.length !== two) {
-			throw new InsightError("Dataset ID can only have one underscore");
-		}
-
-		const curDatasetID: string = colParts[0];
-
-		if (datasetID !== curDatasetID) {
-			throw new InsightError("Query can only reference one dataset");
-		}
-
-		const key: string = colParts[1];
-		if (!mfields.includes(key) && !sfields.includes(key)) {
-			throw new InsightError("COLUMNS must only contain valid mfield or sfield keys");
-		}
-	});
-}
-
-/**
- * Checks if query is valid
- *
- * @param query refers to given query
- * @throws Error if query is not valid
- */
-function validateQuery(query: any): asserts query is Query {
-	// check if query exists:
-	if (query === null || typeof query !== "object") {
-		throw new InsightError("Query has to be an object!");
-	}
-
-	const input = query as Query;
-
-	// check if WHERE exists
-	if (!Object.hasOwn(input, "WHERE")) {
-		throw new InsightError("query is missing required field 'WHERE'.");
-	}
-
-	// check if OPTIONS exist
-	if (!Object.hasOwn(input, "OPTIONS")) {
-		throw new InsightError("query is missing required field 'OPTIONS'.");
-	}
-
-	// check if COLUMNS exist under OPTIONS
-	if (!Object.hasOwn(input.OPTIONS, "COLUMNS")) {
-		throw new InsightError("OPTIONS is missing required field 'COLUMNS'.");
-	}
-
-	// Check if COLUMNS is an array of strings that is NOT empty
-	const columns = input.OPTIONS.COLUMNS;
-	validateColumns(columns);
-
-	const datasetID: string = columns[0].split("_")[0];
-
-	// Check if ORDER exists, and if it does, check if it is a string
-	if ("ORDER" in input.OPTIONS) {
-		// check if order is a string
-		if (typeof input.OPTIONS.ORDER !== "string") {
-			throw new InsightError("ORDER must be a string.");
-		}
-
-		const orderParts = input.OPTIONS.ORDER.split("_");
-		const two = 2;
-
-		// make sure order has exactly one underscore
-		if (orderParts.length !== two) {
-			throw new InsightError("Dataset ID can only have one underscore");
-		}
-		const order: string = orderParts[1];
-
-		// check if order references a different dataset
-		if (datasetID !== orderParts[0]) {
-			throw new InsightError("ORDER referenced a different dataset!");
-		}
-		if (!mfields.includes(order)) {
-			// check if order is an mfield
-			throw new InsightError("ORDER must be a valid mfield key.");
-		}
-	}
-}
-
-function parseOptions(options: any): Record<string, any> {
-	const columns = options.COLUMNS as string[];
-	let order = "";
-
-	if ("ORDER" in options) {
-		order = options.ORDER as string;
-		order = order.split("_")[1];
-	}
-
-	return {
-		order: order,
-		columns: columns,
-		datasetID: columns[0].split("_")[0],
-	};
-}
+export type Where = Record<string, any>;
 
 /**
  * Reads and validates a given dataset.
@@ -164,13 +47,29 @@ function parseOptions(options: any): Record<string, any> {
  * @param datasetID containing the dataset id
  * @throws Error if JSON file is not a valid dataset.
  */
-async function loadDataset(datasetID: string): Promise<Section[]> {
+async function loadDataset(datasetID: string, order: string): Promise<Section[]> {
 	const filename = removeForbiddenCharacters(datasetID);
 	const data = await fs.readFile(`./data/${filename}.json`, "utf-8");
 	const dataset: unknown = JSON.parse(data);
 	validateDataset(dataset);
 	const datasetObject = dataset as { sections: Section[] };
-	return datasetObject.sections;
+
+	const sections = datasetObject.sections;
+
+	if (order !== "") {
+		sections.sort((a: Section, b: Section) => {
+			const fieldA = a[order as keyof Section];
+			const fieldB = b[order as keyof Section];
+
+			if (typeof fieldA === "number" && typeof fieldB === "number") {
+				return fieldA - fieldB;
+			}
+
+			throw new InsightError("order must be an mfield!");
+		});
+	}
+
+	return sections;
 }
 
 function validateDataset(dataset: any): asserts dataset is object {
@@ -183,6 +82,16 @@ function validateDataset(dataset: any): asserts dataset is object {
 	if (!Array.isArray(dataset.sections)) {
 		throw new Error("ValidationError: sections under dataset must be an array.");
 	}
+}
+
+function makeAttribute(datasetID: string, keys: string[], section: Section): InsightResult {
+	const attribute: InsightResult = {};
+
+	keys.forEach((key) => {
+		attribute[datasetID + "_" + key] = section[key as keyof Section];
+	});
+
+	return attribute;
 }
 
 // Removes all forbidden characters for a filename from the string
@@ -296,22 +205,34 @@ export default class InsightFacade implements IInsightFacade {
 		const result: InsightResult[] = [];
 
 		const options = parseOptions(input.OPTIONS);
-		// const order = options.order;
+		const order = options.order;
 		const columns = options.columns;
 		const keys: string[] = columns.map((col: string) => col.split("_")[1]);
 		const datasetID = options.datasetID;
 
-		const sections: Section[] = await loadDataset(datasetID);
+		const sections: Section[] = await loadDataset(datasetID, order);
 
 		// base case when WHERE is empty
 		if (Object.keys(input.WHERE).length === 0) {
 			sections.forEach((section) => {
-				const attribute: InsightResult = {};
-				keys.forEach((key) => {
-					attribute[datasetID + "_" + key] = section[key as keyof Section];
-				});
-				result.push(attribute);
+				result.push(makeAttribute(datasetID, keys, section));
 			});
+			return result;
+		}
+
+		const where: Where = input.WHERE as Where;
+
+		// need to filter attributes
+		sections.forEach((section) => {
+			if (matchQuery(where, section, datasetID)) {
+				result.push(makeAttribute(datasetID, keys, section));
+			}
+		});
+
+		const max = 5000;
+
+		if (result.length > max) {
+			throw new ResultTooLargeError("Result can not be over 5000");
 		}
 
 		return result;
@@ -320,10 +241,4 @@ export default class InsightFacade implements IInsightFacade {
 	public async listDatasets(): Promise<InsightDataset[]> {
 		return this.metadata;
 	}
-
-	/*
-		Todos:
-			- if order exists, first sort sections before adding to result
-			- get some EBNF logic working
-	*/
 }
