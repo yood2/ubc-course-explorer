@@ -10,6 +10,7 @@ import {
 import * as fs from "fs-extra";
 import { processZipContent } from "./ZipUtil";
 import { validateQuery, matchQuery, parseOptions } from "./QueryUtil";
+import { addMetadata, readMetadata, removeMetadata } from "./MetaUtil";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -105,11 +106,9 @@ function removeForbiddenCharacters(filename: string): string {
 
 export default class InsightFacade implements IInsightFacade {
 	private ids: string[];
-	private metadata: InsightDataset[];
 
 	constructor() {
 		this.ids = [];
-		this.metadata = [];
 	}
 
 	public checkId(id: string): boolean {
@@ -155,12 +154,12 @@ export default class InsightFacade implements IInsightFacade {
 			await fs.promises.writeFile(filePath, JSON.stringify(output));
 
 			const dataset: InsightDataset = {
-				id,
-				kind,
+				id: id,
+				kind: kind,
 				numRows: totalRows,
 			};
 
-			this.metadata.push(dataset);
+			await addMetadata(dataset);
 			this.ids.push(id);
 
 			return this.ids;
@@ -182,7 +181,7 @@ export default class InsightFacade implements IInsightFacade {
 			}
 
 			await fs.remove(`data/${id}.json`);
-
+			await removeMetadata(id);
 			const indexToRemove = this.ids.indexOf(id);
 			this.ids.splice(indexToRemove, 1);
 		} catch (err) {
@@ -239,6 +238,6 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async listDatasets(): Promise<InsightDataset[]> {
-		return this.metadata;
+		return readMetadata();
 	}
 }

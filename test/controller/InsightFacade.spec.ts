@@ -525,8 +525,8 @@ describe("InsightFacade", function () {
 				listResults = await facade.listDatasets();
 				expect(listResults.length).to.be.equal(0);
 				expect(listResults).to.not.deep.include(ds1);
-			} catch (_) {
-				expect.fail("Should not throw an error");
+			} catch (err) {
+				expect.fail(`Unexpected error: ${(err as Error).message}`);
 			}
 		});
 
