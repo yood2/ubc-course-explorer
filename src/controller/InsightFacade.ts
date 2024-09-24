@@ -10,7 +10,7 @@ import {
 import * as fs from "fs-extra";
 import { processZipContent } from "./ZipUtil";
 import { validateQuery, matchQuery, parseOptions } from "./QueryUtil";
-import { addMetadata, readMetadata, removeMetadata } from "./MetaUtil";
+import { addMetadata, readMetadata, removeMetadata, getIds } from "./MetaUtil";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -105,12 +105,6 @@ function removeForbiddenCharacters(filename: string): string {
 }
 
 export default class InsightFacade implements IInsightFacade {
-	private ids: string[];
-
-	constructor() {
-		this.ids = [];
-	}
-
 	public checkId(id: string): boolean {
 		// id validity checks
 		id = removeForbiddenCharacters(id);
@@ -137,7 +131,8 @@ export default class InsightFacade implements IInsightFacade {
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		try {
 			this.checkId(id);
-			if (this.ids.includes(id)) {
+			const ids = await getIds();
+			if (ids.includes(id)) {
 				throw new InsightError("Id already exists");
 			}
 
@@ -160,15 +155,20 @@ export default class InsightFacade implements IInsightFacade {
 			};
 
 			await addMetadata(dataset);
-			this.ids.push(id);
-
-			return this.ids;
 		} catch (err) {
 			if (err instanceof InsightError) {
 				throw err;
 			}
 			throw new InsightError(`addDataset threw unexpected error: ${err}`);
 		}
+		const metaData = await readMetadata();
+		const result: string[] = [];
+
+		for (const data of metaData) {
+			result.push(data.id);
+		}
+
+		return result;
 	}
 
 	public async removeDataset(id: string): Promise<string> {
@@ -176,14 +176,14 @@ export default class InsightFacade implements IInsightFacade {
 			// id validity checks
 			this.checkId(id);
 
-			if (!this.ids.includes(id)) {
+			const ids = await getIds();
+
+			if (!ids.includes(id)) {
 				throw new NotFoundError("id not found");
 			}
 
 			await fs.remove(`data/${id}.json`);
 			await removeMetadata(id);
-			const indexToRemove = this.ids.indexOf(id);
-			this.ids.splice(indexToRemove, 1);
 		} catch (err) {
 			if (err instanceof NotFoundError) {
 				throw err;

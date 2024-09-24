@@ -33,6 +33,19 @@ export async function readMetadata(): Promise<InsightDataset[]> {
 	}
 }
 
+export async function getIds(): Promise<string[]> {
+	try {
+		const data = await readMetadata();
+		const result: string[] = [];
+		for (const d of data) {
+			result.push(d.id);
+		}
+		return result;
+	} catch (err) {
+		throw new Error(`Error reading metadata: ${(err as Error).message}`);
+	}
+}
+
 async function writeMetadata(data: InsightDataset[]): Promise<void> {
 	await ensureDataDirectoryExists();
 
