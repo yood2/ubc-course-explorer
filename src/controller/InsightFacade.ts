@@ -10,7 +10,7 @@ import {
 import * as fs from "fs-extra";
 import { processZipContent } from "./ZipUtil";
 import { validateQuery, matchQuery, parseOptions } from "./QueryUtil";
-import { addMetadata, readMetadata, removeMetadata, getIds, removeId } from "./MetaUtil";
+import { addMetadata, readMetadata, removeMetadata, getIds } from "./MetaUtil";
 
 /**
  * This is the main programmatic entry point for the project.
@@ -183,7 +183,7 @@ export default class InsightFacade implements IInsightFacade {
 			}
 
 			await fs.remove(`data/${id}.json`);
-			await removeId(id);
+			await removeMetadata(id);
 		} catch (err) {
 			if (err instanceof NotFoundError) {
 				throw err;
