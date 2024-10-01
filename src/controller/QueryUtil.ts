@@ -118,9 +118,10 @@ export function validateQuery(query: any): asserts query is Query {
 		if (datasetID !== orderParts[0]) {
 			throw new InsightError("ORDER referenced a different dataset!");
 		}
-		if (!mfields.includes(order)) {
-			// check if order is an mfield
-			throw new InsightError("ORDER must be a valid mfield key.");
+
+		// check if order is a valid field
+		if (!mfields.includes(order) && !sfields.includes(order)) {
+			throw new InsightError("ORDER must be a valid field.");
 		}
 	}
 }
