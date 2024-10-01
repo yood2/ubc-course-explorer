@@ -715,6 +715,7 @@ describe("InsightFacade", function () {
 		it("[valid/simple.json] SELECT dept, avg WHERE avg > 97", checkQuery);
 		it("[valid/complex_example.json] Query containing all the filters", checkQuery);
 		it("[valid/simple_unordered.json] Same as simple but unordered", checkQuery);
+		it("[valid/order_string.json] Same as simple but order by string (dept)", checkQuery);
 
 		it("[valid/second_dataset.json] references second dataset", checkQuery);
 		it("[valid/exactly_4999.json] Contains exactly 4999 results", checkQuery);
