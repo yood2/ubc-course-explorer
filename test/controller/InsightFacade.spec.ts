@@ -13,6 +13,9 @@ import { clearDisk, getContentFromArchives, loadTestQuery } from "../TestUtil";
 import { expect, use } from "chai";
 import chaiAsPromised from "chai-as-promised";
 
+import DanielTest from "./DanielTest";
+import AlexTest from "./AlexTest";
+
 use(chaiAsPromised);
 
 export interface ITestQuery {
@@ -25,6 +28,9 @@ export interface ITestQuery {
 describe("InsightFacade", function () {
 	let sections: string;
 	let facade: IInsightFacade;
+
+	describe("Daniel's Tests", DanielTest());
+	describe("Alex's Tests", AlexTest());
 
 	// ========== Adding to dataset tests ===================
 	describe("addDataset", function () {
