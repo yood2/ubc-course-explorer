@@ -1,0 +1,13 @@
+{
+	"title": "Dataset ID is blank in columns",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"sections_audit": 2
+			}
+		},
+		"OPTIONS": { "COLUMNS": [""] }
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

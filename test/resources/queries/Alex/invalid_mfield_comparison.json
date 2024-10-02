@@ -1,0 +1,16 @@
+{
+	"title": "invalid mfield comparison",
+	"input": {
+		"WHERE": {
+			"GUY": {
+				"sections_avg": 97
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept"],
+			"ORDER": "sections_dept"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

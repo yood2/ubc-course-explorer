@@ -68,6 +68,10 @@ async function loadDataset(datasetID: string, order: string): Promise<Section[]>
 				return fieldA - fieldB;
 			}
 
+			if (typeof fieldA === "string" && typeof fieldB === "string") {
+				return fieldA.localeCompare(fieldB);
+			}
+
 			throw new InsightError("order must be an mfield!");
 		});
 	}

@@ -37,7 +37,7 @@ function validateColumns(columns: string[]): void {
 	// make sure datasetID exists
 	const datasetID: string = columns[0].split("_")[0];
 	if (datasetID === "") {
-		throw new InsightError("Dataset ID must exist in query");
+		throw new InsightError("Dataset ID must exist in columns");
 	}
 
 	// check if COLUMNS only contains valid keys
@@ -118,9 +118,10 @@ export function validateQuery(query: any): asserts query is Query {
 		if (datasetID !== orderParts[0]) {
 			throw new InsightError("ORDER referenced a different dataset!");
 		}
-		if (!mfields.includes(order)) {
-			// check if order is an mfield
-			throw new InsightError("ORDER must be a valid mfield key.");
+
+		// check if order is a valid field
+		if (!mfields.includes(order) && !sfields.includes(order)) {
+			throw new InsightError("ORDER must be a valid field.");
 		}
 	}
 }
@@ -136,9 +137,9 @@ function getKey(baseKey: string, datasetID: string): string {
 		throw new InsightError("invalid key in comparison, contains more than one underscore");
 	}
 
-	// check if order references a different dataset
+	// check if key references a different dataset
 	if (datasetID !== keyParts[0]) {
-		throw new InsightError("SComparison referenced a different dataset!");
+		throw new InsightError("key referenced a different dataset!");
 	}
 
 	return keyParts[1];
@@ -215,7 +216,7 @@ function wildCardComparison(filterValue: string, sectionValue: string): boolean 
 	// 2 asterixes
 	const three = 3;
 	if (filterValue.length < three) {
-		throw new InsightError("The filter can't just be a single asterix!");
+		throw new InsightError("The filter can't be just 2 asterixes!");
 	}
 	if (beginning !== "" || end !== "") {
 		throw new InsightError("The filter can only have an asterix at the start or end of the string");
@@ -230,10 +231,6 @@ function wildCardComparison(filterValue: string, sectionValue: string): boolean 
 function SComparison(where: Where, section: Section, datasetID: string): boolean {
 	const filterKey = Object.keys(where)[0];
 	const filter = where[filterKey];
-
-	if (filterKey !== "IS") {
-		throw new InsightError("SComparison can only be 'IS'");
-	}
 
 	const key = getKey(Object.keys(filter)[0], datasetID);
 	if (!sfields.includes(key)) {

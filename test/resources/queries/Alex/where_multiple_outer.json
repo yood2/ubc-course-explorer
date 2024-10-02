@@ -1,0 +1,19 @@
+{
+	"title": "WHERE contains multiple outer objects",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_dept": "cpsc"
+			},
+			"GT": {
+				"sections_avg": 93
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept"],
+			"ORDER": "sections_dept"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

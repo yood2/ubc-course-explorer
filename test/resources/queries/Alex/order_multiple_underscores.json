@@ -1,0 +1,16 @@
+{
+	"title": "order contains multiple underscores",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"sections_avg": 97
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept"],
+			"ORDER": "sections_2_dept"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

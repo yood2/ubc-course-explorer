@@ -1,0 +1,13 @@
+{
+	"title": "Invalid field in columns",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"sections_audit": 2
+			}
+		},
+		"OPTIONS": { "COLUMNS": ["sections_2_audit"] }
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

@@ -27,6 +27,7 @@ describe("InsightFacade", function () {
 	let sections: string;
 	let facade: IInsightFacade;
 
+
 	describe("metaData", function () {
 		before(async function () {
 			await clearDisk();
@@ -103,6 +104,8 @@ describe("InsightFacade", function () {
 			}
 		});
 	});
+
+
 
 	// ========== Adding to dataset tests ===================
 	describe("addDataset", function () {
@@ -814,6 +817,7 @@ describe("InsightFacade", function () {
 		it("[valid/simple.json] SELECT dept, avg WHERE avg > 97", checkQuery);
 		it("[valid/complex_example.json] Query containing all the filters", checkQuery);
 		it("[valid/simple_unordered.json] Same as simple but unordered", checkQuery);
+		it("[valid/order_string.json] Same as simple but order by string (dept)", checkQuery);
 
 		it("[valid/second_dataset.json] references second dataset", checkQuery);
 		it("[valid/exactly_4999.json] Contains exactly 4999 results", checkQuery);
@@ -848,7 +852,7 @@ describe("InsightFacade", function () {
 		it("[invalid/field_wrong.json] COMPARISON using invalid field", checkQuery);
 		it("[invalid/comparison_wrong.json] COMPARISON has typo", checkQuery);
 
-		//invalid mfields
+		// invalid mfields
 		it("[invalid/mfield_audit.json] audit taking wrong type", checkQuery);
 		it("[invalid/mfield_avg.json] avg taking wrong type", checkQuery);
 		it("[invalid/mfield_fail.json] fail taking wrong type", checkQuery);
@@ -867,6 +871,7 @@ describe("InsightFacade", function () {
 		it("[invalid/too_many_asterixes.json] Wild card containing too many asterixes", checkQuery);
 		it("[invalid/asterix_in_middle.json] Wild card containing asterix in the middle", checkQuery);
 		it("[invalid/asterix_in_front_and_middle.json] Wild card containing asterix in the front and middle", checkQuery);
+		it("[invalid/just_two_asterixes.json] Wild card containing just 2 asterixes", checkQuery);
 
 		// not an object error
 		it("[invalid/not_an_object.json] This is not an object", async function () {
@@ -877,5 +882,21 @@ describe("InsightFacade", function () {
 				expect(err).to.be.instanceOf(InsightError);
 			}
 		});
+
+		// column errors
+		it("[Alex/blank_dataset_id_columns.json] Wild card containing just asterixes", checkQuery);
+		it("[Alex/dataset_id_underscores_columns.json] Dataset ID contains multiple underscores in columns", checkQuery);
+		it("[Alex/invalid_field_columns.json] Invalid field in columns", checkQuery);
+
+		// order errors
+		it("[Alex/order_not_a_string.json] order is not a string", checkQuery);
+		it("[Alex/order_multiple_underscores.json] order contains multiple underscores", checkQuery);
+		it("[Alex/order_second_dataset.json] order references another dataset", checkQuery);
+		it("[Alex/order_invalid_field.json] order contains an invalid field", checkQuery);
+
+		it("[Alex/invalid_mfield_comparison.json] invalid mfield comparison", checkQuery);
+		it("[Alex/second_dataset_key.json] mfield references second dataset", checkQuery);
+		it("[Alex/where_multiple_outer.json] WHERE contains multiple outer objects", checkQuery);
+		it("[Alex/no_valid_list_filters.json] no valid list filters", checkQuery);
 	});
 });
