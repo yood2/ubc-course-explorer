@@ -749,18 +749,23 @@ describe("InsightFacade", function () {
 			const section3: string = await getContentFromArchives("one_section.zip");
 			facade = new InsightFacade();
 
-			const loadDatasetPromises: Promise<string[]>[] = [
-				facade.addDataset("sections", sections, InsightDatasetKind.Sections),
-				facade.addDataset("section1", section1, InsightDatasetKind.Sections),
-				facade.addDataset("section2", section2, InsightDatasetKind.Sections),
-				facade.addDataset("section3", section3, InsightDatasetKind.Sections),
-			];
+			// const loadDatasetPromises: Promise<string[]>[] = [
+			// 	facade.addDataset("sections", sections, InsightDatasetKind.Sections),
+			// 	facade.addDataset("section1", section1, InsightDatasetKind.Sections),
+			// 	facade.addDataset("section2", section2, InsightDatasetKind.Sections),
+			// 	facade.addDataset("section3", section3, InsightDatasetKind.Sections),
+			// ];
 
-			try {
-				await Promise.all(loadDatasetPromises);
-			} catch (err) {
-				throw new Error(`In PerformQuery Before hook, dataset(s) failed to be added. \n${err}`);
-			}
+			// try {
+			// 	await Promise.all(loadDatasetPromises);
+			// } catch (err) {
+			// 	throw new Error(`In PerformQuery Before hook, dataset(s) failed to be added. \n${err}`);
+			// }
+
+			await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
+			await facade.addDataset("section1", section1, InsightDatasetKind.Sections);
+			await facade.addDataset("section2", section2, InsightDatasetKind.Sections);
+			await facade.addDataset("section3", section3, InsightDatasetKind.Sections);
 		});
 
 		after(async function () {
