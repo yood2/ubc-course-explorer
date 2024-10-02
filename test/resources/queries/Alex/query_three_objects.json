@@ -1,0 +1,19 @@
+{
+	"title": "query has three objects",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_dept": "cpsc"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept"],
+			"ORDER": "sections_dept"
+		},
+		"SHOULDFAIL": {
+			"ISHOULDFAIL": 82
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

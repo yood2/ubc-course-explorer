@@ -32,10 +32,14 @@ describe("InsightFacade", function () {
 			await clearDisk();
 		});
 
+		after(async function () {
+			await clearDisk();
+		});
+
 		it("should return empty array if reading nothing", async function () {
 			await clearDisk();
 			const data: InsightDataset[] = await readMetadata();
-			expect(data).to.equal([]);
+			expect(data).to.deep.equal([]);
 		});
 
 		it("should add metadata", async function () {
@@ -118,6 +122,10 @@ describe("InsightFacade", function () {
 		beforeEach(async function () {
 			await clearDisk();
 			facade = new InsightFacade();
+		});
+
+		after(async function () {
+			await clearDisk();
 		});
 
 		// Should reject tests
@@ -470,6 +478,10 @@ describe("InsightFacade", function () {
 			facade = new InsightFacade();
 		});
 
+		after(async function () {
+			await clearDisk();
+		});
+
 		it("should reject dataset remove with an empty dataset id", async function () {
 			try {
 				await facade.removeDataset("");
@@ -591,6 +603,10 @@ describe("InsightFacade", function () {
 		beforeEach(async function () {
 			await clearDisk();
 			facade = new InsightFacade();
+		});
+
+		after(async function () {
+			await clearDisk();
 		});
 
 		it("should successfully list one dataset", async function () {
@@ -727,7 +743,6 @@ describe("InsightFacade", function () {
 		before(async function () {
 			// Add the datasets to InsightFacade once.
 			// Will *fail* if there is a problem reading ANY dataset.
-			await clearDisk();
 			sections = await getContentFromArchives("pair.zip");
 			const section1: string = await getContentFromArchives("one_course.zip");
 			const section2: string = await getContentFromArchives("two_courses.zip");
@@ -894,5 +909,13 @@ describe("InsightFacade", function () {
 		it("[Alex/second_dataset_key.json] mfield references second dataset", checkQuery);
 		it("[Alex/where_multiple_outer.json] WHERE contains multiple outer objects", checkQuery);
 		it("[Alex/no_valid_list_filters.json] no valid list filters", checkQuery);
+
+		it("[Alex/multiple_filters.json] Sfield should only have 1 filter", checkQuery);
+		it("[Alex/query_three_objects.json] query has three objects", checkQuery);
+		it("[Alex/where_array.json] where is an array", checkQuery);
+		it("[Alex/where_null.json] where is null", checkQuery);
+		it("[Alex/options_three_objects.json] OPTIONS contains three objects", checkQuery);
+		it("[Alex/options_two_objects.json] OPTIONS contains two objects but no order", checkQuery);
+		it("[Alex/field_not_object.json] field not an object", checkQuery);
 	});
 });

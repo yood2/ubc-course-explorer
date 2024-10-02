@@ -1,0 +1,12 @@
+{
+	"title": "where is an array",
+	"input": {
+		"WHERE": [],
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept"],
+			"ORDER": "sections_dept"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

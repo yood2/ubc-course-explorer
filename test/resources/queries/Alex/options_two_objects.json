@@ -1,0 +1,12 @@
+{
+	"title": "OPTIONS contains two objects but no order",
+	"input": {
+		"WHERE": {},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept"],
+			"FAIL": "SHOULD_FAIL"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
