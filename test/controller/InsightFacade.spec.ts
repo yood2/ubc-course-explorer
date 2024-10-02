@@ -219,7 +219,6 @@ describe("InsightFacade", function () {
 				await facade.addDataset("sections", noCourses, InsightDatasetKind.Sections);
 				expect.fail("Should have thrown an error.");
 			} catch (err) {
-				console.log((err as Error).message);
 				expect(err).to.be.instanceOf(InsightError);
 			}
 		});
