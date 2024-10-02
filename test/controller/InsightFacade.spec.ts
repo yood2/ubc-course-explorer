@@ -9,6 +9,7 @@ import {
 } from "../../src/controller/IInsightFacade";
 import InsightFacade from "../../src/controller/InsightFacade";
 import { clearDisk, getContentFromArchives, loadTestQuery } from "../TestUtil";
+import { getIds, readMetadata, addMetadata, removeMetadata } from "../../src/controller/MetaUtil";
 
 import { expect, use } from "chai";
 import chaiAsPromised from "chai-as-promised";
@@ -25,6 +26,83 @@ export interface ITestQuery {
 describe("InsightFacade", function () {
 	let sections: string;
 	let facade: IInsightFacade;
+
+	describe("metaData", function () {
+		before(async function () {
+			await clearDisk();
+		});
+
+		it("should return empty array if reading nothing", async function () {
+			await clearDisk();
+			const data: InsightDataset[] = await readMetadata();
+			expect(data).to.equal([]);
+		});
+
+		it("should add metadata", async function () {
+			try {
+				const data: InsightDataset = {
+					id: "one",
+					kind: InsightDatasetKind.Sections,
+					numRows: 1,
+				};
+				const result = await addMetadata(data);
+				expect(result);
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		it("should get ids", async function () {
+			try {
+				const ids: string[] = await getIds();
+				expect("one" in ids);
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		it("should read metadata", async function () {
+			try {
+				const data: InsightDataset[] = await readMetadata();
+				const firstMeta: InsightDataset = data[0];
+				expect(firstMeta.id).to.equal("one");
+				expect(firstMeta.kind).to.equal(InsightDatasetKind.Sections);
+				expect(firstMeta.numRows).to.equal(1);
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		it("should add more metadata", async function () {
+			try {
+				const numberOfRows = 100;
+				const data: InsightDataset = {
+					id: "two",
+					kind: InsightDatasetKind.Sections,
+					numRows: numberOfRows,
+				};
+				const result = await addMetadata(data);
+				expect(result);
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		it("should remove metadata", async function () {
+			try {
+				const result = await removeMetadata("one");
+				expect(result);
+				const data: InsightDataset[] = await readMetadata();
+				const firstMeta: InsightDataset = data[0];
+				expect(firstMeta.id).to.equal("two");
+				expect(firstMeta.kind).to.equal(InsightDatasetKind.Sections);
+				const hundred = 100;
+				expect(firstMeta.numRows).to.equal(hundred);
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+	});
 
 	// ========== Adding to dataset tests ===================
 	describe("addDataset", function () {

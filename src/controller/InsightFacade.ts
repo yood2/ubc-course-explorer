@@ -122,13 +122,13 @@ export default class InsightFacade implements IInsightFacade {
 		return true;
 	}
 
-	// public isBase64(str: string): boolean {
-	// 	if (str === "" || str.trim() === "") {
-	// 		return false;
-	// 	}
-	// 	// Check if the string only contains valid base64 characters
-	// 	return /^[A-Za-z0-9+/]*={0,2}$/.test(str) && btoa(atob(str)) === str;
-	// }
+	public isBase64(str: string): boolean {
+		if (str === "" || str.trim() === "") {
+			return false;
+		}
+		// Check if the string only contains valid base64 characters
+		return /^[A-Za-z0-9+/]*={0,2}$/.test(str) && btoa(atob(str)) === str;
+	}
 
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		try {
