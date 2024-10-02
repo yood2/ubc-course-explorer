@@ -1,0 +1,13 @@
+{
+	"title": "OPTIONS contains three objects",
+	"input": {
+		"WHERE": {},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept"],
+			"ORDER": "sections_dept",
+			"FAIL": "SHOULD_FAIL"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

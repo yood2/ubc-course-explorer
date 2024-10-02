@@ -29,7 +29,13 @@ export function parseOptions(options: any): Record<string, any> {
  * @param columns refers to columns field in given query
  * @throws Error if columns is not valid
  */
-function validateColumns(columns: string[]): void {
+function validateColumns(input: any): void {
+	if (!Object.hasOwn(input.OPTIONS, "COLUMNS")) {
+		throw new InsightError("OPTIONS is missing required field 'COLUMNS'.");
+	}
+
+	const columns = input.OPTIONS.COLUMNS;
+
 	if (!Array.isArray(columns) || columns.some((col) => typeof col !== "string") || columns.length === 0) {
 		throw new InsightError("COLUMNS must be an array of strings and not empty.");
 	}
@@ -64,6 +70,50 @@ function validateColumns(columns: string[]): void {
 }
 
 /**
+ * Checks if where is valid
+ *
+ * @param where refers to where field in given query
+ * @throws Error if where is not valid
+ */
+function validateWhere(input: Query): void {
+	if (
+		!Object.hasOwn(input, "WHERE") ||
+		typeof input.WHERE !== "object" ||
+		Array.isArray(input.WHERE) ||
+		input.WHERE === null
+	) {
+		throw new InsightError("'WHERE' is invalid or missing.");
+	}
+
+	// validate where has at most one outer filter
+	if (Object.keys(input.WHERE).length > 1) {
+		throw new InsightError("Where has more than one filter!");
+	}
+}
+
+/**
+ * Checks if options is valid
+ *
+ * @param options refers to options field in given query
+ * @throws Error if options is not valid
+ */
+function validateOptions(input: Query): void {
+	const two = 2;
+
+	if (!Object.hasOwn(input, "OPTIONS")) {
+		throw new InsightError("query is missing required field 'OPTIONS'.");
+	}
+
+	if ("ORDER" in input.OPTIONS) {
+		if (Object.keys(input.OPTIONS).length !== two) {
+			throw new InsightError("'OPTIONS' contains too many objects");
+		}
+	} else if (Object.keys(input.OPTIONS).length !== 1) {
+		throw new InsightError("'OPTIONS' contains too many objects");
+	}
+}
+
+/**
  * Checks if query is valid
  *
  * @param query refers to given query
@@ -71,31 +121,22 @@ function validateColumns(columns: string[]): void {
  */
 export function validateQuery(query: any): asserts query is Query {
 	// check if query exists:
+	const two = 2;
+
 	if (query === null || typeof query !== "object") {
 		throw new InsightError("Query has to be an object!");
 	}
 
+	if (Object.keys(query).length !== two) {
+		throw new InsightError("Query should only contain WHERE and OPTIONS!");
+	}
+
 	const input = query as Query;
+	validateWhere(input);
+	validateOptions(input);
+	validateColumns(input);
 
-	// check if WHERE exists
-	if (!Object.hasOwn(input, "WHERE")) {
-		throw new InsightError("query is missing required field 'WHERE'.");
-	}
-
-	// check if OPTIONS exist
-	if (!Object.hasOwn(input, "OPTIONS")) {
-		throw new InsightError("query is missing required field 'OPTIONS'.");
-	}
-
-	// check if COLUMNS exist under OPTIONS
-	if (!Object.hasOwn(input.OPTIONS, "COLUMNS")) {
-		throw new InsightError("OPTIONS is missing required field 'COLUMNS'.");
-	}
-
-	// Check if COLUMNS is an array of strings that is NOT empty
 	const columns = input.OPTIONS.COLUMNS;
-	validateColumns(columns);
-
 	const datasetID: string = columns[0].split("_")[0];
 
 	// Check if ORDER exists, and if it does, check if it is a string
@@ -106,7 +147,6 @@ export function validateQuery(query: any): asserts query is Query {
 		}
 
 		const orderParts = input.OPTIONS.ORDER.split("_");
-		const two = 2;
 
 		// make sure order has exactly one underscore
 		if (orderParts.length !== two) {
@@ -151,7 +191,7 @@ function MComparison(where: Where, section: Section, datasetID: string): boolean
 
 	const key = getKey(Object.keys(filter)[0], datasetID);
 	if (!mfields.includes(key)) {
-		throw new InsightError("SComparison contains an invalid sfield");
+		throw new InsightError("MComparison contains an invalid sfield");
 	}
 
 	const sectionValue = section[key as keyof Section];
@@ -259,7 +299,7 @@ function matchSingleObject(where: Where, section: Section, datasetID: string): b
 	const filter = where[filterKey];
 
 	if (Object.keys(filter).length !== 1) {
-		throw new InsightError("Where can only have one outer filter");
+		throw new InsightError("filter can only have one outer filter");
 	}
 
 	// If Negation, call matchQuery
@@ -277,11 +317,6 @@ function matchSingleObject(where: Where, section: Section, datasetID: string): b
 }
 
 export function matchQuery(where: Where, section: Section, datasetID: string): boolean {
-	// validate where only has one outer object
-	if (Object.keys(where).length !== 1) {
-		throw new InsightError("Where can only have one outer filter");
-	}
-
 	const filterKey = Object.keys(where)[0];
 	const filter = where[filterKey];
 

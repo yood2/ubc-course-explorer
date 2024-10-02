@@ -1,0 +1,17 @@
+{
+	"title": "Sfield should only have 1 filter",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_dept": "cpsc",
+				"sections_instructor": "fail!"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept"],
+			"ORDER": "sections_dept"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
