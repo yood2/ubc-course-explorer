@@ -1,0 +1,13 @@
+{
+	"title": "Dataset ID contains multiple underscores in columns",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"sections_audit": 2
+			}
+		},
+		"OPTIONS": { "COLUMNS": ["sections_audits"] }
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

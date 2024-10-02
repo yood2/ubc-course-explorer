@@ -1,0 +1,16 @@
+{
+	"title": "mfield references second dataset",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"sections2_avg": 97
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept"],
+			"ORDER": "sections_dept"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

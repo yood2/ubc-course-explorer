@@ -1,0 +1,16 @@
+{
+	"title": "order contains an invalid field",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"sections_avg": 97
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept"],
+			"ORDER": "sections_joe"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
