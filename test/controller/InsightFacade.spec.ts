@@ -27,7 +27,6 @@ describe("InsightFacade", function () {
 	let sections: string;
 	let facade: IInsightFacade;
 
-
 	describe("metaData", function () {
 		before(async function () {
 			await clearDisk();
@@ -104,8 +103,6 @@ describe("InsightFacade", function () {
 			}
 		});
 	});
-
-
 
 	// ========== Adding to dataset tests ===================
 	describe("addDataset", function () {
