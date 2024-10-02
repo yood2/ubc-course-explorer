@@ -29,13 +29,16 @@ export async function processZipContent(content: string): Promise<ProcessResult>
 	return processCoursesData(courseFiles);
 }
 
-function validateZipStructure(folder: JSZip): void {
-	const length = 8;
-	if (!Object.keys(folder.files)[0].slice(0, length).includes("courses/")) {
+function validateZipStructure(zip: JSZip): void {
+	const hasCourseFolder = Object.keys(zip.files).some((filename) => filename.startsWith("courses/"));
+	if (!hasCourseFolder) {
 		throw new Error("Zip file does not contain a 'courses' folder");
 	}
-	const minFiles = 1;
-	if (Object.keys(folder.files).length < minFiles) {
+
+	const coursesContent = Object.keys(zip.files).filter(
+		(filename) => filename.startsWith("courses/") && filename !== "courses/"
+	);
+	if (coursesContent.length === 0) {
 		throw new Error("'courses' folder is empty");
 	}
 }

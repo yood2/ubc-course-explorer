@@ -13,9 +13,6 @@ import { clearDisk, getContentFromArchives, loadTestQuery } from "../TestUtil";
 import { expect, use } from "chai";
 import chaiAsPromised from "chai-as-promised";
 
-import DanielTest from "./DanielTest";
-import AlexTest from "./AlexTest";
-
 use(chaiAsPromised);
 
 export interface ITestQuery {
@@ -28,9 +25,6 @@ export interface ITestQuery {
 describe("InsightFacade", function () {
 	let sections: string;
 	let facade: IInsightFacade;
-
-	describe("Daniel's Tests", DanielTest());
-	describe("Alex's Tests", AlexTest());
 
 	// ========== Adding to dataset tests ===================
 	describe("addDataset", function () {
@@ -147,6 +141,17 @@ describe("InsightFacade", function () {
 				await facade.addDataset("sections", noCourses, InsightDatasetKind.Sections);
 				expect.fail("Should have thrown an error.");
 			} catch (err) {
+				console.log((err as Error).message);
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("should reject a dataset add without a courses folder", async function () {
+			try {
+				const noCourses = await getContentFromArchives("no_courses_folder.zip");
+				await facade.addDataset("sections", noCourses, InsightDatasetKind.Sections);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
 				expect(err).to.be.instanceOf(InsightError);
 			}
 		});
@@ -213,6 +218,16 @@ describe("InsightFacade", function () {
 		it("should reject a dataset add with content not containing any valid sections", async function () {
 			try {
 				const noValidSections = await getContentFromArchives("no_valid_sections.zip");
+				await facade.addDataset("sections", noValidSections, InsightDatasetKind.Sections);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("should reject a dataset add with empty courses folder", async function () {
+			try {
+				const noValidSections = await getContentFromArchives("empty_courses_folder.zip");
 				await facade.addDataset("sections", noValidSections, InsightDatasetKind.Sections);
 				expect.fail("Should have thrown an error.");
 			} catch (err) {
