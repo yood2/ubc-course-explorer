@@ -1,0 +1,16 @@
+{
+	"title": "order references another dataset",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"sections_avg": 97
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept"],
+			"ORDER": "sections2_dept"
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
