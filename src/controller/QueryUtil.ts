@@ -227,10 +227,12 @@ function wildCardComparison(filterValue: string, sectionValue: string): boolean 
 	const beginning = wildcards[0];
 	const end = wildcards.at(-1);
 
+	// > 2 asterixes
 	if (wildcards.length - 1 > two) {
-		throw new InsightError("Can only have ");
+		throw new InsightError("Can only have at most 2 asterixes");
 	}
 
+	// 1 asterix
 	if (wildcards.length - 1 === 1) {
 		if (filterValue.length === 1) {
 			// any string works
@@ -254,10 +256,6 @@ function wildCardComparison(filterValue: string, sectionValue: string): boolean 
 	}
 
 	// 2 asterixes
-	const three = 3;
-	if (filterValue.length < three) {
-		throw new InsightError("The filter can't be just 2 asterixes!");
-	}
 	if (beginning !== "" || end !== "") {
 		throw new InsightError("The filter can only have an asterix at the start or end of the string");
 	}
