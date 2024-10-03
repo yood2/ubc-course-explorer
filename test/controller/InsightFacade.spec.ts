@@ -776,6 +776,7 @@ describe("InsightFacade", function () {
 		it("[valid/exactly_5000.json] Contains exactly 5000 results", checkQuery);
 
 		it("[valid/only_asterix.json] Wild card containing just one asterix", checkQuery);
+		it("[valid/two_asterixes.json] Just 2 asterixes", checkQuery);
 
 		// invalid queries
 		it("[invalid/missing_columns.json] query missing COLUMNS", checkQuery);
@@ -823,7 +824,7 @@ describe("InsightFacade", function () {
 		it("[invalid/too_many_asterixes.json] Wild card containing too many asterixes", checkQuery);
 		it("[invalid/asterix_in_middle.json] Wild card containing asterix in the middle", checkQuery);
 		it("[invalid/asterix_in_front_and_middle.json] Wild card containing asterix in the front and middle", checkQuery);
-		it("[invalid/just_two_asterixes.json] Wild card containing just 2 asterixes", checkQuery);
+		it("[invalid/just_three_asterixes.json] Wild card containing just 3 asterixes", checkQuery);
 
 		// not an object error
 		it("[invalid/not_an_object.json] This is not an object", async function () {

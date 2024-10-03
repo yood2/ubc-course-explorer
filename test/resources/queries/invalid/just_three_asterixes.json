@@ -1,9 +1,9 @@
 {
-	"title": "Wild card containing asterix in the front and middle",
+	"title": "Wild card containing just 3 asterixes",
 	"input": {
 		"WHERE": {
 			"IS": {
-				"sections_dept": "**"
+				"sections_dept": "***"
 			}
 		},
 		"OPTIONS": {
