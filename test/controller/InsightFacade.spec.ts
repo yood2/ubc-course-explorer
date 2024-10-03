@@ -315,6 +315,24 @@ describe("InsightFacade", function () {
 			}
 		});
 
+		it("should successfuly add a dataset with a forbidden character", async function () {
+			try {
+				const result: string[] = await facade.addDataset("section<", sections, InsightDatasetKind.Sections);
+				expect(result).to.include("section<");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		it("should successfuly add a dataset with a single forbidden character", async function () {
+			try {
+				const result: string[] = await facade.addDataset("?", sections, InsightDatasetKind.Sections);
+				expect(result).to.include("?");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
 		it("should successfully add multiple datasets", async function () {
 			try {
 				const result1: string[] = await facade.addDataset("section0", sections, InsightDatasetKind.Sections);

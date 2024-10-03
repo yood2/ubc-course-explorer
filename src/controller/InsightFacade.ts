@@ -51,6 +51,10 @@ export type Where = Record<string, any>;
  * @throws Error if JSON file is not a valid dataset.
  */
 async function loadDataset(datasetID: string, order: string): Promise<Section[]> {
+	// if (datasetID in InsightFacade.Sections) {
+	// 	return InsightFacade.Sections[datasetID];
+	// }
+
 	const filename = removeForbiddenCharacters(datasetID);
 	const data = await fs.readFile(`./data/${filename}.json`, "utf-8");
 	const dataset: unknown = JSON.parse(data);
@@ -110,10 +114,17 @@ function removeForbiddenCharacters(filename: string): string {
 	return filename.replace(forbiddenChars, "");
 }
 
+function checkKind(kind: InsightDatasetKind): void {
+	if (kind === "rooms") {
+		throw new InsightError("Incorrect InsightDatasetKind");
+	}
+}
+
 export default class InsightFacade implements IInsightFacade {
+	// public static Sections: Record<string, Section[]> = {};
+
 	public checkId(id: string): boolean {
 		// id validity checks
-		id = removeForbiddenCharacters(id);
 		if (id.length === 0) {
 			throw new Error("empty id");
 		}
@@ -142,16 +153,16 @@ export default class InsightFacade implements IInsightFacade {
 				throw new InsightError("Id already exists");
 			}
 
-			if (kind === "rooms") {
-				throw new InsightError("Incorrect InsightDatasetKind");
-			}
+			checkKind(kind);
 
 			const { sections, totalRows } = await processZipContent(content);
 
 			const output = { sections };
+			// InsightFacade.Sections[id] = output.sections;
 
+			const fileID = removeForbiddenCharacters(id);
 			await fs.promises.mkdir("data/", { recursive: true });
-			const filePath = `data/${id}.json`;
+			const filePath = `data/${fileID}.json`;
 			await fs.promises.writeFile(filePath, JSON.stringify(output));
 
 			const dataset: InsightDataset = {
@@ -188,8 +199,11 @@ export default class InsightFacade implements IInsightFacade {
 				throw new NotFoundError("id not found");
 			}
 
-			await fs.remove(`data/${id}.json`);
+			const fileID = removeForbiddenCharacters(id);
+			await fs.remove(`data/${fileID}.json`);
 			await removeMetadata(id);
+
+			// delete InsightFacade.Sections[id];
 		} catch (err) {
 			if (err instanceof NotFoundError) {
 				throw err;
