@@ -773,7 +773,27 @@ describe("InsightFacade", function () {
 			}
 		}
 
+		/**
+		 * MORE TESTS????
+		 * - adding a empty dataset???? then querying it???
+		 * - addDataset with ids that are very long but still valid
+		 * - addDataset with id that contain special characters (but not underscores)
+		 *
+		 * - maximum nesting depth???
+		 * - ordering a field with many duplicate values?
+		 * - ordering when dataset is exactly at 5000 results
+		 * - wildcard queries that match zero results
+		 * - wildcard queries that match all results
+		 * - test case sensitivity in wildcard queries
+		 * - query with empty WHERE clause but complex OPTIONS
+		 * - query that has complex WHERE but minimal OPTIONS
+		 * - valid JSON but wrong query structure
+		 * - queries that are almost valid but have syntax errors
+		 * - queries with duplicate keys in WHERE or OPTIONS clauses
+		 */
+
 		it("[Daniel/empty_nested_filters.json] Nested filters have empty value", checkQuery);
+		it("[Daniel/deeply_nested_filters.json] Query with deeply nested filters", checkQuery);
 		it("[Daniel/empty_not_filter.json] NOT filter empty", checkQuery);
 		it("[Daniel/empty_comparison.json] Comparison is empty", checkQuery);
 

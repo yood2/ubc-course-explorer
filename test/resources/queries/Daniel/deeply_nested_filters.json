@@ -1,0 +1,117 @@
+{
+	"title": "deeply nested filters",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"OR": [
+						{
+							"AND": [{ "GT": { "sections_avg": 90 } }, { "LT": { "sections_avg": 92 } }]
+						},
+						{
+							"AND": [
+								{ "GT": { "sections_avg": 95 } },
+								{ "LT": { "sections_avg": 97 } },
+								{
+									"NOT": {
+										"OR": [{ "IS": { "sections_dept": "CPSC" } }, { "IS": { "sections_dept": "MATH" } }]
+									}
+								}
+							]
+						}
+					]
+				},
+				{
+					"OR": [
+						{
+							"AND": [
+								{ "GT": { "sections_year": 2015 } },
+								{ "LT": { "sections_year": 2018 } },
+								{ "IS": { "sections_instructor": "*smith*" } }
+							]
+						},
+						{
+							"AND": [
+								{ "GT": { "sections_pass": 50 } },
+								{ "LT": { "sections_pass": 100 } },
+								{ "GT": { "sections_fail": 0 } },
+								{ "LT": { "sections_fail": 5 } }
+							]
+						}
+					]
+				},
+				{
+					"NOT": {
+						"OR": [
+							{ "EQ": { "sections_year": 2019 } },
+							{
+								"AND": [
+									{ "GT": { "sections_audit": 0 } },
+									{ "LT": { "sections_audit": 3 } },
+									{ "GT": { "sections_avg": 70 } },
+									{ "LT": { "sections_avg": 75 } }
+								]
+							}
+						]
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept", "sections_id", "sections_avg", "sections_instructor", "sections_year"],
+			"ORDER": "sections_avg"
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"sections_dept": "etec",
+			"sections_id": "511",
+			"sections_avg": 90.08,
+			"sections_instructor": "",
+			"sections_year": 1900
+		},
+		{
+			"sections_dept": "cnps",
+			"sections_id": "363",
+			"sections_avg": 90.33,
+			"sections_instructor": "bruno, talino",
+			"sections_year": 2014
+		},
+		{
+			"sections_dept": "cnps",
+			"sections_id": "363",
+			"sections_avg": 90.37,
+			"sections_instructor": "bruno, talino",
+			"sections_year": 2014
+		},
+		{
+			"sections_dept": "epse",
+			"sections_id": "449",
+			"sections_avg": 90.59,
+			"sections_instructor": "el khatib, lara",
+			"sections_year": 2016
+		},
+		{
+			"sections_dept": "etec",
+			"sections_id": "511",
+			"sections_avg": 90.9,
+			"sections_instructor": "",
+			"sections_year": 1900
+		},
+		{
+			"sections_dept": "epse",
+			"sections_id": "449",
+			"sections_avg": 90.9,
+			"sections_instructor": "",
+			"sections_year": 1900
+		},
+		{
+			"sections_dept": "epse",
+			"sections_id": "406",
+			"sections_avg": 90.93,
+			"sections_instructor": "el khatib, lara",
+			"sections_year": 2014
+		}
+	]
+}
