@@ -780,6 +780,7 @@ describe("InsightFacade", function () {
 		 * - performQuery() has empty GT comparison (should be invalid)
 		 */
 		it("[Daniel/empty_nested_filters.json] Match all entries", checkQuery);
+		it("[Daniel/empty_not_filter.json] Match all entries", checkQuery);
 
 		// valid queries
 		it("[valid/match_all.json] Match all entries", checkQuery);
