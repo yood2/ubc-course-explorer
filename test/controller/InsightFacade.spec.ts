@@ -28,6 +28,12 @@ describe("InsightFacade", function () {
 
 	// ========== Adding to dataset tests ===================
 	describe("addDataset", function () {
+		/**
+		 * ADD CASES FOR:
+		 * - addDataset() but file has no results array (should be invalid)
+		 * - addDataset() that has all required fields BUT empty values (should be valid)
+		 */
+
 		let section1: string;
 		let section2: string;
 

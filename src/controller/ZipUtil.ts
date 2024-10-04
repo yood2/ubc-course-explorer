@@ -78,22 +78,20 @@ async function processCoursesData(courseFiles: JSZip.JSZipObject[]): Promise<Pro
 
 function isValidCourseSection(section: PreProcessedSection): boolean {
 	const requiredFields = ["id", "Course", "Title", "Professor", "Subject", "Year", "Avg", "Pass", "Fail", "Audit"];
-
-	const sectionKeys = Object.keys(section);
-	return requiredFields.every((field) => sectionKeys.includes(field));
+	return requiredFields.every((field) => field in section);
 }
 
 function processCourseSection(section: PreProcessedSection): Section {
 	return {
 		uuid: section.id.toString(),
-		id: section.Course,
-		title: section.Title,
-		instructor: section.Professor,
-		dept: section.Subject,
-		year: parseInt(section.Year, 10),
-		avg: parseFloat(section.Avg),
-		pass: parseInt(section.Pass, 10),
-		fail: parseInt(section.Fail, 10),
-		audit: parseInt(section.Audit, 10),
+		id: section.Course || "",
+		title: section.Title || "",
+		instructor: section.Professor || "",
+		dept: section.Subject || "",
+		year: parseInt(section.Year, 10) || 0,
+		avg: parseFloat(section.Avg) || 0,
+		pass: parseInt(section.Pass, 10) || 0,
+		fail: parseInt(section.Fail, 10) || 0,
+		audit: parseInt(section.Audit, 10) || 0,
 	};
 }
