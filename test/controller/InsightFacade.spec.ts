@@ -32,6 +32,9 @@ describe("InsightFacade", function () {
 		 * ADD CASES FOR:
 		 * - addDataset() but file has no results array (should be invalid)
 		 * - addDataset() that has all required fields BUT empty values (should be valid)
+		 * - performQuery() that has empty nested filters (should be invalid)
+		 * - performQuery() that has empty NOT filter (should be invalid)
+		 * - performQuery() has empty GT comparison
 		 */
 
 		let section1: string;
@@ -52,7 +55,15 @@ describe("InsightFacade", function () {
 			await clearDisk();
 		});
 
-		// Should reject tests
+		it.only("should reject dataset add with no results array", async function () {
+			try {
+				const invalidStructure = await getContentFromArchives("no_results_array.zip");
+				await facade.addDataset("section", invalidStructure, InsightDatasetKind.Sections);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
 		it("should reject dataset add with an empty dataset id", async function () {
 			try {
 				await facade.addDataset("", sections, InsightDatasetKind.Sections);
