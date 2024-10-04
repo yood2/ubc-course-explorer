@@ -2,7 +2,7 @@
 	"title": "nested filters that are empty",
 	"input": {
 		"WHERE": {
-			"AND": []
+			"OR": [{ "AND": [] }]
 		},
 		"OPTIONS": {
 			"COLUMNS": ["sections_dept", "sections_avg"]

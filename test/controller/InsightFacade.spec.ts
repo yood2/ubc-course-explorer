@@ -773,15 +773,9 @@ describe("InsightFacade", function () {
 			}
 		}
 
-		/**
-		 * ADD CASES FOR:
-		 * - performQuery() that has empty nested filters (should be invalid)
-		 * - performQuery() that has empty NOT filter (should be invalid)
-		 * - performQuery() has empty GT comparison (should be invalid)
-		 */
-		it("[Daniel/empty_nested_filters.json] Match all entries", checkQuery);
-		it("[Daniel/empty_not_filter.json] Match all entries", checkQuery);
-		it("[Daniel/empty_comparison.json] Match all entries", checkQuery);
+		it("[Daniel/empty_nested_filters.json] Nested filters have empty value", checkQuery);
+		it("[Daniel/empty_not_filter.json] NOT filter empty", checkQuery);
+		it("[Daniel/empty_comparison.json] Comparison is empty", checkQuery);
 
 		// valid queries
 		it("[valid/match_all.json] Match all entries", checkQuery);
