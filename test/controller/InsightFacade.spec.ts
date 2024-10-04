@@ -46,7 +46,16 @@ describe("InsightFacade", function () {
 			await clearDisk();
 		});
 
-		// Should reject tests
+		it("should accept dataset add with required fields with empty values", async function () {
+			try {
+				const validStructure = await getContentFromArchives("required_fields_empty_values.zip");
+				const result = await facade.addDataset("sections", validStructure, InsightDatasetKind.Sections);
+				expect(result).to.include("sections");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
 		it("should reject dataset add with an empty dataset id", async function () {
 			try {
 				await facade.addDataset("", sections, InsightDatasetKind.Sections);
@@ -763,6 +772,27 @@ describe("InsightFacade", function () {
 				}
 			}
 		}
+
+		/**
+		 * MORE TESTS????
+		 * - adding a empty dataset???? then querying it???
+		 * - addDataset with ids that are very long but still valid
+		 * - addDataset with id that contain special characters (but not underscores)
+		 *
+		 * - query with empty WHERE clause but complex OPTIONS
+		 * - query that has complex WHERE but minimal OPTIONS
+		 * - valid JSON but wrong query structure
+		 * - queries that are almost valid but have syntax errors
+		 * - queries with duplicate keys in WHERE or OPTIONS clauses
+		 */
+
+		it("[Daniel/empty_nested_filters.json] Nested filters have empty value", checkQuery);
+		it("[Daniel/deeply_nested_filters.json] Query with deeply nested filters", checkQuery);
+		it("[Daniel/empty_not_filter.json] NOT filter empty", checkQuery);
+		it("[Daniel/empty_comparison.json] Comparison is empty", checkQuery);
+		it("[Daniel/query_every_column.json] Query with all columns in options", checkQuery);
+		it("[Daniel/field_with_duplicates.json] Query with many duplicate values", checkQuery);
+		it("[Daniel/wildcard_with_no_match.json] Wildcard with no matches", checkQuery);
 
 		// valid queries
 		it("[valid/match_all.json] Match all entries", checkQuery);

@@ -1,0 +1,15 @@
+{
+	"title": "wildcard with no matches",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_dept": "NONEXISTENT*"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept", "sections_id"]
+		}
+	},
+	"errorExpected": false,
+	"expected": []
+}

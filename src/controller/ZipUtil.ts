@@ -12,6 +12,7 @@ interface PreProcessedSection {
 	Pass: string;
 	Fail: string;
 	Audit: string;
+	Section: string;
 }
 
 interface ProcessResult {
@@ -51,6 +52,9 @@ async function processCoursesData(courseFiles: JSZip.JSZipObject[]): Promise<Pro
 	const fileProcessingPromises = courseFiles.map(async (file) => {
 		try {
 			const fileContent = await file.async("string");
+			if (!("result" in JSON.parse(fileContent))) {
+				throw new Error("No results array");
+			}
 			const preSections: PreProcessedSection[] = JSON.parse(fileContent).result;
 			const processedSections: Section[] = [];
 
@@ -60,7 +64,6 @@ async function processCoursesData(courseFiles: JSZip.JSZipObject[]): Promise<Pro
 				}
 				processedSections.push(processCourseSection(section));
 			}
-
 			return processedSections;
 		} catch (err) {
 			throw new Error(`Error processing file ${file.name}: ${(err as Error).message}`);
@@ -76,22 +79,30 @@ async function processCoursesData(courseFiles: JSZip.JSZipObject[]): Promise<Pro
 
 function isValidCourseSection(section: PreProcessedSection): boolean {
 	const requiredFields = ["id", "Course", "Title", "Professor", "Subject", "Year", "Avg", "Pass", "Fail", "Audit"];
-
-	const sectionKeys = Object.keys(section);
-	return requiredFields.every((field) => sectionKeys.includes(field));
+	return requiredFields.every((field) => field in section);
 }
 
 function processCourseSection(section: PreProcessedSection): Section {
+	const isOverall = section.Section === "overall";
+	const defaultYear = 1900;
 	return {
 		uuid: section.id.toString(),
-		id: section.Course,
-		title: section.Title,
-		instructor: section.Professor,
-		dept: section.Subject,
-		year: parseInt(section.Year, 10),
-		avg: parseFloat(section.Avg),
-		pass: parseInt(section.Pass, 10),
-		fail: parseInt(section.Fail, 10),
-		audit: parseInt(section.Audit, 10),
+		id: section.Course || "",
+		title: section.Title || "",
+		instructor: section.Professor || "",
+		dept: section.Subject || "",
+		year: isOverall ? defaultYear : parseYear(section.Year),
+		avg: parseFloat(section.Avg) || 0,
+		pass: parseInt(section.Pass, 10) || 0,
+		fail: parseInt(section.Fail, 10) || 0,
+		audit: parseInt(section.Audit, 10) || 0,
 	};
+}
+
+function parseYear(year: string): number {
+	const defaultYear = 1900;
+	if (year === "" || isNaN(parseInt(year, 10))) {
+		return defaultYear; // Default year if empty or invalid
+	}
+	return parseInt(year, 10);
 }
