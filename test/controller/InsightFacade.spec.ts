@@ -779,11 +779,6 @@ describe("InsightFacade", function () {
 		 * - addDataset with ids that are very long but still valid
 		 * - addDataset with id that contain special characters (but not underscores)
 		 *
-		 * - ordering a field with many duplicate values?
-		 * - ordering when dataset is exactly at 5000 results
-		 * - wildcard queries that match zero results
-		 * - wildcard queries that match all results
-		 * - test case sensitivity in wildcard queries
 		 * - query with empty WHERE clause but complex OPTIONS
 		 * - query that has complex WHERE but minimal OPTIONS
 		 * - valid JSON but wrong query structure
@@ -796,6 +791,8 @@ describe("InsightFacade", function () {
 		it("[Daniel/empty_not_filter.json] NOT filter empty", checkQuery);
 		it("[Daniel/empty_comparison.json] Comparison is empty", checkQuery);
 		it("[Daniel/query_every_column.json] Query with all columns in options", checkQuery);
+		it("[Daniel/field_with_duplicates.json] Query with many duplicate values", checkQuery);
+		it("[Daniel/wildcard_with_no_match.json] Wildcard with no matches", checkQuery);
 
 		// valid queries
 		it("[valid/match_all.json] Match all entries", checkQuery);
