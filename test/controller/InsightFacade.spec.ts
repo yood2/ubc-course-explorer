@@ -773,19 +773,6 @@ describe("InsightFacade", function () {
 			}
 		}
 
-		/**
-		 * MORE TESTS????
-		 * - adding a empty dataset???? then querying it???
-		 * - addDataset with ids that are very long but still valid
-		 * - addDataset with id that contain special characters (but not underscores)
-		 *
-		 * - query with empty WHERE clause but complex OPTIONS
-		 * - query that has complex WHERE but minimal OPTIONS
-		 * - valid JSON but wrong query structure
-		 * - queries that are almost valid but have syntax errors
-		 * - queries with duplicate keys in WHERE or OPTIONS clauses
-		 */
-
 		it("[Daniel/empty_nested_filters.json] Nested filters have empty value", checkQuery);
 		it("[Daniel/deeply_nested_filters.json] Query with deeply nested filters", checkQuery);
 		it("[Daniel/empty_not_filter.json] NOT filter empty", checkQuery);
@@ -793,6 +780,15 @@ describe("InsightFacade", function () {
 		it("[Daniel/query_every_column.json] Query with all columns in options", checkQuery);
 		it("[Daniel/field_with_duplicates.json] Query with many duplicate values", checkQuery);
 		it("[Daniel/wildcard_with_no_match.json] Wildcard with no matches", checkQuery);
+		it("[Daniel/case_in_field.json] Case sensitivity with fields", checkQuery);
+		it("[Daniel/invalid_comparison_operator.json] Invalid comparison operator", checkQuery);
+		it("[Daniel/and_or_same_level.json] And or same level", checkQuery);
+		it("[Daniel/valid_nesting_not.json] valid nesting of not", checkQuery);
+		it("[Daniel/invalid_numeric_comparison_value.json] invalid numeric comparison value", checkQuery);
+		it("[Daniel/invalid_string_comparison_value.json] invalid string comparison value", checkQuery);
+		it("[Daniel/empty_array_comparison.json] empty array in logical comparison", checkQuery);
+		it("[Daniel/invalid_key_where.json] invalid key in WHERE", checkQuery);
+		it("[Daniel/missing_id_query.json] missing id in query keyE", checkQuery);
 
 		// valid queries
 		it("[valid/match_all.json] Match all entries", checkQuery);
