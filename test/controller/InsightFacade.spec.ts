@@ -30,7 +30,6 @@ describe("InsightFacade", function () {
 	describe("addDataset", function () {
 		/**
 		 * ADD CASES FOR:
-		 * - addDataset() but file has no results array (should be invalid)
 		 * - addDataset() that has all required fields BUT empty values (should be valid)
 		 * - performQuery() that has empty nested filters (should be invalid)
 		 * - performQuery() that has empty NOT filter (should be invalid)
@@ -55,12 +54,13 @@ describe("InsightFacade", function () {
 			await clearDisk();
 		});
 
-		it.only("should reject dataset add with no results array", async function () {
+		it.only("should accept dataset add with required fields with empty values", async function () {
 			try {
-				const invalidStructure = await getContentFromArchives("no_results_array.zip");
-				await facade.addDataset("section", invalidStructure, InsightDatasetKind.Sections);
+				const validStructure = await getContentFromArchives("required_fields_empty_values.zip");
+				const result = await facade.addDataset("sections", validStructure, InsightDatasetKind.Sections);
+				expect(result).to.include("sections");
 			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
 			}
 		});
 
