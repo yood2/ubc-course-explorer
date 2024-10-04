@@ -1,0 +1,15 @@
+{
+	"title": "missing id in filter key",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"avg": 90
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["dept", "avg"]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

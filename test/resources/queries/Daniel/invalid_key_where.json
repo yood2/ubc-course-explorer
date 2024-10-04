@@ -1,0 +1,15 @@
+{
+	"title": "invalid key in WHERE",
+	"input": {
+		"WHERE": {
+			"INVALID_KEY": {
+				"sections_avg": 90
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept", "sections_avg"]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
