@@ -51,6 +51,9 @@ async function processCoursesData(courseFiles: JSZip.JSZipObject[]): Promise<Pro
 	const fileProcessingPromises = courseFiles.map(async (file) => {
 		try {
 			const fileContent = await file.async("string");
+			if (!("result" in JSON.parse(fileContent))) {
+				throw new Error("No results array");
+			}
 			const preSections: PreProcessedSection[] = JSON.parse(fileContent).result;
 			const processedSections: Section[] = [];
 
@@ -60,7 +63,6 @@ async function processCoursesData(courseFiles: JSZip.JSZipObject[]): Promise<Pro
 				}
 				processedSections.push(processCourseSection(section));
 			}
-
 			return processedSections;
 		} catch (err) {
 			throw new Error(`Error processing file ${file.name}: ${(err as Error).message}`);
