@@ -12,6 +12,7 @@ interface PreProcessedSection {
 	Pass: string;
 	Fail: string;
 	Audit: string;
+	Section: string;
 }
 
 interface ProcessResult {
@@ -82,13 +83,15 @@ function isValidCourseSection(section: PreProcessedSection): boolean {
 }
 
 function processCourseSection(section: PreProcessedSection): Section {
+	const isOverall = section.Section === "overall";
+	const defaultYear = 1900;
 	return {
 		uuid: section.id.toString(),
 		id: section.Course || "",
 		title: section.Title || "",
 		instructor: section.Professor || "",
 		dept: section.Subject || "",
-		year: parseYear(section.Year),
+		year: isOverall ? defaultYear : parseYear(section.Year),
 		avg: parseFloat(section.Avg) || 0,
 		pass: parseInt(section.Pass, 10) || 0,
 		fail: parseInt(section.Fail, 10) || 0,
