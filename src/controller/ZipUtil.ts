@@ -88,10 +88,10 @@ function processCourseSection(section: PreProcessedSection): Section {
 		title: section.Title || "",
 		instructor: section.Professor || "",
 		dept: section.Subject || "",
-		year: parseInt(section.Year, 10) || 0,
-		avg: parseFloat(section.Avg) || 0,
-		pass: parseInt(section.Pass, 10) || 0,
-		fail: parseInt(section.Fail, 10) || 0,
-		audit: parseInt(section.Audit, 10) || 0,
+		year: parseInt(section.Year, 10) || -1,
+		avg: parseFloat(section.Avg) || -1,
+		pass: parseInt(section.Pass, 10) || -1,
+		fail: parseInt(section.Fail, 10) || -1,
+		audit: parseInt(section.Audit, 10) || -1,
 	};
 }
