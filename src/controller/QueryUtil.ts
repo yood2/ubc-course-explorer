@@ -278,6 +278,10 @@ function SComparison(where: Where, section: Section, datasetID: string): boolean
 	const filterValue = filter[Object.keys(filter)[0]];
 	const sectionValue = section[key as keyof Section];
 
+	if (typeof filterValue !== "string") {
+		throw new InsightError(`${filterKey} must be a string!`);
+	}
+
 	if (!filterValue.includes("*")) {
 		return filterValue === sectionValue;
 	}
