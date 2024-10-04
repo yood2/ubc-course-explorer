@@ -28,14 +28,6 @@ describe("InsightFacade", function () {
 
 	// ========== Adding to dataset tests ===================
 	describe("addDataset", function () {
-		/**
-		 * ADD CASES FOR:
-		 * - addDataset() that has all required fields BUT empty values (should be valid)
-		 * - performQuery() that has empty nested filters (should be invalid)
-		 * - performQuery() that has empty NOT filter (should be invalid)
-		 * - performQuery() has empty GT comparison
-		 */
-
 		let section1: string;
 		let section2: string;
 
@@ -54,7 +46,7 @@ describe("InsightFacade", function () {
 			await clearDisk();
 		});
 
-		it.only("should accept dataset add with required fields with empty values", async function () {
+		it("should accept dataset add with required fields with empty values", async function () {
 			try {
 				const validStructure = await getContentFromArchives("required_fields_empty_values.zip");
 				const result = await facade.addDataset("sections", validStructure, InsightDatasetKind.Sections);
@@ -780,6 +772,14 @@ describe("InsightFacade", function () {
 				}
 			}
 		}
+
+		/**
+		 * ADD CASES FOR:
+		 * - performQuery() that has empty nested filters (should be invalid)
+		 * - performQuery() that has empty NOT filter (should be invalid)
+		 * - performQuery() has empty GT comparison (should be invalid)
+		 */
+		it("[Daniel/empty_nested_filters.json] Match all entries", checkQuery);
 
 		// valid queries
 		it("[valid/match_all.json] Match all entries", checkQuery);
