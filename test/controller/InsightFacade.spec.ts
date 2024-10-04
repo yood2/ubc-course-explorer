@@ -779,7 +779,6 @@ describe("InsightFacade", function () {
 		 * - addDataset with ids that are very long but still valid
 		 * - addDataset with id that contain special characters (but not underscores)
 		 *
-		 * - maximum nesting depth???
 		 * - ordering a field with many duplicate values?
 		 * - ordering when dataset is exactly at 5000 results
 		 * - wildcard queries that match zero results
@@ -796,6 +795,7 @@ describe("InsightFacade", function () {
 		it("[Daniel/deeply_nested_filters.json] Query with deeply nested filters", checkQuery);
 		it("[Daniel/empty_not_filter.json] NOT filter empty", checkQuery);
 		it("[Daniel/empty_comparison.json] Comparison is empty", checkQuery);
+		it("[Daniel/query_every_column.json] Query with all columns in options", checkQuery);
 
 		// valid queries
 		it("[valid/match_all.json] Match all entries", checkQuery);
