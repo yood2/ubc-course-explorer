@@ -12,15 +12,9 @@ import { Section, Query, Where } from "./InsightFacade.types";
 import * as fs from "fs-extra";
 import { processZipContent } from "../utils/zip-utils";
 import { validateQuery, matchQuery, parseOptions } from "../utils/query-utils";
-import { addMetadata, readMetadata, removeMetadata, getIds } from "../utils/persistence-utils";
-import {
-	loadDataset,
-	makeAttribute,
-	removeForbiddenCharacters,
-	checkKind,
-	checkId,
-	checkBase64,
-} from "../utils/insight-utils";
+import { addMetadata, readMetadata, removeMetadata, getIds } from "../utils/metadata-utils";
+import { loadDataset, makeAttribute, removeForbiddenCharacters } from "../utils/insight-utils";
+import { checkKind, checkId, checkBase64 } from "../utils/validation-utils";
 
 /**
  * Reads and validates a given dataset.
@@ -34,8 +28,9 @@ export default class InsightFacade implements IInsightFacade {
 
 	/**
 	 * Adds a new dataset into the InsightFacade.
-	 * Checks id, checks content, checks kind.
-	 *
+	 * 1. Checks id, checks content, checks kind.
+	 * 2. Confirms data directions, writes file to path.
+	 * 3. Adds meta data to internal model
 	 *
 	 * @param id - id for dataset to add
 	 * @param content - base64 of content to be added
@@ -84,30 +79,38 @@ export default class InsightFacade implements IInsightFacade {
 		return result;
 	}
 
+	/**
+	 * Removes dataset from InsightFacade given a id
+	 * 1. Check id exists in InsightFacade
+	 * 2. Remove dataset with same fileId
+	 *
+	 * @param id - id of dataset to be removed
+	 * @returns - Promise that resolves to the id of the dataset that was removed
+	 */
 	public async removeDataset(id: string): Promise<string> {
 		try {
-			// id validity checks
+			// Check id
 			checkId(id);
-
 			const ids = await getIds();
-
 			if (!ids.includes(id)) {
 				throw new NotFoundError("id not found");
 			}
 
-			const fileID = removeForbiddenCharacters(id);
-			await fs.remove(`data/${fileID}.json`);
-			await removeMetadata(id);
+			// Find fileId and remove file from local
+			const fileId = removeForbiddenCharacters(id);
+			await fs.remove(`data/${fileId}.json`);
 
-			// delete InsightFacade.Sections[id];
+			// Remove metadata from InsightFacade
+			await removeMetadata(id);
 		} catch (err) {
 			if (err instanceof NotFoundError) {
-				throw err;
+				throw new NotFoundError(`removeDataset threw unexpected error: ${err.message}`);
 			} else {
 				throw new InsightError(`removeDataset threw unexpected error: ${err}`);
 			}
 		}
 
+		// Return id of removed dataset
 		return id;
 	}
 
@@ -153,6 +156,11 @@ export default class InsightFacade implements IInsightFacade {
 		return result;
 	}
 
+	/**
+	 * List all datasets added to InsightFacade
+	 *
+	 * @returns - InsightDataset[] with all datasets added
+	 */
 	public async listDatasets(): Promise<InsightDataset[]> {
 		return readMetadata();
 	}
