@@ -1,4 +1,4 @@
-import { InsightDataset } from "./IInsightFacade";
+import { InsightDataset } from "../controller/IInsightFacade";
 import * as fs from "fs-extra";
 import * as path from "path";
 

@@ -1,5 +1,5 @@
 import JSZip = require("jszip");
-import { Section } from "./InsightFacade";
+import { Section } from "../controller/InsightFacade.types";
 
 interface PreProcessedSection {
 	id: string;
