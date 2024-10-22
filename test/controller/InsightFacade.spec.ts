@@ -32,9 +32,9 @@ describe("InsightFacade", function () {
 		let section2: string;
 
 		before(async function () {
-			sections = await getContentFromArchives("three_courses.zip");
-			section1 = await getContentFromArchives("one_course.zip");
-			section2 = await getContentFromArchives("two_courses.zip");
+			sections = await getContentFromArchives("sections/three_courses.zip");
+			section1 = await getContentFromArchives("sections/one_course.zip");
+			section2 = await getContentFromArchives("sections/two_courses.zip");
 		});
 
 		beforeEach(async function () {
@@ -48,7 +48,7 @@ describe("InsightFacade", function () {
 
 		it("should accept dataset add with required fields with empty values", async function () {
 			try {
-				const validStructure = await getContentFromArchives("required_fields_empty_values.zip");
+				const validStructure = await getContentFromArchives("sections/required_fields_empty_values.zip");
 				const result = await facade.addDataset("sections", validStructure, InsightDatasetKind.Sections);
 				expect(result).to.include("sections");
 			} catch (err) {
@@ -140,7 +140,7 @@ describe("InsightFacade", function () {
 
 		it("should reject a dataset add with invalid folder structure", async function () {
 			try {
-				const invalidStructure = await getContentFromArchives("invalid_folder_structure.zip");
+				const invalidStructure = await getContentFromArchives("sections/invalid_folder_structure.zip");
 				await facade.addDataset("sections", invalidStructure, InsightDatasetKind.Sections);
 				expect.fail("Should have thrown an error.");
 			} catch (err) {
@@ -150,7 +150,7 @@ describe("InsightFacade", function () {
 
 		it("should reject a dataset add without any courses", async function () {
 			try {
-				const noCourses = await getContentFromArchives("no_courses.zip");
+				const noCourses = await getContentFromArchives("sections/no_courses.zip");
 				await facade.addDataset("sections", noCourses, InsightDatasetKind.Sections);
 				expect.fail("Should have thrown an error.");
 			} catch (err) {
@@ -160,7 +160,7 @@ describe("InsightFacade", function () {
 
 		it("should reject a dataset add without a courses folder", async function () {
 			try {
-				const noCourses = await getContentFromArchives("no_courses_folder.zip");
+				const noCourses = await getContentFromArchives("sections/no_courses_folder.zip");
 				await facade.addDataset("sections", noCourses, InsightDatasetKind.Sections);
 				expect.fail("Should have thrown an error.");
 			} catch (err) {
@@ -170,7 +170,7 @@ describe("InsightFacade", function () {
 
 		it("should reject a dataset add where sections isn't stored under result", async function () {
 			try {
-				const Results = await getContentFromArchives("not_stored_in_result.zip");
+				const Results = await getContentFromArchives("sections/not_stored_in_result.zip");
 				await facade.addDataset("sections", Results, InsightDatasetKind.Sections);
 				expect.fail("Should have thrown an error.");
 			} catch (err) {
@@ -180,7 +180,7 @@ describe("InsightFacade", function () {
 
 		it("should reject a dataset add where the folder is coursing instead of courses", async function () {
 			try {
-				const Results = await getContentFromArchives("coursing.zip");
+				const Results = await getContentFromArchives("sections/coursing.zip");
 				await facade.addDataset("sections", Results, InsightDatasetKind.Sections);
 				expect.fail("Should have thrown an error.");
 			} catch (err) {
@@ -190,7 +190,7 @@ describe("InsightFacade", function () {
 
 		it("should reject a dataset add where the course is not in the proper json format", async function () {
 			try {
-				const Results = await getContentFromArchives("improper_json.zip");
+				const Results = await getContentFromArchives("sections/improper_json.zip");
 				await facade.addDataset("sections", Results, InsightDatasetKind.Sections);
 				expect.fail("Should have thrown an error.");
 			} catch (err) {
@@ -198,18 +198,19 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		it("should reject a dataset add when kind isn't sections", async function () {
-			try {
-				await facade.addDataset("section", sections, InsightDatasetKind.Rooms);
-				expect.fail("Should have thrown an error.");
-			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
-			}
-		});
+		// ROOMS SHOULD NOT CAUSE ANY ISSUES NOW
+		// it("should reject a dataset add when kind isn't sections", async function () {
+		// 	try {
+		// 		await facade.addDataset("section", sections, InsightDatasetKind.Rooms);
+		// 		expect.fail("Should have thrown an error.");
+		// 	} catch (err) {
+		// 		expect(err).to.be.instanceOf(InsightError);
+		// 	}
+		// });
 
 		it("should reject a dataset add with course not containing a results object", async function () {
 			try {
-				const invalidCourse = await getContentFromArchives("invalid_course.zip");
+				const invalidCourse = await getContentFromArchives("sections/invalid_course.zip");
 				await facade.addDataset("sections", invalidCourse, InsightDatasetKind.Sections);
 				expect.fail("Should have thrown an error.");
 			} catch (err) {
@@ -219,7 +220,7 @@ describe("InsightFacade", function () {
 
 		it("should reject a dataset add with content not containing any sections", async function () {
 			try {
-				const noSections = await getContentFromArchives("no_sections.zip");
+				const noSections = await getContentFromArchives("sections/no_sections.zip");
 				await facade.addDataset("sections", noSections, InsightDatasetKind.Sections);
 				expect.fail("Should have thrown an error.");
 			} catch (err) {
@@ -229,7 +230,7 @@ describe("InsightFacade", function () {
 
 		it("should reject a dataset add with content not containing any valid sections", async function () {
 			try {
-				const noValidSections = await getContentFromArchives("no_valid_sections.zip");
+				const noValidSections = await getContentFromArchives("sections/no_valid_sections.zip");
 				await facade.addDataset("sections", noValidSections, InsightDatasetKind.Sections);
 				expect.fail("Should have thrown an error.");
 			} catch (err) {
@@ -239,7 +240,7 @@ describe("InsightFacade", function () {
 
 		it("should reject a dataset add with empty courses folder", async function () {
 			try {
-				const noValidSections = await getContentFromArchives("empty_courses_folder.zip");
+				const noValidSections = await getContentFromArchives("sections/empty_courses_folder.zip");
 				await facade.addDataset("sections", noValidSections, InsightDatasetKind.Sections);
 				expect.fail("Should have thrown an error.");
 			} catch (err) {
@@ -413,9 +414,9 @@ describe("InsightFacade", function () {
 		let section2: string;
 
 		before(async function () {
-			sections = await getContentFromArchives("three_courses.zip");
-			section1 = await getContentFromArchives("one_course.zip");
-			section2 = await getContentFromArchives("two_courses.zip");
+			sections = await getContentFromArchives("sections/three_courses.zip");
+			section1 = await getContentFromArchives("sections/one_course.zip");
+			section2 = await getContentFromArchives("sections/two_courses.zip");
 		});
 
 		beforeEach(async function () {
@@ -540,9 +541,9 @@ describe("InsightFacade", function () {
 		let section3: string;
 
 		before(async function () {
-			section1 = await getContentFromArchives("one_course.zip");
-			section2 = await getContentFromArchives("two_courses.zip");
-			section3 = await getContentFromArchives("three_courses.zip");
+			section1 = await getContentFromArchives("sections/one_course.zip");
+			section2 = await getContentFromArchives("sections/two_courses.zip");
+			section3 = await getContentFromArchives("sections/three_courses.zip");
 		});
 
 		beforeEach(async function () {
@@ -688,10 +689,10 @@ describe("InsightFacade", function () {
 		before(async function () {
 			// Add the datasets to InsightFacade once.
 			// Will *fail* if there is a problem reading ANY dataset.
-			sections = await getContentFromArchives("pair.zip");
-			const section1: string = await getContentFromArchives("one_course.zip");
-			const section2: string = await getContentFromArchives("two_courses.zip");
-			const section3: string = await getContentFromArchives("one_section.zip");
+			sections = await getContentFromArchives("sections/pair.zip");
+			const section1: string = await getContentFromArchives("sections/one_course.zip");
+			const section2: string = await getContentFromArchives("sections/two_courses.zip");
+			const section3: string = await getContentFromArchives("sections/one_section.zip");
 			facade = new InsightFacade();
 
 			// const loadDatasetPromises: Promise<string[]>[] = [

@@ -4,11 +4,13 @@ import { InsightError, InsightDatasetKind } from "../controller/IInsightFacade";
  * Check InsightDatasetKind of dataset
  *
  * @param kind - DatasetKind
+ * @returns - string value of kind
  */
-export function checkKind(kind: InsightDatasetKind): void {
-	if (kind === "rooms") {
+export function checkKind(kind: InsightDatasetKind): string {
+	if (kind !== "rooms" && kind !== "sections") {
 		throw new InsightError("Incorrect InsightDatasetKind");
 	}
+	return kind;
 }
 
 /**

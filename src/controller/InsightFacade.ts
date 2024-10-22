@@ -50,7 +50,7 @@ export default class InsightFacade implements IInsightFacade {
 			checkBase64(content);
 
 			// Check kind
-			checkKind(kind);
+			const datasetKind: string = checkKind(kind);
 
 			// Gets sections, totalRows, fileID
 			const { sections, totalRows } = await processZipContent(content);
