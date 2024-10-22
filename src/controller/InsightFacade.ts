@@ -13,7 +13,14 @@ import * as fs from "fs-extra";
 import { processZipContent } from "../utils/zip-utils";
 import { validateQuery, matchQuery, parseOptions } from "../utils/query-utils";
 import { addMetadata, readMetadata, removeMetadata, getIds } from "../utils/persistence-utils";
-import { loadDataset, makeAttribute, removeForbiddenCharacters, checkKind, checkId } from "../utils/insight-utils";
+import {
+	loadDataset,
+	makeAttribute,
+	removeForbiddenCharacters,
+	checkKind,
+	checkId,
+	checkBase64,
+} from "../utils/insight-utils";
 
 /**
  * Reads and validates a given dataset.
@@ -25,45 +32,55 @@ import { loadDataset, makeAttribute, removeForbiddenCharacters, checkKind, check
 export default class InsightFacade implements IInsightFacade {
 	// public static Sections: Record<string, Section[]> = {};
 
+	/**
+	 * Adds a new dataset into the InsightFacade.
+	 * Checks id, checks content, checks kind.
+	 *
+	 *
+	 * @param id - id for dataset to add
+	 * @param content - base64 of content to be added
+	 * @param kind - kind of dataset (Sections, Rooms)
+	 * @returns - promise that resolves into string[] of all the added ids
+	 */
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
 		try {
+			// Check for valid id
 			checkId(id);
 			const ids = await getIds();
 			if (ids.includes(id)) {
 				throw new InsightError("Id already exists");
 			}
 
+			// Check if base64
+			checkBase64(content);
+
+			// Check kind
 			checkKind(kind);
 
+			// Gets sections, totalRows, fileID
 			const { sections, totalRows } = await processZipContent(content);
-
 			const output = { sections };
+			const fileId = removeForbiddenCharacters(id);
 
-			const fileID = removeForbiddenCharacters(id);
+			// Make sure .data/ directiory exists
 			await fs.promises.mkdir("data/", { recursive: true });
-			const filePath = `data/${fileID}.json`;
+
+			// Write file at path
+			const filePath = `data/${fileId}.json`;
 			await fs.promises.writeFile(filePath, JSON.stringify(output));
 
-			const dataset: InsightDataset = {
+			// Add meta data to internal model
+			await addMetadata({
 				id: id,
 				kind: kind,
 				numRows: totalRows,
-			};
-
-			await addMetadata(dataset);
+			});
 		} catch (err) {
-			if (err instanceof InsightError) {
-				throw err;
-			}
 			throw new InsightError(`addDataset threw unexpected error: ${err}`);
 		}
-		const metaData = await readMetadata();
-		const result: string[] = [];
 
-		for (const data of metaData) {
-			result.push(data.id);
-		}
-
+		// Return all ids in internal model
+		const result: string[] = await getIds();
 		return result;
 	}
 

@@ -72,23 +72,34 @@ export function checkKind(kind: InsightDatasetKind): void {
 	}
 }
 
+/**
+ * Checks id string to see if valid
+ *
+ * @param id - id for a dataset
+ * @returns - boolean value true if valid, else throws Error
+ */
 export function checkId(id: string): boolean {
-	// id validity checks
 	if (id.length === 0) {
-		throw new Error("empty id");
+		throw new Error("Empty id");
 	}
 	if (id.includes("_")) {
-		throw new Error("underscore in id");
+		throw new Error("Underscore in id");
 	}
 	if (/^\s*$/.test(id)) {
-		throw new Error("only whitespace in id");
+		throw new Error("Only whitespace in id");
 	}
 	return true;
 }
 
-export function isBase64(str: string): boolean {
-	if (str === "" || str.trim() === "") {
-		return false;
+/**
+ * Checks content to see if it is base64
+ *
+ * @param content - content of the zip file
+ * @returns - true if content is in base64, else throw error
+ */
+export function checkBase64(content: string): boolean {
+	if (content === "" || content.trim() === "") {
+		throw new Error("Content not base64");
 	}
-	return /^[A-Za-z0-9+/]*={0,2}$/.test(str) && btoa(atob(str)) === str;
+	return /^[A-Za-z0-9+/]*={0,2}$/.test(content) && btoa(atob(content)) === content;
 }
