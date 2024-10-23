@@ -1,4 +1,4 @@
-import { InsightDataset } from "./IInsightFacade";
+import { InsightDataset } from "../controller/IInsightFacade";
 import * as fs from "fs-extra";
 import * as path from "path";
 
@@ -21,26 +21,17 @@ export async function readMetadata(): Promise<InsightDataset[]> {
 	}
 }
 
-export async function getIds(): Promise<string[]> {
+export async function addMetadata(newData: InsightDataset): Promise<boolean> {
 	const data = await readMetadata();
-	const result: string[] = [];
-	for (const d of data) {
-		result.push(d.id);
-	}
-	return result;
+	data.push(newData);
+	await writeMetadata(data);
+	return true;
 }
 
 export async function writeMetadata(data: InsightDataset[]): Promise<void> {
 	await ensureDataDirectoryExists();
 	const space = 2;
 	await fs.writeFile(metaFilePath, JSON.stringify({ meta: data }, null, space));
-}
-
-export async function addMetadata(newData: InsightDataset): Promise<boolean> {
-	const data = await readMetadata();
-	data.push(newData);
-	await writeMetadata(data);
-	return true;
 }
 
 export async function removeMetadata(id: string): Promise<boolean> {
@@ -50,4 +41,13 @@ export async function removeMetadata(id: string): Promise<boolean> {
 
 	await writeMetadata(data);
 	return true;
+}
+
+export async function getIds(): Promise<string[]> {
+	const data = await readMetadata();
+	const result: string[] = [];
+	for (const d of data) {
+		result.push(d.id);
+	}
+	return result;
 }

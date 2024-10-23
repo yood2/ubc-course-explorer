@@ -1,5 +1,5 @@
-import { InsightError } from "./IInsightFacade";
-import { Query, Section, Where } from "./InsightFacade";
+import { InsightError } from "../controller/IInsightFacade";
+import { Query, Section, Where } from "../controller/InsightFacade.types";
 
 const mfields: string[] = ["avg", "pass", "fail", "audit", "year"];
 const sfields: string[] = ["dept", "id", "instructor", "title", "uuid"];

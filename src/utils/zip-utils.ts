@@ -1,5 +1,5 @@
 import JSZip = require("jszip");
-import { Section } from "./InsightFacade";
+import { Section } from "../controller/InsightFacade.types";
 
 interface PreProcessedSection {
 	id: string;
@@ -102,7 +102,7 @@ function processCourseSection(section: PreProcessedSection): Section {
 function parseYear(year: string): number {
 	const defaultYear = 1900;
 	if (year === "" || isNaN(parseInt(year, 10))) {
-		return defaultYear; // Default year if empty or invalid
+		return defaultYear;
 	}
 	return parseInt(year, 10);
 }
