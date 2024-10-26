@@ -10,11 +10,12 @@ import {
 import { Section, Query, Where } from "./InsightFacade.types";
 
 import * as fs from "fs-extra";
-import { processZipContent } from "../utils/zip-utils";
 import { validateQuery, matchQuery, parseOptions } from "../utils/query-utils";
 import { addMetadata, readMetadata, removeMetadata, getIds } from "../utils/metadata-utils";
 import { loadDataset, makeAttribute, removeForbiddenCharacters } from "../utils/insight-utils";
-import { checkKind, checkId, checkBase64 } from "../utils/validation-utils";
+import { checkId, checkBase64 } from "../utils/validation-utils";
+
+import { DatasetProcessor } from "./DatasetProcessor";
 
 /**
  * Reads and validates a given dataset.
@@ -24,8 +25,6 @@ import { checkKind, checkId, checkBase64 } from "../utils/validation-utils";
  */
 
 export default class InsightFacade implements IInsightFacade {
-	// public static Sections: Record<string, Section[]> = {};
-
 	/**
 	 * Adds a new dataset into the InsightFacade.
 	 * 1. Checks id, checks content, checks kind.
@@ -34,7 +33,7 @@ export default class InsightFacade implements IInsightFacade {
 	 *
 	 * @param id - id for dataset to add
 	 * @param content - base64 of content to be added
-	 * @param kind - kind of dataset (Sections, Rooms)
+	 * @param kind - kind of dataset (rows, Rooms)
 	 * @returns - promise that resolves into string[] of all the added ids
 	 */
 	public async addDataset(id: string, content: string, kind: InsightDatasetKind): Promise<string[]> {
@@ -49,20 +48,17 @@ export default class InsightFacade implements IInsightFacade {
 			// Check if base64
 			checkBase64(content);
 
-			// Check kind
-			checkKind(kind);
+			// Validate, parse, process
+			const processor = new DatasetProcessor();
+			const validated = await processor.validate(content, kind);
+			const parsed = await processor.parse(validated, kind);
+			const { rows, totalRows } = await processor.process(parsed, kind);
 
-			// Gets sections, totalRows, fileID
-			const { sections, totalRows } = await processZipContent(content);
-			const output = { sections };
+			// Writing
 			const fileId = removeForbiddenCharacters(id);
-
-			// Make sure .data/ directiory exists
-			await fs.promises.mkdir("data/", { recursive: true });
-
-			// Write file at path
 			const filePath = `data/${fileId}.json`;
-			await fs.promises.writeFile(filePath, JSON.stringify(output));
+			await fs.promises.mkdir("data/", { recursive: true });
+			await fs.promises.writeFile(filePath, JSON.stringify({ sections: rows }));
 
 			// Add meta data to internal model
 			await addMetadata({
@@ -70,13 +66,11 @@ export default class InsightFacade implements IInsightFacade {
 				kind: kind,
 				numRows: totalRows,
 			});
+
+			return await getIds();
 		} catch (err) {
 			throw new InsightError(`addDataset threw unexpected error: ${err}`);
 		}
-
-		// Return all ids in internal model
-		const result: string[] = await getIds();
-		return result;
 	}
 
 	/**
@@ -128,11 +122,11 @@ export default class InsightFacade implements IInsightFacade {
 		const keys: string[] = columns.map((col: string) => col.split("_")[1]);
 		const datasetID = options.datasetID;
 
-		const sections: Section[] = await loadDataset(datasetID, order);
+		const rows: Section[] = await loadDataset(datasetID, order);
 
 		// base case when WHERE is empty
 		if (Object.keys(input.WHERE).length === 0) {
-			sections.forEach((section) => {
+			rows.forEach((section) => {
 				result.push(makeAttribute(datasetID, keys, section));
 			});
 			return result;
@@ -141,7 +135,7 @@ export default class InsightFacade implements IInsightFacade {
 		const where: Where = input.WHERE as Where;
 
 		// need to filter attributes
-		sections.forEach((section) => {
+		rows.forEach((section) => {
 			if (matchQuery(where, section, datasetID)) {
 				result.push(makeAttribute(datasetID, keys, section));
 			}

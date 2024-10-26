@@ -35,6 +35,9 @@ export function validateDataset(dataset: any): asserts dataset is object {
 	if (Array.isArray(dataset)) {
 		throw new Error("ValidationError: dataset must be an object not an array.");
 	}
+	// if (!Object.hasOwn(dataset, "sections")) {
+	// 	throw new Error("ValidationError: dataset is missing required field 'sections'.");
+	// }
 	if (!Object.hasOwn(dataset, "sections")) {
 		throw new Error("ValidationError: dataset is missing required field 'sections'.");
 	}
