@@ -11,6 +11,10 @@ export interface Section {
 	audit: number;
 }
 
+export interface Room {
+	id: string;
+}
+
 export interface Query {
 	WHERE: object;
 
@@ -21,3 +25,22 @@ export interface Query {
 }
 
 export type Where = Record<string, any>;
+
+export interface PreProcessedSection {
+	id: string;
+	Course: string;
+	Title: string;
+	Professor: string;
+	Subject: string;
+	Year: string;
+	Avg: string;
+	Pass: string;
+	Fail: string;
+	Audit: string;
+	Section: string;
+}
+
+export interface ProcessResult {
+	rows: Section[] | Room[];
+	totalRows: number;
+}

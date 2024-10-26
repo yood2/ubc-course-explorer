@@ -499,8 +499,8 @@ describe("InsightFacade", function () {
 
 				const remove1: string = await facade.removeDataset("section");
 				expect(remove1).to.equal("section");
-			} catch (_) {
-				expect.fail("Should not throw an error");
+			} catch (e) {
+				expect.fail(`Unexpected error: ${(e as Error).message}`);
 			}
 		});
 
