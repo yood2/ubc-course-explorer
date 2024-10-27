@@ -1,5 +1,5 @@
 import { parse } from "parse5";
-import { Room } from "../controller/InsightFacade.types";
+import { BuildingRow, IndexRow } from "../controller/InsightFacade.types";
 
 // export interface Room {
 // 	fullname: string; >
@@ -15,35 +15,56 @@ import { Room } from "../controller/InsightFacade.types";
 // 	href: string;
 // }
 
-export async function readIndex(index: any): Promise<void> {
+export async function readIndex(index: any): Promise<IndexRow[]> {
 	const file = await index.async("string");
 	const document = parse(file);
 
-	// get <table>
 	const table = findByTag(document, "table")[0];
 	const tbody = findByTag(table, "tbody")[0];
 	const trows = findByTag(tbody, "tr");
 
-	const rooms: Room[] = [];
+	const indexRows: IndexRow[] = [];
 
 	for (const row of trows) {
 		const td = findByClass(row, "views-field views-field-title")[0];
 		const aTag = findByTag(td, "a")[0];
 
-		const room: Room = {
+		const room: IndexRow = {
 			fullname: getText(aTag),
 			shortname: getText(findByClass(row, "views-field views-field-field-building-code")[0]),
 			address: getText(findByClass(row, "views-field views-field-field-building-address")[0]),
 			href: aTag.attrs[0].value,
 		};
 
-		rooms.push(room);
+		indexRows.push(room);
 	}
 
-	console.log(rooms);
+	return indexRows;
 }
 
-export async function readBuilding(building: any): Promise<void> {}
+export async function readBuilding(building: any): Promise<BuildingRow[]> {
+	const file = await building.async("string");
+	const document = parse(file);
+
+	const table = findByClass(document, "views-table cols-5 table")[0];
+	const tbody = findByTag(table, "tbody")[0];
+	const trows = findByTag(tbody, "tr");
+
+	const buildingRows: BuildingRow[] = [];
+
+	for (const row of trows) {
+		const room: BuildingRow = {
+			number: getText(findByTag(findByClass(row, "views-field views-field-field-room-number")[0], "a")[0]),
+			capacity: getText(findByClass(row, "views-field views-field-field-room-capacity")[0]),
+			furniture: getText(findByClass(row, "views-field views-field-field-room-furniture")[0]),
+			type: getText(findByClass(row, "views-field views-field-field-room-type")[0]),
+		};
+
+		buildingRows.push(room);
+	}
+
+	return buildingRows;
+}
 
 function findByTag(node: any, tag: string): any[] {
 	const result: any[] = [];

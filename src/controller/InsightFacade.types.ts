@@ -11,6 +11,20 @@ export interface Section {
 	audit: number;
 }
 
+export interface IndexRow {
+	fullname: string;
+	shortname: string;
+	address: string;
+	href: string;
+}
+
+export interface BuildingRow {
+	number: string;
+	capacity: string;
+	furniture: string;
+	type: string;
+}
+
 export interface Room {
 	fullname: string;
 	shortname: string;
