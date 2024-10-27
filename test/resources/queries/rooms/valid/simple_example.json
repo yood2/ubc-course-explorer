@@ -1,0 +1,42 @@
+{
+	"title": "Simple rooms example with group by",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"IS": {
+						"rooms_furniture": "*Chairs*"
+					}
+				},
+				{
+					"LT": {
+						"rooms_seats": 10
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": ["rooms_fullname", "rooms_shortname", "minSeats"],
+			"ORDER": {
+				"dir": "UP",
+				"keys": ["minSeats"]
+			}
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": ["rooms_fullname", "rooms_shortname"],
+			"APPLY": [
+				{
+					"minSeats": {
+						"MIN": "rooms_seats"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{ "rooms_fullname": "MacMillan", "rooms_shortname": "MCML", "minSeats": 6 },
+		{ "rooms_fullname": "Pharmaceutical Sciences Building", "rooms_shortname": "PHRM", "minSeats": 7 },
+		{ "rooms_fullname": "Irving K Barber Learning Centre", "rooms_shortname": "IBLC", "minSeats": 8 }
+	]
+}

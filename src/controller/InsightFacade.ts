@@ -7,12 +7,12 @@ import {
 	InsightResult,
 	ResultTooLargeError,
 } from "./IInsightFacade";
-import { Section, Query, Where } from "./InsightFacade.types";
+import { Row, Query, Where } from "./InsightFacade.types";
 
 import * as fs from "fs-extra";
-import { validateQuery, matchQuery, parseOptions } from "../utils/query-utils";
+import { QueryUtil, parseOptions } from "../utils/query-utils";
 import { addMetadata, readMetadata, removeMetadata, getIds } from "../utils/metadata-utils";
-import { loadDataset, makeAttribute, removeForbiddenCharacters } from "../utils/insight-utils";
+import { loadDataset, makeAttribute, removeForbiddenCharacters, sortResult } from "../utils/insight-utils";
 import { checkId, checkBase64 } from "../utils/validation-utils";
 
 import { DatasetProcessor } from "./DatasetProcessor";
@@ -109,8 +109,8 @@ export default class InsightFacade implements IInsightFacade {
 	}
 
 	public async performQuery(query: unknown): Promise<InsightResult[]> {
-		// validate query, throw InsightError if query is not valid
-		validateQuery(query);
+		// Create new QueryUtil instance
+		const queryUtil = new QueryUtil(query);
 
 		const input: Query = query as Query;
 
@@ -122,12 +122,12 @@ export default class InsightFacade implements IInsightFacade {
 		const keys: string[] = columns.map((col: string) => col.split("_")[1]);
 		const datasetID = options.datasetID;
 
-		const rows: Section[] = await loadDataset(datasetID, order);
+		const rows: Row[] = await loadDataset(datasetID);
 
 		// base case when WHERE is empty
 		if (Object.keys(input.WHERE).length === 0) {
-			rows.forEach((section) => {
-				result.push(makeAttribute(datasetID, keys, section));
+			rows.forEach((row) => {
+				result.push(makeAttribute(datasetID, keys, row));
 			});
 			return result;
 		}
@@ -135,9 +135,9 @@ export default class InsightFacade implements IInsightFacade {
 		const where: Where = input.WHERE as Where;
 
 		// need to filter attributes
-		rows.forEach((section) => {
-			if (matchQuery(where, section, datasetID)) {
-				result.push(makeAttribute(datasetID, keys, section));
+		rows.forEach((row) => {
+			if (queryUtil.matchQuery(where, row)) {
+				result.push(makeAttribute(datasetID, keys, row));
 			}
 		});
 
@@ -147,7 +147,13 @@ export default class InsightFacade implements IInsightFacade {
 			throw new ResultTooLargeError("Result can not be over 5000");
 		}
 
-		return result;
+		let finalResult: InsightResult[] = result;
+
+		if (order !== "") {
+			finalResult = sortResult(order, result);
+		}
+
+		return finalResult;
 	}
 
 	/**
