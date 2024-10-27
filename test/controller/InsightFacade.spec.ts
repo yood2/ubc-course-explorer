@@ -27,7 +27,42 @@ describe("InsightFacade", function () {
 	let facade: IInsightFacade;
 
 	// ========== Adding to dataset tests ===================
-	describe("addDataset", function () {
+	describe.only("addDataset - Rooms", function () {
+		// before(async function () {
+		// 	rooms = await getContentFromArchives("rooms/small_campus.zip");
+		// });
+
+		this.beforeEach(async function () {
+			await clearDisk();
+			facade = new InsightFacade();
+		});
+
+		after(async function () {
+			await clearDisk();
+		});
+
+		it("Should accept valid rooms dataset", async function () {
+			try {
+				const smallCampus = await getContentFromArchives("rooms/small_campus.zip");
+				const result = await facade.addDataset("small", smallCampus, InsightDatasetKind.Rooms);
+				expect(result).to.include("small");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		it("Should reject rooms dataset with no index", async function () {
+			try {
+				const smallCampus = await getContentFromArchives("rooms/no_index.zip");
+				await facade.addDataset("small", smallCampus, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+	});
+
+	describe("addDataset - Sections", function () {
 		let section1: string;
 		let section2: string;
 

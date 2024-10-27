@@ -12,7 +12,17 @@ export interface Section {
 }
 
 export interface Room {
-	id: string;
+	fullname: string;
+	shortname: string;
+	number?: string;
+	name?: string;
+	address: string;
+	lat?: number;
+	lon?: number;
+	seats?: number;
+	type?: string;
+	furniture?: string;
+	href: string;
 }
 
 export interface Query {

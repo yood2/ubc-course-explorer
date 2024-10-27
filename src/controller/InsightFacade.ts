@@ -27,9 +27,9 @@ import { DatasetProcessor } from "./DatasetProcessor";
 export default class InsightFacade implements IInsightFacade {
 	/**
 	 * Adds a new dataset into the InsightFacade.
-	 * 1. Checks id, checks content, checks kind.
-	 * 2. Confirms data directions, writes file to path.
-	 * 3. Adds meta data to internal model
+	 * 1. Checks id, checks content
+	 * 2. Validate, parse, process
+	 * 3. Write file and metadata
 	 *
 	 * @param id - id for dataset to add
 	 * @param content - base64 of content to be added
@@ -96,6 +96,8 @@ export default class InsightFacade implements IInsightFacade {
 
 			// Remove metadata from InsightFacade
 			await removeMetadata(id);
+
+			return id;
 		} catch (err) {
 			if (err instanceof NotFoundError) {
 				throw new NotFoundError(`removeDataset threw unexpected error: ${err.message}`);
@@ -103,9 +105,6 @@ export default class InsightFacade implements IInsightFacade {
 				throw new InsightError(`removeDataset threw unexpected error: ${err}`);
 			}
 		}
-
-		// Return id of removed dataset
-		return id;
 	}
 
 	public async performQuery(query: unknown): Promise<InsightResult[]> {
