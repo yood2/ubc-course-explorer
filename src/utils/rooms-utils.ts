@@ -4,47 +4,32 @@ import { readIndex, readBuilding } from "../utils/html-utils";
 import { Room } from "../controller/InsightFacade.types";
 
 /**
- * Valid dataset:
- * - zip file
- * - contains at least one valid room
  *
- * Valid index.htm:
- * - index.htm exists
- * - contains table that lists/links to building data files (only one valid building list table)
- * - Each row in table represents building and contains column that links to buildings data file within zip (file may or may not exist or contain no valid rooms)
- * - Link will be contained in cell element with class 'views-field-title'
- *
- * Valid building file:
- * - HTML
- * - linked from index.htm
- * - contains table with valid rooms (can have many tables but only one will be valid room table)
- * - no room table or table with no room == building has no rooms
- *
- * Valid room:
- * - contains every field use in rooms query
- * - if field is present but is empty, still valid
- * - requested rooms geolocation request returns successfully
+ * @param zip
+ * @returns
  */
 export async function validateRooms(zip: JSZip): Promise<Room[]> {
-	// check there is index file
+	/**
+	 * Check for Valid Dataset
+	 * 1. index.htm exists
+	 * 2. contains table that lists/links to building file
+	 * 3. each row links to valid building file
+	 * 4. links are contained in <a> tag with class "view-field-title"
+	 */
 	const index = Object.values(zip.files).find((file) => file.name.endsWith("index.htm"));
 
 	if (!index) {
 		throw new Error("validateRooms: No index.htm file");
 	}
 
-	// check for table with rows (key tags are <table>, <a>)
 	const indexRows = await readIndex(index);
 
-	// const rooms: Room[] = [];
-
-	// for (const row of indexRows) {
-	// 	const link = row.href;
-	// 	const remove = 2;
-	// 	const modifiedLink = `campus/${link.substring(remove)}`;
-	// 	const building = zip.file(modifiedLink);
-	// 	const buildingRooms = readBuilding(building);
-	// }
+	/**
+	 * Check for Valid Building
+	 * 1. Linked from index.htm
+	 * 2. Contains table with valid rooms (might have many tables, only one will be valid room table)
+	 * 3. No room table or table with no room == building has no rooms
+	 */
 
 	const rooms: Room[] = [];
 
@@ -82,7 +67,12 @@ export async function validateRooms(zip: JSZip): Promise<Room[]> {
 		rooms.push(...buildingArray);
 	});
 
-	console.log(rooms);
+	/**
+	 * Check for Valid Room
+	 * - Contains every field used in query
+	 * - If field is present but empty, still valid
+	 * - Requested rooms geolocation request returns successfully
+	 */
 
 	return rooms;
 }
