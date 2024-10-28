@@ -18,14 +18,14 @@ export interface Section {
 export interface Room {
 	fullname: string;
 	shortname: string;
-	number?: string;
-	name?: string;
+	number: string;
+	name: string;
 	address: string;
 	lat?: number;
 	lon?: number;
-	seats?: number;
-	type?: string;
-	furniture?: string;
+	seats: number;
+	type: string;
+	furniture: string;
 	href: string;
 }
 
@@ -34,18 +34,15 @@ export interface IndexRow {
 	shortname: string;
 	address: string;
 	href: string;
+	lat?: number;
+	lon?: number;
 }
 
 export interface BuildingRow {
 	number: string;
-	name: string;
-	address: string;
-	lat: number;
-	lon: number;
-	seats: number;
+	seats: string;
 	type: string;
 	furniture: string;
-	href: string;
 }
 
 export interface Query {
@@ -81,4 +78,9 @@ export interface ProcessResult {
 export interface ParsedData {
 	sections?: { folder: JSZip; values: JSZip.JSZipObject[] };
 	rooms?: { indexRows: any[]; buildingData: Record<string, any[]> };
+}
+
+export interface GeoData {
+	lat: number;
+	lon: number;
 }

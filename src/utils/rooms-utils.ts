@@ -1,6 +1,6 @@
 import JSZip = require("jszip");
 import { parse } from "parse5";
-import { BuildingRow, IndexRow, ProcessResult, Room } from "../controller/InsightFacade.types";
+import { BuildingRow, GeoData, IndexRow, ProcessResult, Room } from "../controller/InsightFacade.types";
 
 /**
  * Parses the zip file and extracts room and building data.
@@ -78,9 +78,9 @@ export function processRooms(indexRows: IndexRow[], buildingData: Record<string,
 				number: buildingRow.number,
 				name: `${indexRow.shortname}_${buildingRow.number}`,
 				address: indexRow.address,
-				lat: 0,
-				lon: 0,
-				seats: Number(buildingRow.capacity),
+				lat: indexRow.lat,
+				lon: indexRow.lon,
+				seats: Number(buildingRow.seats),
 				type: buildingRow.type,
 				furniture: buildingRow.furniture,
 				href: indexRow.href,
@@ -99,21 +99,23 @@ export async function readIndex(index: any): Promise<IndexRow[]> {
 	const tbody = findByTag(table, "tbody")[0];
 	const trows = findByTag(tbody, "tr");
 
-	const indexRows: IndexRow[] = [];
+	const indexRows: IndexRow[] = await Promise.all(
+		trows.map(async (row) => {
+			const td = findByClass(row, "views-field views-field-title")[0];
+			const aTag = findByTag(td, "a")[0];
+			const addressElement = findByClass(row, "views-field views-field-field-building-address")[0];
+			const geo = await fetchData(getText(addressElement));
 
-	for (const row of trows) {
-		const td = findByClass(row, "views-field views-field-title")[0];
-		const aTag = findByTag(td, "a")[0];
-
-		const room: IndexRow = {
-			fullname: getText(aTag),
-			shortname: getText(findByClass(row, "views-field views-field-field-building-code")[0]),
-			address: getText(findByClass(row, "views-field views-field-field-building-address")[0]),
-			href: aTag.attrs[0].value,
-		};
-
-		indexRows.push(room);
-	}
+			return {
+				fullname: getText(aTag),
+				shortname: getText(findByClass(row, "views-field views-field-field-building-code")[0]),
+				address: getText(addressElement),
+				href: aTag.attrs[0].value,
+				lat: geo.lat,
+				lon: geo.lon,
+			};
+		})
+	);
 
 	return indexRows;
 }
@@ -131,7 +133,7 @@ export async function readBuilding(building: any): Promise<BuildingRow[]> {
 	for (const row of trows) {
 		const room: BuildingRow = {
 			number: getText(findByTag(findByClass(row, "views-field views-field-field-room-number")[0], "a")[0]),
-			capacity: getText(findByClass(row, "views-field views-field-field-room-capacity")[0]),
+			seats: getText(findByClass(row, "views-field views-field-field-room-capacity")[0]),
 			furniture: getText(findByClass(row, "views-field views-field-field-room-furniture")[0]),
 			type: getText(findByClass(row, "views-field views-field-field-room-type")[0]),
 		};
@@ -197,4 +199,20 @@ function getText(node: any): string {
 	}
 
 	return text.trim();
+}
+
+async function fetchData(address: string): Promise<GeoData> {
+	try {
+		const url = `http://cs310.students.cs.ubc.ca:11316/api/v1/project_team034/${address}`;
+		const response = await fetch(url);
+
+		if (!response.ok) {
+			throw new Error("fetchData: Fetch not ok.");
+		}
+
+		const json = await response.json();
+		return json;
+	} catch (e) {
+		throw new Error(`fetchData: Unexpected error, ${(e as Error).message}`);
+	}
 }

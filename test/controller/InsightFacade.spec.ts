@@ -27,7 +27,7 @@ describe("InsightFacade", function () {
 	let facade: IInsightFacade;
 
 	// ========== Adding to dataset tests ===================
-	describe("addDataset - Rooms", function () {
+	describe.only("addDataset - Rooms", function () {
 		this.beforeEach(async function () {
 			await clearDisk();
 			facade = new InsightFacade();

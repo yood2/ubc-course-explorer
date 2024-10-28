@@ -7,7 +7,7 @@ import {
 	InsightResult,
 	ResultTooLargeError,
 } from "./IInsightFacade";
-import { Section, Query, Where, ParsedData } from "./InsightFacade.types";
+import { Row, Query, Where, ParsedData } from "./InsightFacade.types";
 // import { Row, Query, Where } from "./InsightFacade.types";
 
 import * as fs from "fs-extra";
