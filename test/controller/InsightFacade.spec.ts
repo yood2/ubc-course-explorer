@@ -27,7 +27,11 @@ describe("InsightFacade", function () {
 	let facade: IInsightFacade;
 
 	// ========== Adding to dataset tests ===================
-	describe.only("addDataset - Rooms", function () {
+	// describe.only("addDataset - General", function () {
+	// 	it("Should reject dataset add with empty dataset ID");
+	// });
+
+	describe("addDataset - Rooms", function () {
 		this.beforeEach(async function () {
 			await clearDisk();
 			facade = new InsightFacade();
@@ -37,6 +41,7 @@ describe("InsightFacade", function () {
 			// await clearDisk();
 		});
 
+		// ACCEPT
 		it("Should accept small, valid rooms dataset", async function () {
 			try {
 				const smallCampus = await getContentFromArchives("rooms/small_campus.zip");
@@ -57,6 +62,88 @@ describe("InsightFacade", function () {
 			}
 		});
 
+		// it("Should add multiple rooms datasets", async function () {
+		// 	try {
+		// 		const result = ["pass"];
+		// 		expect(result).to.include("pass");
+		// 	} catch (err) {
+		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
+		// 	}
+		// });
+
+		// it("Should re-add same dataset after it is removed", async function () {
+		// 	try {
+		// 		const result = ["pass"];
+		// 		expect(result).to.include("pass");
+		// 	} catch (err) {
+		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
+		// 	}
+		// });
+
+		// it("Should add index.htm with multiple tables", async function () {
+		// 	try {
+		// 		const result = ["pass"];
+		// 		expect(result).to.include("pass");
+		// 	} catch (err) {
+		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
+		// 	}
+		// });
+
+		// it("Should skip broken building links", async function () {
+		// 	try {
+		// 		const result = ["pass"];
+		// 		expect(result).to.include("pass");
+		// 	} catch (err) {
+		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
+		// 	}
+		// });
+
+		// it("Should add building files with multiple tables", async function () {
+		// 	try {
+		// 		const result = ["pass"];
+		// 		expect(result).to.include("pass");
+		// 	} catch (err) {
+		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
+		// 	}
+		// });
+
+		// it("Should skip building files with no room table", async function () {
+		// 	try {
+		// 		const result = ["pass"];
+		// 		expect(result).to.include("pass");
+		// 	} catch (err) {
+		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
+		// 	}
+		// });
+
+		// it("Should add room data with empty optional fields", async function () {
+		// 	try {
+		// 		const result = ["pass"];
+		// 		expect(result).to.include("pass");
+		// 	} catch (err) {
+		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
+		// 	}
+		// });
+
+		// it("Should add valid room with proper geolocation data", async function () {
+		// 	try {
+		// 		const result = ["pass"];
+		// 		expect(result).to.include("pass");
+		// 	} catch (err) {
+		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
+		// 	}
+		// });
+
+		// it("Should add valid building file with no room data", async function () {
+		// 	try {
+		// 		const result = ["pass"];
+		// 		expect(result).to.include("pass");
+		// 	} catch (err) {
+		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
+		// 	}
+		// });
+
+		// REJECT
 		it("Should reject rooms dataset with no index", async function () {
 			try {
 				const smallCampus = await getContentFromArchives("rooms/no_index.zip");
@@ -66,6 +153,70 @@ describe("InsightFacade", function () {
 				expect(err).to.be.instanceOf(InsightError);
 			}
 		});
+
+		// it("Should reject dataset where contents are not HTML", async function () {
+		// 	try {
+		// 		expect.fail(`Should have rejected`);
+		// 	} catch (err) {
+		// 		expect(err).to.be.instanceOf(InsightError);
+		// 	}
+		// });
+
+		// it("Should reject index.htm with no tables", async function () {
+		// 	try {
+		// 		expect.fail(`Should have rejected`);
+		// 	} catch (err) {
+		// 		expect(err).to.be.instanceOf(InsightError);
+		// 	}
+		// });
+
+		// it("Should reject dataset with invalid folder structure", async function () {
+		// 	try {
+		// 		expect.fail(`Should have rejected`);
+		// 	} catch (err) {
+		// 		expect(err).to.be.instanceOf(InsightError);
+		// 	}
+		// });
+
+		// it("Should reject index.htm with no building files", async function () {
+		// 	try {
+		// 		expect.fail(`Should have rejected`);
+		// 	} catch (err) {
+		// 		expect(err).to.be.instanceOf(InsightError);
+		// 	}
+		// });
+
+		// it("Should reject room table with missing fields (views-field-field-building-address)", async function () {
+		// 	try {
+		// 		expect.fail(`Should have rejected`);
+		// 	} catch (err) {
+		// 		expect(err).to.be.instanceOf(InsightError);
+		// 	}
+		// });
+
+		// it("Should reject room data with invalid HTML structure", async function () {
+		// 	try {
+		// 		expect.fail(`Should have rejected`);
+		// 	} catch (err) {
+		// 		expect(err).to.be.instanceOf(InsightError);
+		// 	}
+		// });
+
+		// it("Should reject rooms with failed geolocation requests", async function () {
+		// 	try {
+		// 		expect.fail(`Should have rejected`);
+		// 	} catch (err) {
+		// 		expect(err).to.be.instanceOf(InsightError);
+		// 	}
+		// });
+
+		// it("Should reject a dataset where index.htm links to missing building files", async function () {
+		// 	try {
+		// 		expect.fail(`Should have rejected`);
+		// 	} catch (err) {
+		// 		expect(err).to.be.instanceOf(InsightError);
+		// 	}
+		// });
 	});
 
 	describe("addDataset - Sections", function () {
@@ -289,7 +440,7 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		it("Add same dataset consecutively", async function () {
+		it("Should reject same dataset added consecutively", async function () {
 			try {
 				const result: string[] = await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
 				expect(result).to.include("sections");
@@ -300,7 +451,7 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		it("Add dataset with same id", async function () {
+		it("Should reject dataset with same id", async function () {
 			try {
 				const result: string[] = await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
 				expect(result).to.include("sections");
@@ -336,7 +487,7 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		it("Add same dataset between datasets", async function () {
+		it("Should reject same dataset between datasets", async function () {
 			try {
 				// first dataset
 				const result: string[] = await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
