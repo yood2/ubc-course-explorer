@@ -7,7 +7,7 @@ import {
 	InsightResult,
 	ResultTooLargeError,
 } from "./IInsightFacade";
-import { Section, Query, Where } from "./InsightFacade.types";
+import { Section, Query, Where, ParsedData } from "./InsightFacade.types";
 
 import * as fs from "fs-extra";
 import { validateQuery, matchQuery, parseOptions } from "../utils/query-utils";
@@ -48,10 +48,10 @@ export default class InsightFacade implements IInsightFacade {
 			// Check if base64
 			checkBase64(content);
 
-			// Validate, parse, process
+			// Parse, validate, process
 			const processor = new DatasetProcessor();
-			const validated = await processor.validate(content, kind);
-			const parsed = await processor.parse(validated, kind);
+			const parsed: ParsedData = await processor.parse(content, kind);
+			await processor.validate(parsed, kind);
 			const { rows, totalRows } = await processor.process(parsed, kind);
 
 			// Writing

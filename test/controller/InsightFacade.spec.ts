@@ -27,7 +27,7 @@ describe("InsightFacade", function () {
 	let facade: IInsightFacade;
 
 	// ========== Adding to dataset tests ===================
-	describe.only("addDataset - Rooms", function () {
+	describe("addDataset - Rooms", function () {
 		// before(async function () {
 		// 	rooms = await getContentFromArchives("rooms/small_campus.zip");
 		// });
