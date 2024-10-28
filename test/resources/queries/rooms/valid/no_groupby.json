@@ -1,0 +1,70 @@
+{
+	"title": "Simple rooms example without group by",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"IS": {
+						"rooms_furniture": "*Chairs*"
+					}
+				},
+				{
+					"LT": {
+						"rooms_seats": 8
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": ["rooms_fullname", "rooms_shortname", "rooms_seats"]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"rooms_fullname": "MacMillan",
+			"rooms_shortname": "MCML",
+			"rooms_seats": 6
+		},
+		{
+			"rooms_fullname": "MacMillan",
+			"rooms_shortname": "MCML",
+			"rooms_seats": 6
+		},
+		{
+			"rooms_fullname": "Pharmaceutical Sciences Building",
+			"rooms_shortname": "PHRM",
+			"rooms_seats": 7
+		},
+		{
+			"rooms_fullname": "Pharmaceutical Sciences Building",
+			"rooms_shortname": "PHRM",
+			"rooms_seats": 7
+		},
+		{
+			"rooms_fullname": "Pharmaceutical Sciences Building",
+			"rooms_shortname": "PHRM",
+			"rooms_seats": 7
+		},
+		{
+			"rooms_fullname": "Pharmaceutical Sciences Building",
+			"rooms_shortname": "PHRM",
+			"rooms_seats": 7
+		},
+		{
+			"rooms_fullname": "Pharmaceutical Sciences Building",
+			"rooms_shortname": "PHRM",
+			"rooms_seats": 7
+		},
+		{
+			"rooms_fullname": "Pharmaceutical Sciences Building",
+			"rooms_shortname": "PHRM",
+			"rooms_seats": 7
+		},
+		{
+			"rooms_fullname": "Pharmaceutical Sciences Building",
+			"rooms_shortname": "PHRM",
+			"rooms_seats": 7
+		}
+	]
+}

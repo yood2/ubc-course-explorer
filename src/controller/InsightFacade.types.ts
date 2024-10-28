@@ -1,5 +1,7 @@
 import JSZip = require("jszip");
 
+export type Row = Room | Section;
+
 export interface Section {
 	uuid: string;
 	id: string;
@@ -36,9 +38,14 @@ export interface IndexRow {
 
 export interface BuildingRow {
 	number: string;
-	capacity: string;
-	furniture: string;
+	name: string;
+	address: string;
+	lat: number;
+	lon: number;
+	seats: number;
 	type: string;
+	furniture: string;
+	href: string;
 }
 
 export interface Query {
