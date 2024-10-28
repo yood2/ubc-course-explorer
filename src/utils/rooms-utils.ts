@@ -1,7 +1,6 @@
 import JSZip = require("jszip");
 import { parse } from "parse5";
 import { BuildingRow, GeoData, IndexRow, ProcessResult, Room } from "../controller/InsightFacade.types";
-import { format } from "path";
 
 /**
  * Parses the zip file and extracts room and building data.
@@ -25,7 +24,8 @@ export async function parseRooms(
 	await Promise.all(
 		indexRows.map(async (indexRow) => {
 			const link = indexRow.href;
-			const formattedLink: string = "" + Object.keys(zip.files).find((path) => path.endsWith(link.slice(2)));
+			const length = 2;
+			const formattedLink: string = "" + Object.keys(zip.files).find((path) => path.endsWith(link.slice(length)));
 			const buildingFile = zip.file(formattedLink);
 
 			if (buildingFile) {

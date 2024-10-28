@@ -68,7 +68,7 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		it("Should add multiple rooms datasets", async function () {
+		it.only("Should add multiple rooms datasets", async function () {
 			try {
 				let result = await facade.addDataset("small", smallCampus, InsightDatasetKind.Rooms);
 				expect(result).to.deep.equal(["small"]);
@@ -79,7 +79,7 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		it.only("Should add index.htm with multiple tables", async function () {
+		it("Should add index.htm with multiple tables", async function () {
 			try {
 				const multiTable = await getContentFromArchives("rooms/index_multi_table.zip");
 				const result = await facade.addDataset("multi", multiTable, InsightDatasetKind.Rooms);
@@ -146,7 +146,7 @@ describe("InsightFacade", function () {
 		// REJECT
 		it("Should reject rooms dataset with no index", async function () {
 			try {
-				const smallCampus = await getContentFromArchives("rooms/no_index.zip");
+				smallCampus = await getContentFromArchives("rooms/no_index.zip");
 				await facade.addDataset("small", smallCampus, InsightDatasetKind.Rooms);
 				expect.fail(`Should have rejected`);
 			} catch (err) {
