@@ -32,7 +32,15 @@ describe("InsightFacade", function () {
 	// });
 
 	describe("addDataset - Rooms", function () {
-		this.beforeEach(async function () {
+		let smallCampus: string;
+		let campus: string;
+
+		before(async function () {
+			smallCampus = await getContentFromArchives("rooms/small_campus.zip");
+			campus = await getContentFromArchives("rooms/campus.zip");
+		});
+
+		beforeEach(async function () {
 			await clearDisk();
 			facade = new InsightFacade();
 		});
@@ -44,7 +52,6 @@ describe("InsightFacade", function () {
 		// ACCEPT
 		it("Should accept small, valid rooms dataset", async function () {
 			try {
-				const smallCampus = await getContentFromArchives("rooms/small_campus.zip");
 				const result = await facade.addDataset("small", smallCampus, InsightDatasetKind.Rooms);
 				expect(result).to.include("small");
 			} catch (err) {
@@ -54,40 +61,32 @@ describe("InsightFacade", function () {
 
 		it("Should accept large, valid rooms dataset", async function () {
 			try {
-				const smallCampus = await getContentFromArchives("rooms/campus.zip");
-				const result = await facade.addDataset("campus", smallCampus, InsightDatasetKind.Rooms);
+				const result = await facade.addDataset("campus", campus, InsightDatasetKind.Rooms);
 				expect(result).to.include("campus");
 			} catch (err) {
 				expect.fail(`Unexpected Error: ${(err as Error).message}`);
 			}
 		});
 
-		// it("Should add multiple rooms datasets", async function () {
-		// 	try {
-		// 		const result = ["pass"];
-		// 		expect(result).to.include("pass");
-		// 	} catch (err) {
-		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
-		// 	}
-		// });
+		it("Should add multiple rooms datasets", async function () {
+			try {
+				let result = await facade.addDataset("small", smallCampus, InsightDatasetKind.Rooms);
+				expect(result).to.deep.equal(["small"]);
+				result = await facade.addDataset("campus", campus, InsightDatasetKind.Rooms);
+				expect(result).to.deep.equal(["small", "campus"]);
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
 
-		// it("Should re-add same dataset after it is removed", async function () {
-		// 	try {
-		// 		const result = ["pass"];
-		// 		expect(result).to.include("pass");
-		// 	} catch (err) {
-		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
-		// 	}
-		// });
-
-		// it("Should add index.htm with multiple tables", async function () {
-		// 	try {
-		// 		const result = ["pass"];
-		// 		expect(result).to.include("pass");
-		// 	} catch (err) {
-		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
-		// 	}
-		// });
+		it("Should add index.htm with multiple tables", async function () {
+			try {
+				const result = ["pass"];
+				expect(result).to.include("pass");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
 
 		// it("Should skip broken building links", async function () {
 		// 	try {
