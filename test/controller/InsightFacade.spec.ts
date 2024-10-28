@@ -31,7 +31,7 @@ describe("InsightFacade", function () {
 	// 	it("Should reject dataset add with empty dataset ID");
 	// });
 
-	describe("addDataset - Rooms", function () {
+	describe.only("addDataset - Rooms", function () {
 		let smallCampus: string;
 		let campus: string;
 
@@ -79,10 +79,11 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		it("Should add index.htm with multiple tables", async function () {
+		it.only("Should add index.htm with multiple tables", async function () {
 			try {
-				const result = ["pass"];
-				expect(result).to.include("pass");
+				const multiTable = await getContentFromArchives("rooms/index_multi_table.zip");
+				const result = await facade.addDataset("multi", multiTable, InsightDatasetKind.Rooms);
+				expect(result).to.include("multi");
 			} catch (err) {
 				expect.fail(`Unexpected Error: ${(err as Error).message}`);
 			}

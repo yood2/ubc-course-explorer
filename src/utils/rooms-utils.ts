@@ -1,6 +1,7 @@
 import JSZip = require("jszip");
 import { parse } from "parse5";
 import { BuildingRow, GeoData, IndexRow, ProcessResult, Room } from "../controller/InsightFacade.types";
+import { format } from "path";
 
 /**
  * Parses the zip file and extracts room and building data.
@@ -24,9 +25,8 @@ export async function parseRooms(
 	await Promise.all(
 		indexRows.map(async (indexRow) => {
 			const link = indexRow.href;
-			const length = 2;
-			const modifiedLink = `${link.substring(length)}`;
-			const buildingFile = zip.file(modifiedLink);
+			const formattedLink: string = "" + Object.keys(zip.files).find((path) => path.endsWith(link.slice(2)));
+			const buildingFile = zip.file(formattedLink);
 
 			if (buildingFile) {
 				const buildingRows = await readBuilding(buildingFile);
@@ -95,7 +95,7 @@ export async function readIndex(index: any): Promise<IndexRow[]> {
 	const file = await index.async("string");
 	const document = parse(file);
 
-	const table = findByTag(document, "table")[0];
+	const table = findByClass(document, "views-table cols-5 table")[0];
 	const tbody = findByTag(table, "tbody")[0];
 	const trows = findByTag(tbody, "tr");
 
@@ -193,19 +193,27 @@ function findByClass(node: any, targetClass: string): any {
 }
 
 function getText(node: any): string {
-	let text = "";
-
-	if (node.nodeName === "#text") {
-		text += node.value;
-	}
-
-	if (node.childNodes) {
-		for (const child of node.childNodes) {
-			text += getText(child);
+	try {
+		if (!node) {
+			return "";
 		}
-	}
 
-	return text.trim();
+		let text = "";
+
+		if (node.nodeName === "#text") {
+			text += node.value;
+		}
+
+		if (node.childNodes) {
+			for (const child of node.childNodes) {
+				text += getText(child);
+			}
+		}
+
+		return text.trim();
+	} catch (e) {
+		throw new Error(`getText: Unexpected error for ${node} ${(e as Error).message}`);
+	}
 }
 
 async function fetchData(address: string): Promise<GeoData> {
@@ -220,6 +228,6 @@ async function fetchData(address: string): Promise<GeoData> {
 		const json = await response.json();
 		return json;
 	} catch (e) {
-		throw new Error(`fetchData: Unexpected error, ${(e as Error).message}`);
+		throw new Error(`fetchData: Unexpected error for ${address}, ${(e as Error).message}`);
 	}
 }

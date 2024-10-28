@@ -59,7 +59,11 @@ export default class InsightFacade implements IInsightFacade {
 			const fileId = removeForbiddenCharacters(id);
 			const filePath = `data/${fileId}.json`;
 			await fs.promises.mkdir("data/", { recursive: true });
-			await fs.promises.writeFile(filePath, JSON.stringify({ sections: rows }));
+			if (kind === InsightDatasetKind.Sections) {
+				await fs.promises.writeFile(filePath, JSON.stringify({ sections: rows }));
+			} else {
+				await fs.promises.writeFile(filePath, JSON.stringify({ rooms: rows }));
+			}
 
 			// Add meta data to internal model
 			await addMetadata({
