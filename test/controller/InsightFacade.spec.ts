@@ -34,14 +34,24 @@ describe("InsightFacade", function () {
 		});
 
 		after(async function () {
-			await clearDisk();
+			// await clearDisk();
 		});
 
-		it("Should accept valid rooms dataset", async function () {
+		it("Should accept small, valid rooms dataset", async function () {
 			try {
 				const smallCampus = await getContentFromArchives("rooms/small_campus.zip");
 				const result = await facade.addDataset("small", smallCampus, InsightDatasetKind.Rooms);
 				expect(result).to.include("small");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		it("Should accept large, valid rooms dataset", async function () {
+			try {
+				const smallCampus = await getContentFromArchives("rooms/campus.zip");
+				const result = await facade.addDataset("campus", smallCampus, InsightDatasetKind.Rooms);
+				expect(result).to.include("campus");
 			} catch (err) {
 				expect.fail(`Unexpected Error: ${(err as Error).message}`);
 			}

@@ -25,7 +25,7 @@ export async function parseRooms(
 		indexRows.map(async (indexRow) => {
 			const link = indexRow.href;
 			const length = 2;
-			const modifiedLink = `campus/${link.substring(length)}`;
+			const modifiedLink = `${link.substring(length)}`;
 			const buildingFile = zip.file(modifiedLink);
 
 			if (buildingFile) {
@@ -53,7 +53,7 @@ export function validateRooms(indexRows: IndexRow[], buildingData: Record<string
 
 	for (const indexRow of indexRows) {
 		if (!buildingData[indexRow.shortname] || buildingData[indexRow.shortname].length === 0) {
-			console.warn(`validateRooms: No rooms found for building ${indexRow.shortname}.`);
+			// console.warn(`validateRooms: No rooms found for building ${indexRow.shortname}.`);
 		}
 	}
 }
@@ -137,7 +137,6 @@ export async function readBuilding(building: any): Promise<BuildingRow[]> {
 			furniture: getText(findByClass(row, "views-field views-field-field-room-furniture")[0]),
 			type: getText(findByClass(row, "views-field views-field-field-room-type")[0]),
 		};
-
 		buildingRows.push(room);
 	}
 
@@ -145,20 +144,28 @@ export async function readBuilding(building: any): Promise<BuildingRow[]> {
 }
 
 function findByTag(node: any, tag: string): any[] {
-	const result: any[] = [];
-	const queue: any[] = [node];
-
-	while (queue.length > 0) {
-		const curr = queue.shift();
-		if (curr.tagName === tag) {
-			result.push(curr);
+	try {
+		if (!node) {
+			return [];
 		}
 
-		if (curr.childNodes) {
-			queue.push(...curr.childNodes);
+		const result: any[] = [];
+		const queue: any[] = [node];
+
+		while (queue.length > 0) {
+			const curr = queue.shift();
+			if (curr.tagName === tag) {
+				result.push(curr);
+			}
+
+			if (curr.childNodes) {
+				queue.push(...curr.childNodes);
+			}
 		}
+		return result;
+	} catch (e) {
+		throw new Error(`findByTag: Unexpected error at ${node}, message: ${(e as Error).message}`);
 	}
-	return result;
 }
 
 function findByClass(node: any, targetClass: string): any {
