@@ -1,3 +1,5 @@
+import JSZip = require("jszip");
+
 export type Row = Room | Section;
 
 export interface Section {
@@ -19,12 +21,28 @@ export interface Room {
 	number: string;
 	name: string;
 	address: string;
-	lat: number;
-	lon: number;
+	lat?: number;
+	lon?: number;
 	seats: number;
 	type: string;
 	furniture: string;
 	href: string;
+}
+
+export interface IndexRow {
+	fullname: string;
+	shortname: string;
+	address: string;
+	href: string;
+	lat?: number;
+	lon?: number;
+}
+
+export interface BuildingRow {
+	number: string;
+	seats: string;
+	type: string;
+	furniture: string;
 }
 
 export interface Query {
@@ -55,4 +73,14 @@ export interface PreProcessedSection {
 export interface ProcessResult {
 	rows: Section[] | Room[];
 	totalRows: number;
+}
+
+export interface ParsedData {
+	sections?: { folder: JSZip; values: JSZip.JSZipObject[] };
+	rooms?: { indexRows: any[]; buildingData: Record<string, any[]> };
+}
+
+export interface GeoData {
+	lat: number;
+	lon: number;
 }

@@ -7,7 +7,8 @@ import {
 	InsightResult,
 	ResultTooLargeError,
 } from "./IInsightFacade";
-import { Row, Query, Where } from "./InsightFacade.types";
+import { Row, Query, Where, ParsedData } from "./InsightFacade.types";
+// import { Row, Query, Where } from "./InsightFacade.types";
 
 import * as fs from "fs-extra";
 import { QueryUtil, parseOptions } from "../utils/query-utils";
@@ -27,9 +28,9 @@ import { DatasetProcessor } from "./DatasetProcessor";
 export default class InsightFacade implements IInsightFacade {
 	/**
 	 * Adds a new dataset into the InsightFacade.
-	 * 1. Checks id, checks content, checks kind.
-	 * 2. Confirms data directions, writes file to path.
-	 * 3. Adds meta data to internal model
+	 * 1. Checks id, checks content
+	 * 2. Validate, parse, process
+	 * 3. Write file and metadata
 	 *
 	 * @param id - id for dataset to add
 	 * @param content - base64 of content to be added
@@ -48,17 +49,21 @@ export default class InsightFacade implements IInsightFacade {
 			// Check if base64
 			checkBase64(content);
 
-			// Validate, parse, process
+			// Parse, validate, process
 			const processor = new DatasetProcessor();
-			const validated = await processor.validate(content, kind);
-			const parsed = await processor.parse(validated, kind);
+			const parsed: ParsedData = await processor.parse(content, kind);
+			await processor.validate(parsed, kind);
 			const { rows, totalRows } = await processor.process(parsed, kind);
 
 			// Writing
 			const fileId = removeForbiddenCharacters(id);
 			const filePath = `data/${fileId}.json`;
 			await fs.promises.mkdir("data/", { recursive: true });
-			await fs.promises.writeFile(filePath, JSON.stringify({ sections: rows }));
+			if (kind === InsightDatasetKind.Sections) {
+				await fs.promises.writeFile(filePath, JSON.stringify({ sections: rows }));
+			} else {
+				await fs.promises.writeFile(filePath, JSON.stringify({ rooms: rows }));
+			}
 
 			// Add meta data to internal model
 			await addMetadata({
@@ -96,6 +101,8 @@ export default class InsightFacade implements IInsightFacade {
 
 			// Remove metadata from InsightFacade
 			await removeMetadata(id);
+
+			return id;
 		} catch (err) {
 			if (err instanceof NotFoundError) {
 				throw new NotFoundError(`removeDataset threw unexpected error: ${err.message}`);
@@ -103,9 +110,6 @@ export default class InsightFacade implements IInsightFacade {
 				throw new InsightError(`removeDataset threw unexpected error: ${err}`);
 			}
 		}
-
-		// Return id of removed dataset
-		return id;
 	}
 
 	public async performQuery(query: unknown): Promise<InsightResult[]> {
