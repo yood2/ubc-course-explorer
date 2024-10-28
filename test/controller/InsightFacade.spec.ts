@@ -28,10 +28,6 @@ describe("InsightFacade", function () {
 
 	// ========== Adding to dataset tests ===================
 	describe("addDataset - Rooms", function () {
-		// before(async function () {
-		// 	rooms = await getContentFromArchives("rooms/small_campus.zip");
-		// });
-
 		this.beforeEach(async function () {
 			await clearDisk();
 			facade = new InsightFacade();
