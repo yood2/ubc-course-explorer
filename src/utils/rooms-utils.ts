@@ -11,6 +11,8 @@ import { BuildingRow, GeoData, IndexRow, ProcessResult, Room } from "../controll
 export async function parseRooms(
 	zip: JSZip
 ): Promise<{ indexRows: IndexRow[]; buildingData: Record<string, BuildingRow[]> }> {
+	validateFolderStructure(zip);
+
 	const indexFile = Object.values(zip.files).find((file) => file.name.endsWith("index.htm"));
 
 	if (!indexFile) {
@@ -24,8 +26,16 @@ export async function parseRooms(
 	await Promise.all(
 		indexRows.map(async (indexRow) => {
 			const link = indexRow.href;
+
+			// Look for the corresponding file in zip by stripping the first 2 characters
 			const length = 2;
-			const formattedLink: string = "" + Object.keys(zip.files).find((path) => path.endsWith(link.slice(length)));
+			const formattedLink = Object.keys(zip.files).find((path) => path.endsWith(link.slice(length)));
+
+			if (!formattedLink) {
+				// Skip if the file does not exist or does not end in .htm
+				return;
+			}
+
 			const buildingFile = zip.file(formattedLink);
 
 			if (buildingFile) {
@@ -229,5 +239,14 @@ async function fetchData(address: string): Promise<GeoData> {
 		return json;
 	} catch (e) {
 		throw new Error(`fetchData: Unexpected error for ${address}, ${(e as Error).message}`);
+	}
+}
+
+function validateFolderStructure(zip: JSZip): void {
+	const requiredPathPattern = /.*\/campus\/discover\/buildings-and-classrooms\/[^/]+\.htm$/;
+	for (const filePath in zip.files) {
+		if (!requiredPathPattern.test(filePath)) {
+			throw new Error(`validateDirectory: invalid folder structure`);
+		}
 	}
 }
