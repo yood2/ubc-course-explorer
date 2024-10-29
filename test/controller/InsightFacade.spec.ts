@@ -31,7 +31,7 @@ describe("InsightFacade", function () {
 	// 	it("Should reject dataset add with empty dataset ID");
 	// });
 
-	describe.only("addDataset - Rooms", function () {
+	describe("addDataset - Rooms", function () {
 		let smallCampus: string;
 		let campus: string;
 
@@ -68,7 +68,7 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		it.only("Should add multiple rooms datasets", async function () {
+		it("Should add multiple rooms datasets", async function () {
 			try {
 				let result = await facade.addDataset("small", smallCampus, InsightDatasetKind.Rooms);
 				expect(result).to.deep.equal(["small"]);
@@ -885,6 +885,7 @@ describe("InsightFacade", function () {
 			const section1: string = await getContentFromArchives("sections/one_course.zip");
 			const section2: string = await getContentFromArchives("sections/two_courses.zip");
 			const section3: string = await getContentFromArchives("sections/one_section.zip");
+			const rooms = await getContentFromArchives("rooms/campus.zip");
 			facade = new InsightFacade();
 
 			// const loadDatasetPromises: Promise<string[]>[] = [
@@ -904,6 +905,7 @@ describe("InsightFacade", function () {
 			await facade.addDataset("section1", section1, InsightDatasetKind.Sections);
 			await facade.addDataset("section2", section2, InsightDatasetKind.Sections);
 			await facade.addDataset("section3", section3, InsightDatasetKind.Sections);
+			await facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms);
 		});
 
 		after(async function () {
@@ -921,29 +923,36 @@ describe("InsightFacade", function () {
 			// Destructuring assignment to reduce property accesses
 			const { input, expected, errorExpected } = await loadTestQuery(this.test.title);
 
-			let orderFlag = false;
-			let order = "";
-
-			if (input !== null && typeof input === "object") {
-				// only need OPTIONS in object as we're just checking if order exists in this block of code
-				const hasOptions = input as { OPTIONS: { ORDER?: any } };
-
-				// Check if the ORDER key exists in OPTIONS
-				if (hasOptions.OPTIONS && "ORDER" in hasOptions.OPTIONS) {
-					orderFlag = true; // Set flag to true if ORDER exists
-					order = hasOptions.OPTIONS.ORDER as string;
-				}
-			}
-
 			try {
 				const result: InsightResult[] = await facade.performQuery(input);
+
+				let orderFlag = false;
+				let keys: string[] = [];
+
+				if (input !== null && typeof input === "object") {
+					// only need OPTIONS in object as we're just checking if order exists in this block of code
+					const hasOptions = input as { OPTIONS: { ORDER?: any } };
+
+					// Check if the ORDER key exists in OPTIONS
+					if (hasOptions.OPTIONS && "ORDER" in hasOptions.OPTIONS) {
+						orderFlag = true; // Set flag to true if ORDER exists
+						const orderOption = hasOptions.OPTIONS.ORDER;
+						if (typeof orderOption === "string") {
+							keys[0] = orderOption;
+						} else {
+							keys = orderOption.keys;
+						}
+					}
+				}
 
 				if (!errorExpected) {
 					expect(result.length).to.equal(expected.length);
 					if (orderFlag === true) {
 						expect(result).to.deep.members(expected);
 						for (let i = 0; i < result.length; i++) {
-							expect(result[i][order]).to.equal(expected[i][order]);
+							for (const order of keys) {
+								expect(result[i][order]).to.equal(expected[i][order]);
+							}
 						}
 					} else {
 						expect(result).to.deep.members(expected);
@@ -965,6 +974,14 @@ describe("InsightFacade", function () {
 				}
 			}
 		}
+
+		it("[C2/rooms/valid/no_groupby.json] Simple rooms example without group by", checkQuery);
+		it("[C2/rooms/valid/simple_example.json] Simple rooms example with group by", checkQuery);
+		it("[C2/sort/valid/sort_down.json] simple sort down", checkQuery);
+		it("[C2/sort/valid/sort_up.json] simple sort up", checkQuery);
+		it("[C2/transformation/valid/basic_transformations.json] basic transformations", checkQuery);
+		it("[C2/transformation/valid/basic_group.json] basic groups", checkQuery);
+		it("[C2/transformation/valid/multi_apply_tokens.json] transformation with multiple apply tokens", checkQuery);
 
 		it("[Daniel/empty_nested_filters.json] Nested filters have empty value", checkQuery);
 		it("[Daniel/deeply_nested_filters.json] Query with deeply nested filters", checkQuery);

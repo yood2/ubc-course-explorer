@@ -1,140 +1,78 @@
 import { InsightError } from "../controller/IInsightFacade";
-import { Query, Row, Where } from "../controller/InsightFacade.types";
+import { Query } from "../controller/InsightFacade.types";
 
-export const sectionFields = {
-	mfields: ["avg", "pass", "fail", "audit", "year"],
-	sfields: ["dept", "id", "instructor", "title", "uuid"],
-};
+// gets key for the Comparisons
+// throws error if key is invalid
+export function getKey(baseKey: string, datasetID: string): string {
+	const keyParts = baseKey.split("_");
+	const two = 2;
 
-export const roomsFields = {
-	mfields: ["lat", "lon", "seats"],
-	sfields: ["fullname", "shortname", "number", "name", "address", "type", "furniture", "href"],
-};
-
-export function parseOptions(options: any): Record<string, any> {
-	const columns = options.COLUMNS as string[];
-	let order = "";
-
-	if ("ORDER" in options) {
-		order = options.ORDER as string;
-		if (!columns.includes(order)) {
-			throw new InsightError("ORDER must be in columns!");
-		}
+	// make sure key has exactly one underscore
+	if (keyParts.length !== two) {
+		throw new InsightError("invalid key in comparison, contains more than one underscore");
 	}
 
-	return {
-		order: order,
-		columns: columns,
-		datasetID: columns[0].split("_")[0],
-	};
+	// check if key references a different dataset
+	if (datasetID !== keyParts[0]) {
+		throw new InsightError("key referenced a different dataset!");
+	}
+
+	return keyParts[1];
 }
 
-export class QueryUtil {
+// validates query functions
+export class ValidateQuery {
 	private mfields: string[] = [];
 	private sfields: string[] = [];
 	private datasetID = "";
+	public transformationKeys: string[] = [];
+
+	public initializeMembers(mfields: string[], sfields: string[], datasetID: string): void {
+		this.mfields = mfields;
+		this.sfields = sfields;
+		this.datasetID = datasetID;
+	}
 
 	/**
-	 * Constructor for validateQuery
+	 * Checks if query is valid
 	 *
 	 * @param query refers to given query
 	 * @throws Error if query is not valid
 	 */
-	constructor(query: any) {
-		this.validateQueryStructure(query);
-		this.initializeMembers(query);
-		this.validateQueryKeys(query);
-	}
-
-	/**
-	 * Initializes class members for ValidateQuery
-	 *
-	 * @param input refers to given query
-	 * @throws Error if query is not valid
-	 */
-	private initializeMembers(input: any): void {
-		// take the first key of columns to initialize members
-		const columns = input.OPTIONS.COLUMNS;
-		const colParts = columns[0].split("_");
-
-		// get datasetID
-		this.datasetID = colParts[0];
-
-		// set m and s fields according to dataset type
-		const key: string = colParts[1];
-		if (sectionFields.mfields.includes(key) || sectionFields.sfields.includes(key)) {
-			this.mfields = sectionFields.mfields;
-			this.sfields = sectionFields.sfields;
-		} else if (roomsFields.mfields.includes(key) || roomsFields.sfields.includes(key)) {
-			this.mfields = roomsFields.mfields;
-			this.sfields = roomsFields.sfields;
-		} else {
-			throw new InsightError("Columns must contain valid fields.");
+	public validateQueryStructure(query: any): void {
+		// check if query exists:
+		if (query === null || typeof query !== "object") {
+			throw new InsightError("Query has to be an object!");
 		}
+
+		const input = query as Query;
+		// validate size of query
+		this.validateQuerySize(input);
+		this.validateTransformationStructure(input);
+		this.validateWhereStructure(input);
+		this.validateOptionStructure(input);
+		this.validateColumnStructure(input);
 	}
 
-	private validateQueryKeys(input: any): void {
-		this.validateSortKeys(input);
+	public validateQueryKeys(input: any): void {
+		this.validateTransformationKeys(input);
 		this.validateColumnKeys(input.OPTIONS.COLUMNS);
+		this.validateSortKeys(input);
 	}
 
-	private validateSortKeys(input: any): void {
+	private validateQuerySize(input: Query): void {
 		const two = 2;
-		// Check if ORDER exists, and if it does, check if it is a string
-		if ("ORDER" in input.OPTIONS) {
-			// check if order is a string
-			if (typeof input.OPTIONS.ORDER !== "string") {
-				throw new InsightError("ORDER must be a string.");
+		const three = 3;
+
+		if (Object.hasOwn(input, "TRANSFORMATIONS")) {
+			if (Object.keys(input).length > three) {
+				throw new InsightError("Query should only contain WHERE, OPTIONS, and TRANSFORMATIONS!");
 			}
-
-			const orderParts = input.OPTIONS.ORDER.split("_");
-
-			// make sure order has exactly one underscore
-			if (orderParts.length !== two) {
-				throw new InsightError("Dataset ID can only have one underscore");
-			}
-			const order: string = orderParts[1];
-
-			// check if order references a different dataset
-			if (this.datasetID !== orderParts[0]) {
-				throw new InsightError("ORDER referenced a different dataset!");
-			}
-
-			// check if order is a valid field
-			if (!this.mfields.includes(order) && !this.sfields.includes(order)) {
-				throw new InsightError("ORDER must be a valid field.");
+		} else {
+			if (Object.keys(input).length !== two) {
+				throw new InsightError("Query should only contain WHERE, OPTIONS, and TRANSFORMATIONS!");
 			}
 		}
-	}
-
-	private validateColumnKeys(columns: string[]): void {
-		// make sure datasetID exists
-		const datasetID: string = columns[0].split("_")[0];
-		if (datasetID === "") {
-			throw new InsightError("Dataset ID must exist in columns");
-		}
-
-		// check if COLUMNS only contains valid keys
-		columns.forEach((col) => {
-			const colParts = col.split("_");
-			const two = 2;
-
-			// make sure order has exactly one underscore
-			if (colParts.length !== two) {
-				throw new InsightError("Dataset ID can only have one underscore");
-			}
-
-			const curDatasetID: string = colParts[0];
-
-			if (datasetID !== curDatasetID) {
-				throw new InsightError("Query can only reference one dataset");
-			}
-
-			const key: string = colParts[1];
-			if (!this.mfields.includes(key) && !this.sfields.includes(key)) {
-				throw new InsightError("COLUMNS must only contain valid mfield or sfield keys");
-			}
-		});
 	}
 
 	/**
@@ -200,220 +138,226 @@ export class QueryUtil {
 	}
 
 	/**
-	 * Checks if query is valid
+	 * Checks if transformations is valid
 	 *
-	 * @param query refers to given query
-	 * @throws Error if query is not valid
+	 * @param transformations refers to transformations field in given query
+	 * @throws Error if transforamtions is not valid
 	 */
-	private validateQueryStructure(query: any): asserts query is Query {
-		// check if query exists:
+	private validateTransformationStructure(input: any): void {
+		if (!Object.hasOwn(input, "TRANSFORMATIONS")) {
+			return;
+		}
+
+		const transformations = input.TRANSFORMATIONS;
+
+		if (!Object.hasOwn(transformations, "GROUP") || !Object.hasOwn(transformations, "APPLY")) {
+			throw new InsightError("TRANSFORMATIONS must have 'GROUP' and 'APPLY' fields.");
+		}
+
+		// Validate GROUP
+		const group = transformations.GROUP;
+		if (!Array.isArray(group) || group.some((key) => typeof key !== "string") || group.length === 0) {
+			throw new InsightError("GROUP must be a non-empty array of strings.");
+		}
+
+		// Validate APPLY
+		const apply = transformations.APPLY;
+		if (!Array.isArray(apply)) {
+			throw new InsightError("APPLY must be an array.");
+		}
+
+		apply.forEach((applyRule) => {
+			if (typeof applyRule !== "object" || Object.keys(applyRule).length !== 1) {
+				throw new InsightError("Each APPLY rule must be a single object with one applykey.");
+			}
+
+			const applyKey = Object.keys(applyRule)[0];
+			const ruleDefinition = applyRule[applyKey];
+
+			if (typeof ruleDefinition !== "object" || Object.keys(ruleDefinition).length !== 1) {
+				throw new InsightError("Each applykey must map to an object with one APPLYTOKEN and KEY.");
+			}
+
+			const token = Object.keys(ruleDefinition)[0];
+			if (!["MAX", "MIN", "AVG", "COUNT", "SUM"].includes(token)) {
+				throw new InsightError("Invalid APPLYTOKEN. Must be one of 'MAX', 'MIN', 'AVG', 'COUNT', or 'SUM'.");
+			}
+
+			const key = ruleDefinition[token];
+			if (typeof key !== "string") {
+				throw new InsightError("KEY in APPLY rule must be a string.");
+			}
+		});
+	}
+
+	private validateApplyKeys(apply: any[]): void {
 		const two = 2;
+		apply.forEach((applyRule) => {
+			const applyKey = Object.keys(applyRule)[0];
+			if (applyKey in this.transformationKeys) {
+				throw new InsightError("Apply key must be unique!");
+			}
+			this.transformationKeys.push(applyKey);
 
-		if (query === null || typeof query !== "object") {
-			throw new InsightError("Query has to be an object!");
-		}
-
-		if (Object.keys(query).length !== two) {
-			throw new InsightError("Query should only contain WHERE and OPTIONS!");
-		}
-
-		const input = query as Query;
-		this.validateWhereStructure(input);
-		this.validateOptionStructure(input);
-		this.validateColumnStructure(input);
-	}
-
-	// gets key for the Comparisons
-	// throws error if key is invalid
-	private getKey(baseKey: string, datasetID: string): string {
-		const keyParts = baseKey.split("_");
-		const two = 2;
-
-		// make sure order has exactly one underscore
-		if (keyParts.length !== two) {
-			throw new InsightError("invalid key in comparison, contains more than one underscore");
-		}
-
-		// check if key references a different dataset
-		if (datasetID !== keyParts[0]) {
-			throw new InsightError("key referenced a different dataset!");
-		}
-
-		return keyParts[1];
-	}
-
-	private MComparison(where: Where, row: Row, datasetID: string): boolean {
-		const filterKey = Object.keys(where)[0];
-		const filter = where[filterKey];
-
-		const key = this.getKey(Object.keys(filter)[0], datasetID);
-		if (!this.mfields.includes(key)) {
-			throw new InsightError("MComparison contains an invalid sfield");
-		}
-
-		const sectionValue = row[key as keyof Row];
-		const filterValue = filter[Object.keys(filter)[0]];
-
-		if (typeof sectionValue !== "number") {
-			throw new InsightError(`${filterKey} must be a number!`);
-		}
-
-		if (typeof filterValue !== "number") {
-			throw new InsightError(`${filterKey} must be a number!`);
-		}
-
-		switch (filterKey) {
-			case "LT":
-				return sectionValue < filterValue;
-
-			case "GT":
-				return sectionValue > filterValue;
-
-			case "EQ":
-				return sectionValue === filterValue;
-
-			default:
-				throw new InsightError("Where contains an invalid base comparison");
-		}
-	}
-
-	private wildCardComparison(filterValue: string, sectionValue: string): boolean {
-		const wildcards = filterValue.split("*");
-		const two = 2;
-
-		const beginning = wildcards[0];
-		const end = wildcards.at(-1);
-
-		// > 2 asterixes
-		if (wildcards.length - 1 > two) {
-			throw new InsightError("Can only have at most 2 asterixes");
-		}
-
-		// 1 asterix
-		if (wildcards.length - 1 === 1) {
-			if (filterValue.length === 1) {
-				// any string works
-				return true;
+			// validate apply key
+			if (applyKey.includes("_")) {
+				throw new InsightError("Apply key cannot contain any underscores!");
 			}
 
-			if (beginning === "") {
-				// any string before value works
-				const regex = new RegExp(`${wildcards[1]}$`);
-				return regex.test(sectionValue);
+			const ruleDefinition = applyRule[applyKey];
+			const key = ruleDefinition[Object.keys(ruleDefinition)[0]];
+
+			const keyParts = key.split("_");
+			if (keyParts.length !== two) {
+				throw new InsightError("APPLY keys must be in the format 'datasetID_field'.");
 			}
 
-			if (end === "") {
-				// any string after value works
-				const regex = new RegExp(`^${wildcards[0]}`);
-
-				return regex.test(sectionValue);
+			const [curDatasetID, fieldKey] = keyParts;
+			if (this.datasetID !== curDatasetID) {
+				throw new InsightError("APPLY keys references another dataset");
 			}
 
-			throw new InsightError("The filter can only have an asterix at the start or end of the string");
-		}
-
-		// 2 asterixes
-		if (beginning !== "" || end !== "") {
-			throw new InsightError("The filter can only have an asterix at the start or end of the string");
-		}
-
-		// any string containing value works
-		const regex = new RegExp(`.*${wildcards[1]}`);
-
-		return regex.test(sectionValue);
-	}
-
-	private SComparison(where: Where, row: Row, datasetID: string): boolean {
-		const filterKey = Object.keys(where)[0];
-		const filter = where[filterKey];
-
-		const key = this.getKey(Object.keys(filter)[0], datasetID);
-		if (!this.sfields.includes(key)) {
-			throw new InsightError("SComparison contains an invalid sfield");
-		}
-
-		const filterValue = filter[Object.keys(filter)[0]];
-		const sectionValue = row[key as keyof Row];
-
-		if (typeof filterValue !== "string") {
-			throw new InsightError(`${filterKey} must be a string!`);
-		}
-
-		if (!filterValue.includes("*")) {
-			return filterValue === sectionValue;
-		}
-
-		if (typeof sectionValue === "string" && typeof filterValue === "string") {
-			return this.wildCardComparison(filterValue, sectionValue);
-		}
-		throw new InsightError("section value has to be a string!");
-	}
-
-	/*
-	- Helper function for matchQuery
-	- Run this when where contains an object and not an array
-*/
-	private matchSingleObject(where: Where, row: Row): boolean {
-		const filterKey = Object.keys(where)[0];
-		const filter = where[filterKey];
-		const datasetID = this.datasetID;
-
-		if (Object.keys(filter).length !== 1) {
-			throw new InsightError("filter can only have one outer filter");
-		}
-
-		// If Negation, call matchQuery
-		if (filterKey === "NOT") {
-			return !this.matchQuery(filter, row);
-		}
-
-		// check if filter is SComparison
-		if (filterKey === "IS") {
-			return this.SComparison(where, row, datasetID);
-		}
-
-		// must be mcomparison, if not, will throw an error
-		return this.MComparison(where, row, datasetID);
-	}
-
-	public matchQuery(where: Where, row: Row): boolean {
-		const filterKey = Object.keys(where)[0];
-		const filter = where[filterKey];
-
-		// Base Case: Check if where is a M or S Comparison
-		// If M or S Comparison, compare and return boolean
-		// if negation, call matchQuery on filter
-		if (!Array.isArray(filter)) {
-			return this.matchSingleObject(where, row);
-		}
-
-		// Check if 'where' is an And
-		if (filterKey === "AND") {
-			if (filter.length === 0) {
-				throw new InsightError("And has to have a filter!");
-			}
-			for (const subFilter of filter) {
-				if (!this.matchQuery(subFilter, row)) {
-					return false;
+			const token = Object.keys(ruleDefinition)[0];
+			if (["MAX", "MIN", "AVG", "SUM"].includes(token)) {
+				if (!this.mfields.includes(fieldKey)) {
+					throw new InsightError(`APPLY keys must be a valid mfield for ${token}.`);
+				}
+			} else {
+				if (!this.mfields.includes(fieldKey) && !this.sfields.includes(fieldKey)) {
+					throw new InsightError(`APPLY keys must be valid mfield or sfield for ${token}.`);
 				}
 			}
-			return true;
+		});
+	}
+
+	private validateGroupKeys(group: string[]): void {
+		const two = 2;
+		group.forEach((key) => {
+			this.transformationKeys.push(key);
+			const keyParts = key.split("_");
+
+			if (keyParts.length !== two) {
+				throw new InsightError("GROUP keys must be in the format 'datasetID_field'.");
+			}
+
+			const [curDatasetID, fieldKey] = keyParts;
+			if (this.datasetID !== curDatasetID) {
+				throw new InsightError("GROUP can only reference one dataset.");
+			}
+
+			if (!this.mfields.includes(fieldKey) && !this.sfields.includes(fieldKey)) {
+				throw new InsightError("GROUP keys must be valid mfield or sfield keys.");
+			}
+		});
+	}
+
+	private validateTransformationKeys(input: any): void {
+		if (!Object.hasOwn(input, "TRANSFORMATIONS")) {
+			return;
+		}
+		const group: string[] = input.TRANSFORMATIONS.GROUP;
+		const apply: any[] = input.TRANSFORMATIONS.APPLY;
+
+		// Validate GROUP keys
+		this.validateGroupKeys(group);
+
+		// Validate APPLY keys
+		this.validateApplyKeys(apply);
+	}
+
+	private validateSortKey(order: string, columns: string[]): void {
+		const two = 2;
+
+		if (!columns.includes(order)) {
+			throw new InsightError("ORDER must be in columns!");
 		}
 
-		// Check if where is an Or
-		if (filterKey === "OR") {
-			if (filter.length === 0) {
-				throw new InsightError("OR has to have a filter!");
+		const orderParts = order.split("_");
+
+		if (this.transformationKeys.length === 0) {
+			// make sure order has exactly one underscore
+			if (orderParts.length !== two) {
+				throw new InsightError("Dataset ID can only have one underscore");
 			}
-			for (const subFilter of filter) {
-				if (this.matchQuery(subFilter, row)) {
-					return true;
+			const orderKey: string = orderParts[1];
+
+			// check if order references a different dataset
+			if (this.datasetID !== orderParts[0]) {
+				throw new InsightError("ORDER referenced a different dataset!");
+			}
+
+			// check if order is a valid field
+			if (!this.mfields.includes(orderKey) && !this.sfields.includes(orderKey)) {
+				throw new InsightError("ORDER must be a valid field.");
+			}
+		} else {
+			// order has to be part of group/apply
+			if (!this.transformationKeys.includes(order)) {
+				throw new InsightError("ORDER must only contain keys from group and apply");
+			}
+		}
+	}
+
+	private validateSortKeys(input: any): void {
+		// Check if ORDER exists, and if it does, check if it is a string
+		if ("ORDER" in input.OPTIONS) {
+			const columns = input.OPTIONS.COLUMNS as string[];
+			const orderOption = input.OPTIONS.ORDER;
+
+			// check if orderOption is a string or SORT object
+			if (typeof orderOption === "string") {
+				this.validateSortKey(orderOption, columns);
+			} else if (typeof orderOption === "object" && "dir" in orderOption && "keys" in orderOption) {
+				const { dir, keys } = orderOption;
+
+				if (dir !== "UP" && dir !== "DOWN") {
+					throw new InsightError("Invalid direction in ORDER!");
+				}
+
+				keys.forEach((key: string) => {
+					this.validateSortKey(key, columns);
+				});
+			} else {
+				throw new InsightError("ORDER must be a string or valid SORT object.");
+			}
+		}
+	}
+
+	private validateColumnKeys(columns: string[]): void {
+		// make sure datasetID exists
+		const datasetID: string = columns[0].split("_")[0];
+		if (datasetID === "") {
+			throw new InsightError("Dataset ID must exist in columns");
+		}
+
+		// check if COLUMNS only contains valid keys
+		columns.forEach((col) => {
+			const colParts = col.split("_");
+			const two = 2;
+			if (this.transformationKeys.length === 0) {
+				// make sure dataset id has exactly one underscore
+				if (colParts.length !== two) {
+					throw new InsightError("Dataset ID can only have one underscore");
+				}
+
+				const curDatasetID: string = colParts[0];
+
+				if (datasetID !== curDatasetID) {
+					throw new InsightError("Query can only reference one dataset");
+				}
+
+				const key: string = colParts[1];
+
+				// columns has to be part of m/sfield for room/section
+				if (!this.mfields.includes(key) && !this.sfields.includes(key)) {
+					throw new InsightError("COLUMNS must only contain valid mfield or sfield keys");
+				}
+			} else {
+				// columns has to be part of group/apply
+				if (!this.transformationKeys.includes(col)) {
+					throw new InsightError("COLUMNS must only contain keys from group and apply");
 				}
 			}
-			return false;
-		}
-
-		// Doesn't belong to any valid filter, return insightError
-		throw new InsightError("where does not contain any valid filters");
+		});
 	}
 }

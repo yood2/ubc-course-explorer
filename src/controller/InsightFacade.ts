@@ -11,9 +11,16 @@ import { Row, Query, Where, ParsedData } from "./InsightFacade.types";
 // import { Row, Query, Where } from "./InsightFacade.types";
 
 import * as fs from "fs-extra";
-import { QueryUtil, parseOptions } from "../utils/query-utils";
+import { QueryEngine, parseOptions, parseTransformations } from "./QueryEngine";
 import { addMetadata, readMetadata, removeMetadata, getIds } from "../utils/metadata-utils";
-import { loadDataset, makeAttribute, removeForbiddenCharacters, sortResult } from "../utils/insight-utils";
+import {
+	loadDataset,
+	makeAttribute,
+	performTransformations,
+	removeForbiddenCharacters,
+	sortResult,
+	trimResults,
+} from "../utils/insight-utils";
 import { checkId, checkBase64 } from "../utils/validation-utils";
 
 import { DatasetProcessor } from "./DatasetProcessor";
@@ -59,11 +66,7 @@ export default class InsightFacade implements IInsightFacade {
 			const fileId = removeForbiddenCharacters(id);
 			const filePath = `data/${fileId}.json`;
 			await fs.promises.mkdir("data/", { recursive: true });
-			if (kind === InsightDatasetKind.Sections) {
-				await fs.promises.writeFile(filePath, JSON.stringify({ sections: rows }));
-			} else {
-				await fs.promises.writeFile(filePath, JSON.stringify({ rooms: rows }));
-			}
+			await fs.promises.writeFile(filePath, JSON.stringify({ rows: rows }));
 
 			// Add meta data to internal model
 			await addMetadata({
@@ -114,50 +117,61 @@ export default class InsightFacade implements IInsightFacade {
 
 	public async performQuery(query: unknown): Promise<InsightResult[]> {
 		// Create new QueryUtil instance
-		const queryUtil = new QueryUtil(query);
+		const queryUtil = new QueryEngine(query);
 
 		const input: Query = query as Query;
 
+		const transformations = parseTransformations(input);
 		const result: InsightResult[] = [];
-
 		const options = parseOptions(input.OPTIONS);
-		const order = options.order;
-		const columns = options.columns;
-		const keys: string[] = columns.map((col: string) => col.split("_")[1]);
+		// const keys: string[] = options.columns.map((col: string) => col.split("_")[1]);
 		const datasetID = options.datasetID;
+		const where: Where = input.WHERE as Where;
 
 		const rows: Row[] = await loadDataset(datasetID);
 
 		// base case when WHERE is empty
 		if (Object.keys(input.WHERE).length === 0) {
 			rows.forEach((row) => {
-				result.push(makeAttribute(datasetID, keys, row));
+				result.push(makeAttribute(datasetID, row));
 			});
-			return result;
-		}
-
-		const where: Where = input.WHERE as Where;
-
-		// need to filter attributes
-		rows.forEach((row) => {
-			if (queryUtil.matchQuery(where, row)) {
-				result.push(makeAttribute(datasetID, keys, row));
-			}
-		});
-
-		const max = 5000;
-
-		if (result.length > max) {
-			throw new ResultTooLargeError("Result can not be over 5000");
+		} else {
+			rows.forEach((row) => {
+				if (queryUtil.matchQuery(where, row)) {
+					result.push(makeAttribute(datasetID, row));
+				}
+			});
 		}
 
 		let finalResult: InsightResult[] = result;
 
-		if (order !== "") {
-			finalResult = sortResult(order, result);
+		// apply transformations if TRANSOFRMATIONS exist
+		if (Object.keys(transformations).length !== 0) {
+			finalResult = performTransformations(transformations, finalResult);
 		}
 
+		// check if it exceeds 5000 results
+		const max = 5000;
+		if (finalResult.length > max) {
+			throw new ResultTooLargeError("Result can not be over 5000");
+		}
+
+		// sort if ORDER exists
+		if (options.order !== "") {
+			finalResult = sortResult(options.order, finalResult);
+		}
+
+		// trim results to only contain keys from columns
+		finalResult = trimResults(options.columns, finalResult);
+
 		return finalResult;
+
+		/*
+			Todos:
+			- Write tests for invalid sort
+			- Write tests where column keys isn't in group or apply
+			- Write tests where transformation keys are invalid
+		*/
 	}
 
 	/**

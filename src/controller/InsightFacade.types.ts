@@ -52,6 +52,11 @@ export interface Query {
 		COLUMNS: string[];
 		ORDER?: string;
 	};
+
+	TRANSFORMATIONS?: {
+		GROUP: string[];
+		APPLY: any[];
+	};
 }
 
 export type Where = Record<string, any>;
