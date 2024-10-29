@@ -31,7 +31,7 @@ describe("InsightFacade", function () {
 	// 	it("Should reject dataset add with empty dataset ID");
 	// });
 
-	describe("addDataset - Rooms", function () {
+	describe.only("addDataset - Rooms", function () {
 		let smallCampus: string;
 		let campus: string;
 
@@ -82,59 +82,64 @@ describe("InsightFacade", function () {
 		it("Should add index.htm with multiple tables", async function () {
 			try {
 				const multiTable = await getContentFromArchives("rooms/index_multi_table.zip");
-				const result = await facade.addDataset("multi", multiTable, InsightDatasetKind.Rooms);
-				expect(result).to.include("multi");
+				const result = await facade.addDataset("indexMultiTable", multiTable, InsightDatasetKind.Rooms);
+				expect(result).to.include("indexMultiTable");
 			} catch (err) {
 				expect.fail(`Unexpected Error: ${(err as Error).message}`);
 			}
 		});
 
-		// it("Should skip broken building links", async function () {
-		// 	try {
-		// 		const result = ["pass"];
-		// 		expect(result).to.include("pass");
-		// 	} catch (err) {
-		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
-		// 	}
-		// });
+		it("Should skip broken building links", async function () {
+			try {
+				const brokenLink = await getContentFromArchives("rooms/broken_link.zip");
+				const result = await facade.addDataset("brokenLink", brokenLink, InsightDatasetKind.Rooms);
+				expect(result).to.include("brokenLink");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
 
-		// it("Should add building files with multiple tables", async function () {
-		// 	try {
-		// 		const result = ["pass"];
-		// 		expect(result).to.include("pass");
-		// 	} catch (err) {
-		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
-		// 	}
-		// });
+		it("Should add building files with multiple tables", async function () {
+			try {
+				const multiTable = await getContentFromArchives("rooms/building_multi_table.zip");
+				const result = await facade.addDataset("buildingMultiTable", multiTable, InsightDatasetKind.Rooms);
+				expect(result).to.include("buildingMultiTable");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
 
-		// it("Should skip building files with no room table", async function () {
-		// 	try {
-		// 		const result = ["pass"];
-		// 		expect(result).to.include("pass");
-		// 	} catch (err) {
-		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
-		// 	}
-		// });
+		it("Should skip building files with no tables", async function () {
+			try {
+				const buildingNoTable = await getContentFromArchives("rooms/building_no_table.zip");
+				const result = await facade.addDataset("buildingNoTable", buildingNoTable, InsightDatasetKind.Rooms);
+				expect(result).to.include("buildingNoTable");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
 
-		// it("Should add room data with empty optional fields", async function () {
-		// 	try {
-		// 		const result = ["pass"];
-		// 		expect(result).to.include("pass");
-		// 	} catch (err) {
-		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
-		// 	}
-		// });
+		it("Should add room data with empty optional fields", async function () {
+			try {
+				const emptyValues = await getContentFromArchives("rooms/building_empty_values.zip");
+				const result = await facade.addDataset("emptyValues", emptyValues, InsightDatasetKind.Rooms);
+				expect(result).to.include("emptyValues");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		it("Should add valid building file with no room data", async function () {
+			try {
+				const noRoomData = await getContentFromArchives("rooms/building_no_room_data.zip");
+				const result = await facade.addDataset("noRoomData", noRoomData, InsightDatasetKind.Rooms);
+				expect(result).to.include("noRoomData");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
 
 		// it("Should add valid room with proper geolocation data", async function () {
-		// 	try {
-		// 		const result = ["pass"];
-		// 		expect(result).to.include("pass");
-		// 	} catch (err) {
-		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
-		// 	}
-		// });
-
-		// it("Should add valid building file with no room data", async function () {
 		// 	try {
 		// 		const result = ["pass"];
 		// 		expect(result).to.include("pass");
@@ -146,37 +151,64 @@ describe("InsightFacade", function () {
 		// REJECT
 		it("Should reject rooms dataset with no index", async function () {
 			try {
-				smallCampus = await getContentFromArchives("rooms/no_index.zip");
-				await facade.addDataset("small", smallCampus, InsightDatasetKind.Rooms);
+				const noIndex = await getContentFromArchives("rooms/no_index.zip");
+				await facade.addDataset("noIndex", noIndex, InsightDatasetKind.Rooms);
 				expect.fail(`Should have rejected`);
 			} catch (err) {
 				expect(err).to.be.instanceOf(InsightError);
 			}
 		});
 
-		// it("Should reject dataset where contents are not HTML", async function () {
+		it("Should reject dataset where index not html", async function () {
+			try {
+				const indexNotHtml = await getContentFromArchives("rooms/index_not_html.zip");
+				await facade.addDataset("indexNotHtml", indexNotHtml, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		// NOT SURE ABOUT THIS ONE
+		// it("Should reject dataset where buildings not html", async function () {
 		// 	try {
+		// 		const buildingNotHtml = await getContentFromArchives("rooms/building_not_html.zip");
+		// 		await facade.addDataset("buildingNotHtml", buildingNotHtml, InsightDatasetKind.Rooms);
 		// 		expect.fail(`Should have rejected`);
 		// 	} catch (err) {
 		// 		expect(err).to.be.instanceOf(InsightError);
 		// 	}
 		// });
 
-		// it("Should reject index.htm with no tables", async function () {
-		// 	try {
-		// 		expect.fail(`Should have rejected`);
-		// 	} catch (err) {
-		// 		expect(err).to.be.instanceOf(InsightError);
-		// 	}
-		// });
+		it("Should reject index.htm with no tables", async function () {
+			try {
+				const indexNoTable = await getContentFromArchives("rooms/index_no_table.zip");
+				await facade.addDataset("indexNoTable", indexNoTable, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
 
-		// it("Should reject dataset with invalid folder structure", async function () {
-		// 	try {
-		// 		expect.fail(`Should have rejected`);
-		// 	} catch (err) {
-		// 		expect(err).to.be.instanceOf(InsightError);
-		// 	}
-		// });
+		it("Should reject invalid folder structure but correct links", async function () {
+			try {
+				const invalidFolder1 = await getContentFromArchives("rooms/invalid_folder_correct_link.zip");
+				await facade.addDataset("invalidFolder1", invalidFolder1, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("Should reject invalid folder structure and incorrect links", async function () {
+			try {
+				const invalidFolder2 = await getContentFromArchives("rooms/invalid_folder_incorrect_link.zip");
+				await facade.addDataset("invalidFolder2", invalidFolder2, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
 
 		// it("Should reject index.htm with no building files", async function () {
 		// 	try {
