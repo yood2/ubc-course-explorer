@@ -21,7 +21,8 @@
 			]
 		},
 		"OPTIONS": {
-			"COLUMNS": ["section1_dept", "section1_id", "section1_avg"]
+			"COLUMNS": ["section1_dept", "section1_id", "section1_avg"],
+			"ORDER": "section1_avg"
 		}
 	},
 	"errorExpected": false,
