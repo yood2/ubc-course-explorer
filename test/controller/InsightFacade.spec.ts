@@ -23,21 +23,15 @@ export interface ITestQuery {
 }
 
 describe("InsightFacade", function () {
-	let sections: string;
 	let facade: IInsightFacade;
 
-	// ========== Adding to dataset tests ===================
-	// describe.only("addDataset - General", function () {
-	// 	it("Should reject dataset add with empty dataset ID");
-	// });
-
-	describe("addDataset - Rooms", function () {
-		let smallCampus: string;
-		let campus: string;
+	describe("addDataset - General", function () {
+		let smallSections: string;
+		let smallRooms: string;
 
 		before(async function () {
-			smallCampus = await getContentFromArchives("rooms/small_campus.zip");
-			campus = await getContentFromArchives("rooms/campus.zip");
+			smallSections = await getContentFromArchives("sections/one_section.zip");
+			smallRooms = await getContentFromArchives("rooms/one_building.zip");
 		});
 
 		beforeEach(async function () {
@@ -46,13 +40,340 @@ describe("InsightFacade", function () {
 		});
 
 		after(async function () {
-			// await clearDisk();
+			await clearDisk();
 		});
 
-		// ACCEPT
+		/**
+		 * ACCEPTANCE TESTS
+		 * - accept empty required fields
+		 * - accept valid dataset
+		 * - accept dataset with forbidden chars
+		 * - accept dataset with single forbidden char
+		 * - accept multiple valid datasets
+		 * - accept same dataset after removed
+		 */
+
+		it("should accept dataset add with required fields with empty values", async function () {
+			try {
+				const emptyValues = await getContentFromArchives("sections/required_fields_empty_values.zip");
+				const result = await facade.addDataset("sections", emptyValues, InsightDatasetKind.Sections);
+				expect(result).to.include("sections");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		it("should successfuly add a dataset with a forbidden character", async function () {
+			try {
+				const result: string[] = await facade.addDataset("sections<?", smallSections, InsightDatasetKind.Sections);
+				expect(result).to.include("sections<?");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		it("should successfuly add a dataset with a single forbidden character", async function () {
+			try {
+				const result: string[] = await facade.addDataset("?", smallSections, InsightDatasetKind.Sections);
+				expect(result).to.include("?");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		it("should successfully add multiple datasets", async function () {
+			try {
+				const result1: string[] = await facade.addDataset("sections", smallSections, InsightDatasetKind.Sections);
+				const result2: string[] = await facade.addDataset("rooms", smallRooms, InsightDatasetKind.Rooms);
+
+				expect(result1).to.deep.equal(["sections"]);
+				expect(result2).to.deep.equal(["sections", "rooms"]);
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		it("should successfully add the same dataset after it is removed", async function () {
+			try {
+				// first add
+				let result: string[] = await facade.addDataset("sections", smallSections, InsightDatasetKind.Sections);
+				expect(result).to.deep.equal(["sections"]);
+
+				// second add
+				result = await facade.addDataset("rooms", smallRooms, InsightDatasetKind.Rooms);
+				expect(result).to.deep.equal(["sections", "rooms"]);
+
+				// remove and add again
+				await facade.removeDataset("sections");
+				result = await facade.addDataset("sections", smallSections, InsightDatasetKind.Sections);
+				expect(result).to.deep.equal(["rooms", "sections"]);
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		/**
+		 * REJECTION TESTS
+		 * - reject empty dataset id
+		 * - reject id with only whitespace
+		 * - reject id with only underscore
+		 * - reject id containing underscores
+		 * - reject id containing single underscore
+		 * - reject id containing underscore at end
+		 * - reject id containing underscore at beginning
+		 * - reject invalid id after valid add
+		 * - reject content not base64
+		 * - reject same dataset added twice
+		 * - reject dataset with same id
+		 * - reject adding existing dataset id after removal
+		 * - reject invalid dataset id after removal
+		 * - reject same dataset between adds
+		 */
+		it("should reject dataset add with empty dataset id", async function () {
+			try {
+				await facade.addDataset("", smallSections, InsightDatasetKind.Sections);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+
+			try {
+				await facade.addDataset("", smallRooms, InsightDatasetKind.Rooms);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("should reject a dataset add with id containing only whitespace", async function () {
+			try {
+				await facade.addDataset("    ", smallSections, InsightDatasetKind.Sections);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+
+			try {
+				await facade.addDataset("    ", smallRooms, InsightDatasetKind.Rooms);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("should reject a dataset add with an id containing only an underscore", async function () {
+			try {
+				await facade.addDataset("_", smallSections, InsightDatasetKind.Sections);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+
+			try {
+				await facade.addDataset("_", smallRooms, InsightDatasetKind.Rooms);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("should reject a dataset add with an id containing underscores", async function () {
+			try {
+				await facade.addDataset("This_should_fail", smallSections, InsightDatasetKind.Sections);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+
+			try {
+				await facade.addDataset("This_should_fail", smallRooms, InsightDatasetKind.Rooms);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("should reject a dataset add with an id containing single underscore", async function () {
+			try {
+				await facade.addDataset("ThisShould_Fail", smallSections, InsightDatasetKind.Sections);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+
+			try {
+				await facade.addDataset("ThisShould_Fail", smallRooms, InsightDatasetKind.Rooms);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("should reject a dataset add with an id containing underscore at end", async function () {
+			try {
+				await facade.addDataset("ThisShouldFail_", smallSections, InsightDatasetKind.Sections);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+
+			try {
+				await facade.addDataset("ThisShouldFail_", smallRooms, InsightDatasetKind.Rooms);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("should reject a dataset add with an id containing underscore at beginning", async function () {
+			try {
+				await facade.addDataset("_ThisShouldFail", smallSections, InsightDatasetKind.Sections);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+
+			try {
+				await facade.addDataset("_ThisShouldFail", smallRooms, InsightDatasetKind.Rooms);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("should reject a dataset add with invalid id after a valid dataset add", async function () {
+			try {
+				await facade.addDataset("sections", smallSections, InsightDatasetKind.Sections);
+				await facade.addDataset("rooms_", smallRooms, InsightDatasetKind.Rooms);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+
+			try {
+				await facade.addDataset("rooms", smallRooms, InsightDatasetKind.Rooms);
+				await facade.addDataset("sections_", smallSections, InsightDatasetKind.Sections);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("should reject a dataset add with content not structured as a base64 string", async function () {
+			try {
+				await facade.addDataset("sections", "This is not base64 string of a zip file", InsightDatasetKind.Sections);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+
+			try {
+				await facade.addDataset("sections", "This is not base64 string of a zip file", InsightDatasetKind.Rooms);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("Should reject same dataset added consecutively", async function () {
+			try {
+				const result: string[] = await facade.addDataset("sections", smallSections, InsightDatasetKind.Sections);
+				expect(result).to.include("sections");
+				await facade.addDataset("sections", smallSections, InsightDatasetKind.Sections);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+
+			try {
+				const result: string[] = await facade.addDataset("rooms", smallRooms, InsightDatasetKind.Rooms);
+				expect(result).to.include("rooms");
+				await facade.addDataset("rooms", smallRooms, InsightDatasetKind.Rooms);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("Should reject dataset with same id", async function () {
+			try {
+				const result: string[] = await facade.addDataset("sections", smallSections, InsightDatasetKind.Sections);
+				expect(result).to.include("sections");
+				await facade.addDataset("sections", smallRooms, InsightDatasetKind.Rooms);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("should reject adding existing dataset id after remove", async function () {
+			try {
+				await facade.addDataset("sections", smallSections, InsightDatasetKind.Sections);
+				await facade.addDataset("rooms", smallRooms, InsightDatasetKind.Rooms);
+				await facade.removeDataset("sections");
+				await facade.addDataset("rooms", smallSections, InsightDatasetKind.Sections);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("should reject invalid dataset id added after remove", async function () {
+			try {
+				await facade.addDataset("sections", smallSections, InsightDatasetKind.Sections);
+				await facade.addDataset("rooms", smallRooms, InsightDatasetKind.Rooms);
+				await facade.removeDataset("sections");
+				await facade.addDataset("sections_0", smallSections, InsightDatasetKind.Sections);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("should reject same dataset between datasets", async function () {
+			try {
+				// first dataset
+				let result: string[] = await facade.addDataset("sections", smallSections, InsightDatasetKind.Sections);
+				expect(result).to.include("sections");
+
+				// second dataset
+				result = await facade.addDataset("rooms", smallRooms, InsightDatasetKind.Rooms);
+				expect(result).to.deep.equal(["sections", "rooms"]);
+
+				// duplicate dataset
+				await facade.addDataset("sections", smallSections, InsightDatasetKind.Sections);
+				expect.fail("Should have thrown an error.");
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+	});
+
+	describe("addDataset - Rooms", function () {
+		let rooms: string;
+		let smallRooms: string;
+
+		before(async function () {
+			rooms = await getContentFromArchives("rooms/campus.zip");
+			smallRooms = await getContentFromArchives("rooms/small_campus.zip");
+		});
+
+		beforeEach(async function () {
+			await clearDisk();
+			facade = new InsightFacade();
+		});
+
+		after(async function () {
+			await clearDisk();
+		});
+
+		/**
+		 * ACCEPTANCE TESTS
+		 *
+		 */
 		it("Should accept small, valid rooms dataset", async function () {
 			try {
-				const result = await facade.addDataset("small", smallCampus, InsightDatasetKind.Rooms);
+				const result = await facade.addDataset("small", smallRooms, InsightDatasetKind.Rooms);
 				expect(result).to.include("small");
 			} catch (err) {
 				expect.fail(`Unexpected Error: ${(err as Error).message}`);
@@ -61,7 +382,7 @@ describe("InsightFacade", function () {
 
 		it("Should accept large, valid rooms dataset", async function () {
 			try {
-				const result = await facade.addDataset("campus", campus, InsightDatasetKind.Rooms);
+				const result = await facade.addDataset("campus", rooms, InsightDatasetKind.Rooms);
 				expect(result).to.include("campus");
 			} catch (err) {
 				expect.fail(`Unexpected Error: ${(err as Error).message}`);
@@ -70,9 +391,9 @@ describe("InsightFacade", function () {
 
 		it("Should add multiple rooms datasets", async function () {
 			try {
-				let result = await facade.addDataset("small", smallCampus, InsightDatasetKind.Rooms);
+				let result = await facade.addDataset("small", smallRooms, InsightDatasetKind.Rooms);
 				expect(result).to.deep.equal(["small"]);
-				result = await facade.addDataset("campus", campus, InsightDatasetKind.Rooms);
+				result = await facade.addDataset("campus", rooms, InsightDatasetKind.Rooms);
 				expect(result).to.deep.equal(["small", "campus"]);
 			} catch (err) {
 				expect.fail(`Unexpected Error: ${(err as Error).message}`);
@@ -139,14 +460,35 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		// it("Should add valid room with proper geolocation data", async function () {
-		// 	try {
-		// 		const result = ["pass"];
-		// 		expect(result).to.include("pass");
-		// 	} catch (err) {
-		// 		expect.fail(`Unexpected Error: ${(err as Error).message}`);
-		// 	}
-		// });
+		it("Should accept room table with missing capacity", async function () {
+			try {
+				const missingCapacity = await getContentFromArchives("rooms/table_missing_capacity.zip");
+				const result = await facade.addDataset("missingCapacity", missingCapacity, InsightDatasetKind.Rooms);
+				expect(result).to.deep.equal(["missingCapacity"]);
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		it("Should accept room table with missing furniture", async function () {
+			try {
+				const missingFurniture = await getContentFromArchives("rooms/table_missing_furniture.zip");
+				const result = await facade.addDataset("missingFurniture", missingFurniture, InsightDatasetKind.Rooms);
+				expect(result).to.deep.equal(["missingFurniture"]);
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		it("Should accept room table with missing type", async function () {
+			try {
+				const missingType = await getContentFromArchives("rooms/table_missing_type.zip");
+				const result = await facade.addDataset("missingType", missingType, InsightDatasetKind.Rooms);
+				expect(result).to.deep.equal(["missingType"]);
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
 
 		// REJECT
 		it("Should reject rooms dataset with no index", async function () {
@@ -169,17 +511,6 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		// NOT SURE ABOUT THIS ONE
-		// it("Should reject dataset where buildings not html", async function () {
-		// 	try {
-		// 		const buildingNotHtml = await getContentFromArchives("rooms/building_not_html.zip");
-		// 		await facade.addDataset("buildingNotHtml", buildingNotHtml, InsightDatasetKind.Rooms);
-		// 		expect.fail(`Should have rejected`);
-		// 	} catch (err) {
-		// 		expect(err).to.be.instanceOf(InsightError);
-		// 	}
-		// });
-
 		it("Should reject index.htm with no tables", async function () {
 			try {
 				const indexNoTable = await getContentFromArchives("rooms/index_no_table.zip");
@@ -190,37 +521,60 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		// MIGHT BE WRONG
-		// it("Should reject invalid folder structure but correct links", async function () {
-		// 	try {
-		// 		const invalidFolder1 = await getContentFromArchives("rooms/invalid_folder_correct_link.zip");
-		// 		await facade.addDataset("invalidFolder1", invalidFolder1, InsightDatasetKind.Rooms);
-		// 		expect.fail(`Should have rejected`);
-		// 	} catch (err) {
-		// 		expect(err).to.be.instanceOf(InsightError);
-		// 	}
-		// });
+		it("Should reject index.htm with no building files", async function () {
+			try {
+				const indexNoBuildings = await getContentFromArchives("rooms/index_no_buildings.zip");
+				await facade.addDataset("indexNoBuildings", indexNoBuildings, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
 
-		// it("Should reject invalid folder structure and incorrect links", async function () {
-		// 	try {
-		// 		const invalidFolder2 = await getContentFromArchives("rooms/invalid_folder_incorrect_link.zip");
-		// 		await facade.addDataset("invalidFolder2", invalidFolder2, InsightDatasetKind.Rooms);
-		// 		expect.fail(`Should have rejected`);
-		// 	} catch (err) {
-		// 		expect(err).to.be.instanceOf(InsightError);
-		// 	}
-		// });
+		it("Should reject table with missing capacity tag", async function () {
+			try {
+				const tableNoCapacityTag = await getContentFromArchives("rooms/table_missing_capacity_tag.zip");
+				await facade.addDataset("tableNoCapacityTag", tableNoCapacityTag, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
 
-		// it("Should reject index.htm with no building files", async function () {
-		// 	try {
-		// 		expect.fail(`Should have rejected`);
-		// 	} catch (err) {
-		// 		expect(err).to.be.instanceOf(InsightError);
-		// 	}
-		// });
+		it("Should reject table with missing furniture tag", async function () {
+			try {
+				const tableNoFurnitureTag = await getContentFromArchives("rooms/table_missing_furniture_tag.zip");
+				await facade.addDataset("tableNoFurnitureTag", tableNoFurnitureTag, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
 
-		// it("Should reject room table with missing fields (views-field-field-building-address)", async function () {
+		it("Should reject table with missing number tag", async function () {
+			try {
+				const tableNoNumberTag = await getContentFromArchives("rooms/table_missing_number_tag.zip");
+				await facade.addDataset("tableNoNumberTag", tableNoNumberTag, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("Should reject table with missing type tag", async function () {
+			try {
+				const tableNoTypeTag = await getContentFromArchives("rooms/table_missing_type_tag.zip");
+				await facade.addDataset("tableNoTypeTag", tableNoTypeTag, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		// it("Should reject room table with missing table class", async function () {
 		// 	try {
+		// 		const missingTable = await getContentFromArchives("rooms/table_missing_table.zip");
+		// 		await facade.addDataset("missingTable", missingTable, InsightDatasetKind.Rooms);
 		// 		expect.fail(`Should have rejected`);
 		// 	} catch (err) {
 		// 		expect(err).to.be.instanceOf(InsightError);
@@ -250,16 +604,34 @@ describe("InsightFacade", function () {
 		// 		expect(err).to.be.instanceOf(InsightError);
 		// 	}
 		// });
+
+		// MIGHT BE WRONG
+		// it("Should reject invalid folder structure but correct links", async function () {
+		// 	try {
+		// 		const invalidFolder1 = await getContentFromArchives("rooms/invalid_folder_correct_link.zip");
+		// 		await facade.addDataset("invalidFolder1", invalidFolder1, InsightDatasetKind.Rooms);
+		// 		expect.fail(`Should have rejected`);
+		// 	} catch (err) {
+		// 		expect(err).to.be.instanceOf(InsightError);
+		// 	}
+		// });
+
+		// it("Should reject invalid folder structure and incorrect links", async function () {
+		// 	try {
+		// 		const invalidFolder2 = await getContentFromArchives("rooms/invalid_folder_incorrect_link.zip");
+		// 		await facade.addDataset("invalidFolder2", invalidFolder2, InsightDatasetKind.Rooms);
+		// 		expect.fail(`Should have rejected`);
+		// 	} catch (err) {
+		// 		expect(err).to.be.instanceOf(InsightError);
+		// 	}
+		// });
 	});
 
 	describe("addDataset - Sections", function () {
-		let section1: string;
-		let section2: string;
+		let sections: string;
 
 		before(async function () {
 			sections = await getContentFromArchives("sections/three_courses.zip");
-			section1 = await getContentFromArchives("sections/one_course.zip");
-			section2 = await getContentFromArchives("sections/two_courses.zip");
 		});
 
 		beforeEach(async function () {
@@ -271,97 +643,21 @@ describe("InsightFacade", function () {
 			await clearDisk();
 		});
 
-		it("should accept dataset add with required fields with empty values", async function () {
+		/**
+		 * ACCEPTANCE TESTS
+		 */
+		it("should accept a large valid dataset", async function () {
 			try {
-				const validStructure = await getContentFromArchives("sections/required_fields_empty_values.zip");
-				const result = await facade.addDataset("sections", validStructure, InsightDatasetKind.Sections);
-				expect(result).to.include("sections");
+				const result: string[] = await facade.addDataset("section", sections, InsightDatasetKind.Sections);
+				expect(result).to.include("section");
 			} catch (err) {
 				expect.fail(`Unexpected Error: ${(err as Error).message}`);
 			}
 		});
 
-		it("should reject dataset add with an empty dataset id", async function () {
-			try {
-				await facade.addDataset("", sections, InsightDatasetKind.Sections);
-				expect.fail("Should have thrown an error.");
-			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
-			}
-		});
-
-		it("should reject a dataset add with an id containing only whitespace", async function () {
-			try {
-				await facade.addDataset("    ", sections, InsightDatasetKind.Sections);
-				expect.fail("Should have thrown an error.");
-			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
-			}
-		});
-
-		it("should reject a dataset add with an id containing only an underscore", async function () {
-			try {
-				await facade.addDataset("_", sections, InsightDatasetKind.Sections);
-				expect.fail("Should have thrown an error.");
-			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
-			}
-		});
-
-		it("should reject a dataset add with an id containing underscores", async function () {
-			try {
-				await facade.addDataset("This_should_fail", sections, InsightDatasetKind.Sections);
-				expect.fail("Should have thrown an error.");
-			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
-			}
-		});
-
-		it("should reject a dataset add with an id containing underscore", async function () {
-			try {
-				await facade.addDataset("ThisShould_Fail", sections, InsightDatasetKind.Sections);
-				expect.fail("Should have thrown an error.");
-			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
-			}
-		});
-
-		it("should reject a dataset add with an id containing underscore at end", async function () {
-			try {
-				await facade.addDataset("ThisShouldFail_", sections, InsightDatasetKind.Sections);
-				expect.fail("Should have thrown an error.");
-			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
-			}
-		});
-
-		it("should reject a dataset add with an id containing underscore at beginning", async function () {
-			try {
-				await facade.addDataset("_ThisShouldFail", sections, InsightDatasetKind.Sections);
-				expect.fail("Should have thrown an error.");
-			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
-			}
-		});
-
-		it("should reject a dataset add with invalid id after a valid dataset add", async function () {
-			try {
-				await facade.addDataset("section", sections, InsightDatasetKind.Sections);
-				await facade.addDataset("section_", section1, InsightDatasetKind.Sections);
-				expect.fail("Should have thrown an error.");
-			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
-			}
-		});
-
-		it("should reject a dataset add with content not structured as a base64 string", async function () {
-			try {
-				await facade.addDataset("sections", "This is not base64 string of a zip file", InsightDatasetKind.Sections);
-				expect.fail("Should have thrown an error.");
-			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
-			}
-		});
+		/**
+		 * REJECTION TESTS
+		 */
 
 		it("should reject a dataset add with invalid folder structure", async function () {
 			try {
@@ -423,16 +719,6 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		// ROOMS SHOULD NOT CAUSE ANY ISSUES NOW
-		// it("should reject a dataset add when kind isn't sections", async function () {
-		// 	try {
-		// 		await facade.addDataset("section", sections, InsightDatasetKind.Rooms);
-		// 		expect.fail("Should have thrown an error.");
-		// 	} catch (err) {
-		// 		expect(err).to.be.instanceOf(InsightError);
-		// 	}
-		// });
-
 		it("should reject a dataset add with course not containing a results object", async function () {
 			try {
 				const invalidCourse = await getContentFromArchives("sections/invalid_course.zip");
@@ -472,169 +758,11 @@ describe("InsightFacade", function () {
 				expect(err).to.be.instanceOf(InsightError);
 			}
 		});
-
-		it("Should reject same dataset added consecutively", async function () {
-			try {
-				const result: string[] = await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
-				expect(result).to.include("sections");
-				await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
-				expect.fail("Should have thrown an error.");
-			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
-			}
-		});
-
-		it("Should reject dataset with same id", async function () {
-			try {
-				const result: string[] = await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
-				expect(result).to.include("sections");
-				await facade.addDataset("sections", section1, InsightDatasetKind.Sections);
-				expect.fail("Should have thrown an error.");
-			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
-			}
-		});
-
-		it("Add existing dataset id after remove", async function () {
-			try {
-				await facade.addDataset("section0", sections, InsightDatasetKind.Sections);
-				await facade.addDataset("section1", section1, InsightDatasetKind.Sections);
-				await facade.addDataset("section2", section2, InsightDatasetKind.Sections);
-				await facade.removeDataset("section2");
-				await facade.addDataset("section0", sections, InsightDatasetKind.Sections);
-				expect.fail("Should have thrown an error.");
-			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
-			}
-		});
-
-		it("invalid dataset id added after remove", async function () {
-			try {
-				await facade.addDataset("section0", sections, InsightDatasetKind.Sections);
-				await facade.addDataset("section2", section2, InsightDatasetKind.Sections);
-				await facade.removeDataset("section2");
-				await facade.addDataset("section_0", sections, InsightDatasetKind.Sections);
-				expect.fail("Should have thrown an error.");
-			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
-			}
-		});
-
-		it("Should reject same dataset between datasets", async function () {
-			try {
-				// first dataset
-				const result: string[] = await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
-				expect(result).to.include("sections");
-
-				// second dataset
-				const result2: string[] = await facade.addDataset("section1", section1, InsightDatasetKind.Sections);
-				expect(result2).to.include("section1");
-
-				// duplicate dataset
-				await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
-				expect.fail("Should have thrown an error.");
-			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
-			}
-		});
-
-		// faulty datasets (missing info, etc.)
-
-		// should be valid test
-		it("should successfully add a dataset", async function () {
-			try {
-				const result: string[] = await facade.addDataset("section", sections, InsightDatasetKind.Sections);
-				expect(result).to.include("section");
-			} catch (err) {
-				expect.fail(`Unexpected Error: ${(err as Error).message}`);
-			}
-		});
-
-		it("should successfuly add a dataset with a forbidden character", async function () {
-			try {
-				const result: string[] = await facade.addDataset("section<", sections, InsightDatasetKind.Sections);
-				expect(result).to.include("section<");
-			} catch (err) {
-				expect.fail(`Unexpected Error: ${(err as Error).message}`);
-			}
-		});
-
-		it("should successfuly add a dataset with a single forbidden character", async function () {
-			try {
-				const result: string[] = await facade.addDataset("?", sections, InsightDatasetKind.Sections);
-				expect(result).to.include("?");
-			} catch (err) {
-				expect.fail(`Unexpected Error: ${(err as Error).message}`);
-			}
-		});
-
-		it("should successfully add multiple datasets", async function () {
-			try {
-				const result1: string[] = await facade.addDataset("section0", sections, InsightDatasetKind.Sections);
-				const result2: string[] = await facade.addDataset("section1", section1, InsightDatasetKind.Sections);
-				const result3: string[] = await facade.addDataset("section2", section2, InsightDatasetKind.Sections);
-				const result4: string[] = await facade.addDataset("section3", section2, InsightDatasetKind.Sections);
-
-				expect(result1).to.include("section0");
-
-				expect(result2).to.include("section0");
-				expect(result2).to.include("section1");
-
-				expect(result3).to.include("section0");
-				expect(result3).to.include("section1");
-				expect(result3).to.include("section2");
-
-				expect(result4).to.include("section0");
-				expect(result4).to.include("section1");
-				expect(result4).to.include("section2");
-				expect(result4).to.include("section3");
-			} catch (err) {
-				expect.fail(`Unexpected Error: ${(err as Error).message}`);
-			}
-		});
-
-		it("should successfully add the same dataset after it is removed", async function () {
-			try {
-				const sizeTwo = 2;
-				const sizeThree = 3;
-
-				const result1: string[] = await facade.addDataset("section0", sections, InsightDatasetKind.Sections);
-				expect(result1.length).to.equal(1);
-				expect(result1).to.include("section0");
-
-				const result2: string[] = await facade.addDataset("section1", section1, InsightDatasetKind.Sections);
-				expect(result2.length).to.equal(sizeTwo);
-				expect(result2).to.include("section0");
-				expect(result2).to.include("section1");
-
-				const result3: string[] = await facade.addDataset("section2", section2, InsightDatasetKind.Sections);
-				expect(result3.length).to.equal(sizeThree);
-				expect(result3).to.include("section0");
-				expect(result3).to.include("section1");
-				expect(result3).to.include("section2");
-
-				await facade.removeDataset("section0");
-				await facade.removeDataset("section2");
-
-				const result4: string[] = await facade.addDataset("section2", section2, InsightDatasetKind.Sections);
-				expect(result4.length).to.equal(sizeTwo);
-				expect(result4).to.include("section1");
-				expect(result4).to.include("section2");
-				expect(result4).to.not.include("section0");
-
-				const result5: string[] = await facade.addDataset("section5", sections, InsightDatasetKind.Sections);
-				expect(result5.length).to.equal(sizeThree);
-				expect(result5).to.include("section5");
-				expect(result5).to.include("section1");
-				expect(result5).to.include("section2");
-			} catch (err) {
-				expect.fail(`Unexpected Error: ${(err as Error).message}`);
-			}
-		});
 	});
 
 	// ================= removing dataset tests ==========================
 	describe("removeDataset", function () {
+		let sections: string;
 		let section1: string;
 		let section2: string;
 
@@ -910,6 +1038,7 @@ describe("InsightFacade", function () {
 		 *
 		 * Note: the 'this' parameter is automatically set by Mocha and contains information about the test.
 		 */
+		let sections: string;
 
 		before(async function () {
 			// Add the datasets to InsightFacade once.
