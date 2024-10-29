@@ -257,12 +257,3 @@ async function fetchData(address: string): Promise<GeoData> {
 			});
 	});
 }
-
-// function validateFolderStructure(zip: JSZip): void {
-// 	const requiredPathPattern = /.*\/campus\/discover\/buildings-and-classrooms\/[^/]+\.htm$/;
-// 	for (const filePath in zip.files) {
-// 		if (!requiredPathPattern.test(filePath)) {
-// 			throw new Error(`validateDirectory: invalid folder structure`);
-// 		}
-// 	}
-// }

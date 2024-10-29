@@ -7,6 +7,7 @@ export async function loadDataset(datasetID: string): Promise<Row[]> {
 	const filename = removeForbiddenCharacters(datasetID);
 	const data = await fs.readFile(`./data/${filename}.json`, "utf-8");
 	const dataset: unknown = JSON.parse(data);
+
 	validateDataset(dataset);
 
 	const datasetObject = dataset as { rows: Row[] };
@@ -217,6 +218,8 @@ export function validateDataset(dataset: any): asserts dataset is object {
 		throw new Error("ValidationError: dataset must be an object not an array.");
 	}
 	if (!Object.hasOwn(dataset, "rows")) {
+		console.log(Object.hasOwn(dataset, "rows"));
+		console.log("HERE");
 		throw new Error("ValidationError: dataset is missing required field 'rows.");
 	}
 	if (!Array.isArray(dataset.rows)) {
