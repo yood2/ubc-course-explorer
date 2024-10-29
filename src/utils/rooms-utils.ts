@@ -1,4 +1,5 @@
 import JSZip = require("jszip");
+import * as http from "node:http";
 import { parse } from "parse5";
 import { BuildingRow, GeoData, IndexRow, ProcessResult, Room } from "../controller/InsightFacade.types";
 
@@ -11,8 +12,6 @@ import { BuildingRow, GeoData, IndexRow, ProcessResult, Room } from "../controll
 export async function parseRooms(
 	zip: JSZip
 ): Promise<{ indexRows: IndexRow[]; buildingData: Record<string, BuildingRow[]> }> {
-	validateFolderStructure(zip);
-
 	const indexFile = Object.values(zip.files).find((file) => file.name.endsWith("index.htm"));
 
 	if (!indexFile) {
@@ -227,26 +226,43 @@ function getText(node: any): string {
 }
 
 async function fetchData(address: string): Promise<GeoData> {
-	try {
-		const url = `http://cs310.students.cs.ubc.ca:11316/api/v1/project_team034/${address}`;
-		const response = await fetch(url);
+	return new Promise((resolve, reject) => {
+		http
+			.get(
+				{
+					hostname: "cs310.students.cs.ubc.ca",
+					port: 11316,
+					path: `/api/v1/project_team034/${encodeURIComponent(address)}`,
+				},
+				(res) => {
+					let data = "";
 
-		if (!response.ok) {
-			throw new Error("fetchData: Fetch not ok.");
-		}
+					res.on("data", (chunk) => {
+						data += chunk;
+					});
 
-		const json = await response.json();
-		return json;
-	} catch (e) {
-		throw new Error(`fetchData: Unexpected error for ${address}, ${(e as Error).message}`);
-	}
+					// parse to json and resolve
+					res.on("end", () => {
+						try {
+							const jsonData = JSON.parse(data);
+							resolve(jsonData);
+						} catch (_) {
+							reject(new Error("fetchData: Failed to parse JSON"));
+						}
+					});
+				}
+			)
+			.on("error", (error) => {
+				reject(error);
+			});
+	});
 }
 
-function validateFolderStructure(zip: JSZip): void {
-	const requiredPathPattern = /.*\/campus\/discover\/buildings-and-classrooms\/[^/]+\.htm$/;
-	for (const filePath in zip.files) {
-		if (!requiredPathPattern.test(filePath)) {
-			throw new Error(`validateDirectory: invalid folder structure`);
-		}
-	}
-}
+// function validateFolderStructure(zip: JSZip): void {
+// 	const requiredPathPattern = /.*\/campus\/discover\/buildings-and-classrooms\/[^/]+\.htm$/;
+// 	for (const filePath in zip.files) {
+// 		if (!requiredPathPattern.test(filePath)) {
+// 			throw new Error(`validateDirectory: invalid folder structure`);
+// 		}
+// 	}
+// }
