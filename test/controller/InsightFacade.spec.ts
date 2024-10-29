@@ -571,33 +571,7 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		// it("Should reject room table with missing table class", async function () {
-		// 	try {
-		// 		const missingTable = await getContentFromArchives("rooms/table_missing_table.zip");
-		// 		await facade.addDataset("missingTable", missingTable, InsightDatasetKind.Rooms);
-		// 		expect.fail(`Should have rejected`);
-		// 	} catch (err) {
-		// 		expect(err).to.be.instanceOf(InsightError);
-		// 	}
-		// });
-
-		// it("Should reject room data with invalid HTML structure", async function () {
-		// 	try {
-		// 		expect.fail(`Should have rejected`);
-		// 	} catch (err) {
-		// 		expect(err).to.be.instanceOf(InsightError);
-		// 	}
-		// });
-
 		// it("Should reject rooms with failed geolocation requests", async function () {
-		// 	try {
-		// 		expect.fail(`Should have rejected`);
-		// 	} catch (err) {
-		// 		expect(err).to.be.instanceOf(InsightError);
-		// 	}
-		// });
-
-		// it("Should reject a dataset where index.htm links to missing building files", async function () {
 		// 	try {
 		// 		expect.fail(`Should have rejected`);
 		// 	} catch (err) {
