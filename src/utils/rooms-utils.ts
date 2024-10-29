@@ -14,6 +14,8 @@ export async function parseRooms(
 ): Promise<{ indexRows: IndexRow[]; buildingData: Record<string, BuildingRow[]> }> {
 	const indexFile = Object.values(zip.files).find((file) => file.name.endsWith("index.htm"));
 
+	// console.log(zip);
+
 	if (!indexFile) {
 		throw new Error("parseRooms: No index.htm file found.");
 	}
@@ -45,6 +47,10 @@ export async function parseRooms(
 			}
 		})
 	);
+
+	if (Object.keys(buildingData).length === 0) {
+		throw new Error("parseRooms: no valid rooms");
+	}
 
 	return { indexRows, buildingData };
 }
@@ -140,11 +146,20 @@ export async function readBuilding(building: any): Promise<BuildingRow[]> {
 	const buildingRows: BuildingRow[] = [];
 
 	for (const row of trows) {
+		const number = findByTag(findByClass(row, "views-field views-field-field-room-number")[0], "a");
+		const seats = findByClass(row, "views-field views-field-field-room-capacity");
+		const furniture = findByClass(row, "views-field views-field-field-room-furniture");
+		const type = findByClass(row, "views-field views-field-field-room-type");
+
+		if (!number.length || !seats.length || !furniture.length || !type.length) {
+			throw new Error("readBuilding: Tag not found");
+		}
+
 		const room: BuildingRow = {
-			number: getText(findByTag(findByClass(row, "views-field views-field-field-room-number")[0], "a")[0]),
-			seats: getText(findByClass(row, "views-field views-field-field-room-capacity")[0]),
-			furniture: getText(findByClass(row, "views-field views-field-field-room-furniture")[0]),
-			type: getText(findByClass(row, "views-field views-field-field-room-type")[0]),
+			number: getText(number[0]),
+			seats: getText(seats[0]),
+			furniture: getText(furniture[0]),
+			type: getText(type[0]),
 		};
 		buildingRows.push(room);
 	}
