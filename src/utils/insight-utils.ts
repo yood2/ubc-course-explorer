@@ -7,6 +7,7 @@ export async function loadDataset(datasetID: string): Promise<Row[]> {
 	const filename = removeForbiddenCharacters(datasetID);
 	const data = await fs.readFile(`./data/${filename}.json`, "utf-8");
 	const dataset: unknown = JSON.parse(data);
+
 	validateDataset(dataset);
 
 	const datasetObject = dataset as { rows: Row[] };
