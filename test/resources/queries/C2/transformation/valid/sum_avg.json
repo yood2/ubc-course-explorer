@@ -1,0 +1,106 @@
+{
+	"title": "transformations with sum and avg",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"IS": {
+						"sections_dept": "phys"
+					}
+				},
+				{
+					"GT": {
+						"sections_avg": 75
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept", "sections_id", "averageAvg", "sumPass"]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": ["sections_dept", "sections_id"],
+			"APPLY": [
+				{
+					"averageAvg": {
+						"AVG": "sections_avg"
+					}
+				},
+				{
+					"sumPass": {
+						"SUM": "sections_pass"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{ "sections_dept": "phys", "sections_id": "100", "averageAvg": 76.03, "sumPass": 4854 },
+		{ "sections_dept": "phys", "sections_id": "101", "averageAvg": 77.46, "sumPass": 8626 },
+		{ "sections_dept": "phys", "sections_id": "102", "averageAvg": 76.69, "sumPass": 1645 },
+		{ "sections_dept": "phys", "sections_id": "107", "averageAvg": 78.74, "sumPass": 1730 },
+		{ "sections_dept": "phys", "sections_id": "108", "averageAvg": 78.88, "sumPass": 1096 },
+		{ "sections_dept": "phys", "sections_id": "109", "averageAvg": 82.81, "sumPass": 1136 },
+		{ "sections_dept": "phys", "sections_id": "117", "averageAvg": 80.44, "sumPass": 258 },
+		{ "sections_dept": "phys", "sections_id": "118", "averageAvg": 75.03, "sumPass": 217 },
+		{ "sections_dept": "phys", "sections_id": "119", "averageAvg": 83.98, "sumPass": 604 },
+		{ "sections_dept": "phys", "sections_id": "157", "averageAvg": 75.04, "sumPass": 245 },
+		{ "sections_dept": "phys", "sections_id": "159", "averageAvg": 80.67, "sumPass": 1746 },
+		{ "sections_dept": "phys", "sections_id": "170", "averageAvg": 77.2, "sumPass": 3103 },
+		{ "sections_dept": "phys", "sections_id": "200", "averageAvg": 79.44, "sumPass": 450 },
+		{ "sections_dept": "phys", "sections_id": "203", "averageAvg": 75.76, "sumPass": 74 },
+		{ "sections_dept": "phys", "sections_id": "210", "averageAvg": 82.08, "sumPass": 716 },
+		{ "sections_dept": "phys", "sections_id": "216", "averageAvg": 78.41, "sumPass": 312 },
+		{ "sections_dept": "phys", "sections_id": "219", "averageAvg": 79.67, "sumPass": 432 },
+		{ "sections_dept": "phys", "sections_id": "229", "averageAvg": 82.93, "sumPass": 360 },
+		{ "sections_dept": "phys", "sections_id": "301", "averageAvg": 77.5, "sumPass": 1052 },
+		{ "sections_dept": "phys", "sections_id": "304", "averageAvg": 80.21, "sumPass": 1344 },
+		{ "sections_dept": "phys", "sections_id": "305", "averageAvg": 76.17, "sumPass": 142 },
+		{ "sections_dept": "phys", "sections_id": "306", "averageAvg": 79.09, "sumPass": 294 },
+		{ "sections_dept": "phys", "sections_id": "309", "averageAvg": 77.42, "sumPass": 416 },
+		{ "sections_dept": "phys", "sections_id": "312", "averageAvg": 78.59, "sumPass": 162 },
+		{ "sections_dept": "phys", "sections_id": "314", "averageAvg": 77.89, "sumPass": 36 },
+		{ "sections_dept": "phys", "sections_id": "319", "averageAvg": 79.86, "sumPass": 424 },
+		{ "sections_dept": "phys", "sections_id": "333", "averageAvg": 79.4, "sumPass": 184 },
+		{ "sections_dept": "phys", "sections_id": "341", "averageAvg": 76.49, "sumPass": 166 },
+		{ "sections_dept": "phys", "sections_id": "348", "averageAvg": 82.72, "sumPass": 402 },
+		{ "sections_dept": "phys", "sections_id": "349", "averageAvg": 82.51, "sumPass": 41 },
+		{ "sections_dept": "phys", "sections_id": "350", "averageAvg": 77.48, "sumPass": 104 },
+		{ "sections_dept": "phys", "sections_id": "400", "averageAvg": 78.95, "sumPass": 252 },
+		{ "sections_dept": "phys", "sections_id": "401", "averageAvg": 78.56, "sumPass": 384 },
+		{ "sections_dept": "phys", "sections_id": "402", "averageAvg": 79.98, "sumPass": 310 },
+		{ "sections_dept": "phys", "sections_id": "403", "averageAvg": 78.62, "sumPass": 212 },
+		{ "sections_dept": "phys", "sections_id": "404", "averageAvg": 78.46, "sumPass": 392 },
+		{ "sections_dept": "phys", "sections_id": "405", "averageAvg": 78.28, "sumPass": 148 },
+		{ "sections_dept": "phys", "sections_id": "407", "averageAvg": 79.84, "sumPass": 466 },
+		{ "sections_dept": "phys", "sections_id": "408", "averageAvg": 77.27, "sumPass": 832 },
+		{ "sections_dept": "phys", "sections_id": "410", "averageAvg": 79.91, "sumPass": 664 },
+		{ "sections_dept": "phys", "sections_id": "438", "averageAvg": 78.36, "sumPass": 154 },
+		{ "sections_dept": "phys", "sections_id": "449", "averageAvg": 85.79, "sumPass": 394 },
+		{ "sections_dept": "phys", "sections_id": "473", "averageAvg": 78.21, "sumPass": 404 },
+		{ "sections_dept": "phys", "sections_id": "474", "averageAvg": 78.98, "sumPass": 252 },
+		{ "sections_dept": "phys", "sections_id": "500", "averageAvg": 82.61, "sumPass": 562 },
+		{ "sections_dept": "phys", "sections_id": "501", "averageAvg": 84.97, "sumPass": 196 },
+		{ "sections_dept": "phys", "sections_id": "502", "averageAvg": 81.13, "sumPass": 176 },
+		{ "sections_dept": "phys", "sections_id": "503", "averageAvg": 87.99, "sumPass": 110 },
+		{ "sections_dept": "phys", "sections_id": "504", "averageAvg": 85.37, "sumPass": 244 },
+		{ "sections_dept": "phys", "sections_id": "505", "averageAvg": 83.47, "sumPass": 50 },
+		{ "sections_dept": "phys", "sections_id": "506", "averageAvg": 86.89, "sumPass": 72 },
+		{ "sections_dept": "phys", "sections_id": "508", "averageAvg": 92.03, "sumPass": 116 },
+		{ "sections_dept": "phys", "sections_id": "516", "averageAvg": 83, "sumPass": 252 },
+		{ "sections_dept": "phys", "sections_id": "526", "averageAvg": 87.62, "sumPass": 282 },
+		{ "sections_dept": "phys", "sections_id": "534", "averageAvg": 82.66, "sumPass": 100 },
+		{ "sections_dept": "phys", "sections_id": "535", "averageAvg": 87.61, "sumPass": 56 },
+		{ "sections_dept": "phys", "sections_id": "536", "averageAvg": 86.8, "sumPass": 94 },
+		{ "sections_dept": "phys", "sections_id": "539", "averageAvg": 85.04, "sumPass": 86 },
+		{ "sections_dept": "phys", "sections_id": "540", "averageAvg": 82.52, "sumPass": 160 },
+		{ "sections_dept": "phys", "sections_id": "541", "averageAvg": 83.01, "sumPass": 70 },
+		{ "sections_dept": "phys", "sections_id": "543", "averageAvg": 84.93, "sumPass": 74 },
+		{ "sections_dept": "phys", "sections_id": "545", "averageAvg": 89.92, "sumPass": 292 },
+		{ "sections_dept": "phys", "sections_id": "560", "averageAvg": 80.57, "sumPass": 14 },
+		{ "sections_dept": "phys", "sections_id": "565", "averageAvg": 84.33, "sumPass": 34 },
+		{ "sections_dept": "phys", "sections_id": "571", "averageAvg": 86.36, "sumPass": 90 },
+		{ "sections_dept": "phys", "sections_id": "572", "averageAvg": 86.5, "sumPass": 20 }
+	]
+}

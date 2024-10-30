@@ -85,17 +85,20 @@ function applyTokens(row: InsightResult, applyResults: any[]): any[] {
 				apply.total = Math.min(apply.total, row[apply.attribute] as number);
 				break;
 			case "AVG": {
-				apply.total = new Decimal(apply.total);
+				const curVal = new Decimal(apply.total);
 				const val = new Decimal(row[apply.attribute]);
-				apply.total = apply.total.add(val);
+				apply.total = curVal.add(val);
 				break;
 			}
-			case "COUNT":
-				apply.total += 1;
+			case "COUNT": {
+				apply.uniqueVals.add(row[apply.attribute]);
 				break;
-			case "SUM":
-				apply.total = apply.total.add(row[apply.attribute]);
+			}
+			case "SUM": {
+				const curVal = new Decimal(apply.total);
+				apply.total = curVal.add(row[apply.attribute]);
 				break;
+			}
 			default:
 				break;
 		}
@@ -109,6 +112,9 @@ function finalizeTokens(applyResults: any[]): any[] {
 	const two = 2;
 	applyResults.forEach((apply) => {
 		switch (apply.token) {
+			case "COUNT":
+				apply.total = apply.uniqueVals.size;
+				break;
 			case "AVG":
 				apply.total = apply.total.toNumber() / apply.count;
 				apply.total = Number(apply.total.toFixed(two));
@@ -139,6 +145,7 @@ function initializeApply(apply: any[], row: InsightResult): any[] {
 		applyVal.attribute = attribute;
 		applyVal.total = 0;
 		applyVal.count = 0;
+		applyVal.uniqueVals = new Set<number | string>();
 
 		if (applyVal.token === "MAX" || applyVal.token === "MIN") {
 			applyVal.total = row[applyVal.attribute];

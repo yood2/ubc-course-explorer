@@ -1,0 +1,111 @@
+{
+	"title": "transformations with min and avg",
+	"input": {
+		"WHERE": {
+			"OR": [
+				{
+					"IS": {
+						"sections_dept": "cpsc"
+					}
+				},
+				{
+					"IS": {
+						"sections_dept": "cpen"
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept", "sections_id", "totalAvg", "minPass"]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": ["sections_dept", "sections_id"],
+			"APPLY": [
+				{
+					"totalAvg": {
+						"SUM": "sections_avg"
+					}
+				},
+				{
+					"minPass": {
+						"MIN": "sections_pass"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{ "sections_dept": "cpen", "sections_id": "211", "totalAvg": 147.62, "minPass": 256 },
+		{ "sections_dept": "cpen", "sections_id": "221", "totalAvg": 153.12, "minPass": 190 },
+		{ "sections_dept": "cpen", "sections_id": "281", "totalAvg": 301.63, "minPass": 29 },
+		{ "sections_dept": "cpen", "sections_id": "311", "totalAvg": 224.36, "minPass": 51 },
+		{ "sections_dept": "cpen", "sections_id": "312", "totalAvg": 242.51, "minPass": 67 },
+		{ "sections_dept": "cpen", "sections_id": "321", "totalAvg": 161.74, "minPass": 114 },
+		{ "sections_dept": "cpen", "sections_id": "331", "totalAvg": 138.82, "minPass": 99 },
+		{ "sections_dept": "cpen", "sections_id": "333", "totalAvg": 173.8, "minPass": 47 },
+		{ "sections_dept": "cpen", "sections_id": "391", "totalAvg": 243.42, "minPass": 9 },
+		{ "sections_dept": "cpen", "sections_id": "411", "totalAvg": 142.26, "minPass": 38 },
+		{ "sections_dept": "cpen", "sections_id": "412", "totalAvg": 158.7, "minPass": 64 },
+		{ "sections_dept": "cpen", "sections_id": "421", "totalAvg": 146.84, "minPass": 66 },
+		{ "sections_dept": "cpen", "sections_id": "422", "totalAvg": 151.88, "minPass": 86 },
+		{ "sections_dept": "cpen", "sections_id": "431", "totalAvg": 154.26, "minPass": 46 },
+		{ "sections_dept": "cpen", "sections_id": "442", "totalAvg": 162.56, "minPass": 68 },
+		{ "sections_dept": "cpen", "sections_id": "481", "totalAvg": 381.4, "minPass": 33 },
+		{ "sections_dept": "cpen", "sections_id": "491", "totalAvg": 172.64, "minPass": 41 },
+		{ "sections_dept": "cpen", "sections_id": "492", "totalAvg": 171.84, "minPass": 37 },
+		{ "sections_dept": "cpsc", "sections_id": "110", "totalAvg": 4315.79, "minPass": 6 },
+		{ "sections_dept": "cpsc", "sections_id": "121", "totalAvg": 4608.02, "minPass": 5 },
+		{ "sections_dept": "cpsc", "sections_id": "210", "totalAvg": 3403.46, "minPass": 7 },
+		{ "sections_dept": "cpsc", "sections_id": "213", "totalAvg": 3183.71, "minPass": 40 },
+		{ "sections_dept": "cpsc", "sections_id": "221", "totalAvg": 3873.43, "minPass": 25 },
+		{ "sections_dept": "cpsc", "sections_id": "259", "totalAvg": 744.64, "minPass": 119 },
+		{ "sections_dept": "cpsc", "sections_id": "261", "totalAvg": 553.36, "minPass": 104 },
+		{ "sections_dept": "cpsc", "sections_id": "301", "totalAvg": 1145.72, "minPass": 28 },
+		{ "sections_dept": "cpsc", "sections_id": "302", "totalAvg": 1359.2, "minPass": 26 },
+		{ "sections_dept": "cpsc", "sections_id": "303", "totalAvg": 1309.7, "minPass": 14 },
+		{ "sections_dept": "cpsc", "sections_id": "304", "totalAvg": 3128.23, "minPass": 46 },
+		{ "sections_dept": "cpsc", "sections_id": "310", "totalAvg": 3051.73, "minPass": 22 },
+		{ "sections_dept": "cpsc", "sections_id": "311", "totalAvg": 1390.44, "minPass": 28 },
+		{ "sections_dept": "cpsc", "sections_id": "312", "totalAvg": 1614.16, "minPass": 48 },
+		{ "sections_dept": "cpsc", "sections_id": "313", "totalAvg": 2589.4, "minPass": 34 },
+		{ "sections_dept": "cpsc", "sections_id": "314", "totalAvg": 2073.03, "minPass": 17 },
+		{ "sections_dept": "cpsc", "sections_id": "317", "totalAvg": 1959.28, "minPass": 40 },
+		{ "sections_dept": "cpsc", "sections_id": "319", "totalAvg": 1521.28, "minPass": 34 },
+		{ "sections_dept": "cpsc", "sections_id": "320", "totalAvg": 2313.12, "minPass": 52 },
+		{ "sections_dept": "cpsc", "sections_id": "322", "totalAvg": 2266.48, "minPass": 40 },
+		{ "sections_dept": "cpsc", "sections_id": "340", "totalAvg": 1513.82, "minPass": 36 },
+		{ "sections_dept": "cpsc", "sections_id": "344", "totalAvg": 1491, "minPass": 24 },
+		{ "sections_dept": "cpsc", "sections_id": "404", "totalAvg": 2006.77, "minPass": 30 },
+		{ "sections_dept": "cpsc", "sections_id": "410", "totalAvg": 1388, "minPass": 74 },
+		{ "sections_dept": "cpsc", "sections_id": "411", "totalAvg": 1443.3, "minPass": 11 },
+		{ "sections_dept": "cpsc", "sections_id": "415", "totalAvg": 1418.58, "minPass": 24 },
+		{ "sections_dept": "cpsc", "sections_id": "416", "totalAvg": 1348.18, "minPass": 11 },
+		{ "sections_dept": "cpsc", "sections_id": "418", "totalAvg": 483.04, "minPass": 37 },
+		{ "sections_dept": "cpsc", "sections_id": "420", "totalAvg": 1300.28, "minPass": 30 },
+		{ "sections_dept": "cpsc", "sections_id": "421", "totalAvg": 1348.36, "minPass": 16 },
+		{ "sections_dept": "cpsc", "sections_id": "422", "totalAvg": 1314.16, "minPass": 22 },
+		{ "sections_dept": "cpsc", "sections_id": "425", "totalAvg": 1330.7, "minPass": 44 },
+		{ "sections_dept": "cpsc", "sections_id": "430", "totalAvg": 1702.58, "minPass": 42 },
+		{ "sections_dept": "cpsc", "sections_id": "444", "totalAvg": 788.38, "minPass": 13 },
+		{ "sections_dept": "cpsc", "sections_id": "445", "totalAvg": 1455.46, "minPass": 16 },
+		{ "sections_dept": "cpsc", "sections_id": "449", "totalAvg": 1446.06, "minPass": 4 },
+		{ "sections_dept": "cpsc", "sections_id": "490", "totalAvg": 1346.55, "minPass": 6 },
+		{ "sections_dept": "cpsc", "sections_id": "500", "totalAvg": 1511.2, "minPass": 13 },
+		{ "sections_dept": "cpsc", "sections_id": "501", "totalAvg": 1077.3, "minPass": 4 },
+		{ "sections_dept": "cpsc", "sections_id": "502", "totalAvg": 1161.48, "minPass": 14 },
+		{ "sections_dept": "cpsc", "sections_id": "503", "totalAvg": 1057, "minPass": 6 },
+		{ "sections_dept": "cpsc", "sections_id": "507", "totalAvg": 874.42, "minPass": 6 },
+		{ "sections_dept": "cpsc", "sections_id": "509", "totalAvg": 860.2, "minPass": 5 },
+		{ "sections_dept": "cpsc", "sections_id": "513", "totalAvg": 1323.14, "minPass": 3 },
+		{ "sections_dept": "cpsc", "sections_id": "515", "totalAvg": 490.78, "minPass": 8 },
+		{ "sections_dept": "cpsc", "sections_id": "521", "totalAvg": 1190.82, "minPass": 7 },
+		{ "sections_dept": "cpsc", "sections_id": "522", "totalAvg": 681.3, "minPass": 7 },
+		{ "sections_dept": "cpsc", "sections_id": "527", "totalAvg": 699.88, "minPass": 9 },
+		{ "sections_dept": "cpsc", "sections_id": "540", "totalAvg": 1373.92, "minPass": 14 },
+		{ "sections_dept": "cpsc", "sections_id": "543", "totalAvg": 1029.4, "minPass": 4 },
+		{ "sections_dept": "cpsc", "sections_id": "544", "totalAvg": 1517.6, "minPass": 6 },
+		{ "sections_dept": "cpsc", "sections_id": "547", "totalAvg": 354.3, "minPass": 17 },
+		{ "sections_dept": "cpsc", "sections_id": "589", "totalAvg": 1457.77, "minPass": 1 }
+	]
+}
