@@ -490,7 +490,27 @@ describe("InsightFacade", function () {
 			}
 		});
 
+		it("Should accept dataset with one building invalid address", async function () {
+			try {
+				const geoOneInvalidAddress = await getContentFromArchives("rooms/geo_one_invalid_address.zip");
+				const result = await facade.addDataset("geoOneInvalidAddress", geoOneInvalidAddress, InsightDatasetKind.Rooms);
+				expect(result).to.deep.equal(["geoOneInvalidAddress"]);
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
 		// REJECT
+		it("Should reject dataset with only invalid addresses", async function () {
+			try {
+				const geoAllInvalidAddress = await getContentFromArchives("rooms/geo_all_invalid_address.zip");
+				await facade.addDataset("geoAllInvalidAddress", geoAllInvalidAddress, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
 		it("Should reject rooms dataset with no index", async function () {
 			try {
 				const noIndex = await getContentFromArchives("rooms/no_index.zip");

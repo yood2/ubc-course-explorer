@@ -114,23 +114,30 @@ export async function readIndex(index: any): Promise<IndexRow[]> {
 	const tbody = findByTag(table, "tbody")[0];
 	const trows = findByTag(tbody, "tr");
 
-	const indexRows: IndexRow[] = await Promise.all(
-		trows.map(async (row) => {
-			const td = findByClass(row, "views-field views-field-title")[0];
-			const aTag = findByTag(td, "a")[0];
-			const addressElement = findByClass(row, "views-field views-field-field-building-address")[0];
-			const geo = await fetchData(getText(addressElement));
+	const indexRows: IndexRow[] = (
+		await Promise.all(
+			trows.map(async (row) => {
+				const td = findByClass(row, "views-field views-field-title")[0];
+				const aTag = findByTag(td, "a")[0];
+				const addressElement = findByClass(row, "views-field views-field-field-building-address")[0];
+				const geo = await fetchData(getText(addressElement));
 
-			return {
-				fullname: getText(aTag),
-				shortname: getText(findByClass(row, "views-field views-field-field-building-code")[0]),
-				address: getText(addressElement),
-				href: aTag.attrs[0].value,
-				lat: geo.lat,
-				lon: geo.lon,
-			};
-		})
-	);
+				// Skip rows with an error in geo
+				if (geo.error) {
+					return null;
+				}
+
+				return {
+					fullname: getText(aTag),
+					shortname: getText(findByClass(row, "views-field views-field-field-building-code")[0]),
+					address: getText(addressElement),
+					href: aTag.attrs[0].value,
+					lat: geo.lat,
+					lon: geo.lon,
+				};
+			})
+		)
+	).filter((row) => row !== null) as IndexRow[]; // Filter out nulls
 
 	return indexRows;
 }
