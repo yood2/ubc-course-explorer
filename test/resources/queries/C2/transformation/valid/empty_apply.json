@@ -1,0 +1,83 @@
+{
+	"title": "transformations with empty apply",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_dept": "chem"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept", "sections_id"]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": ["sections_dept", "sections_id"],
+			"APPLY": []
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{ "sections_dept": "chem", "sections_id": "111" },
+		{ "sections_dept": "chem", "sections_id": "121" },
+		{ "sections_dept": "chem", "sections_id": "123" },
+		{ "sections_dept": "chem", "sections_id": "154" },
+		{ "sections_dept": "chem", "sections_id": "203" },
+		{ "sections_dept": "chem", "sections_id": "205" },
+		{ "sections_dept": "chem", "sections_id": "208" },
+		{ "sections_dept": "chem", "sections_id": "211" },
+		{ "sections_dept": "chem", "sections_id": "213" },
+		{ "sections_dept": "chem", "sections_id": "218" },
+		{ "sections_dept": "chem", "sections_id": "233" },
+		{ "sections_dept": "chem", "sections_id": "235" },
+		{ "sections_dept": "chem", "sections_id": "245" },
+		{ "sections_dept": "chem", "sections_id": "250" },
+		{ "sections_dept": "chem", "sections_id": "251" },
+		{ "sections_dept": "chem", "sections_id": "260" },
+		{ "sections_dept": "chem", "sections_id": "300" },
+		{ "sections_dept": "chem", "sections_id": "301" },
+		{ "sections_dept": "chem", "sections_id": "302" },
+		{ "sections_dept": "chem", "sections_id": "304" },
+		{ "sections_dept": "chem", "sections_id": "305" },
+		{ "sections_dept": "chem", "sections_id": "309" },
+		{ "sections_dept": "chem", "sections_id": "310" },
+		{ "sections_dept": "chem", "sections_id": "311" },
+		{ "sections_dept": "chem", "sections_id": "312" },
+		{ "sections_dept": "chem", "sections_id": "313" },
+		{ "sections_dept": "chem", "sections_id": "315" },
+		{ "sections_dept": "chem", "sections_id": "325" },
+		{ "sections_dept": "chem", "sections_id": "330" },
+		{ "sections_dept": "chem", "sections_id": "333" },
+		{ "sections_dept": "chem", "sections_id": "335" },
+		{ "sections_dept": "chem", "sections_id": "341" },
+		{ "sections_dept": "chem", "sections_id": "345" },
+		{ "sections_dept": "chem", "sections_id": "401" },
+		{ "sections_dept": "chem", "sections_id": "402" },
+		{ "sections_dept": "chem", "sections_id": "403" },
+		{ "sections_dept": "chem", "sections_id": "405" },
+		{ "sections_dept": "chem", "sections_id": "406" },
+		{ "sections_dept": "chem", "sections_id": "407" },
+		{ "sections_dept": "chem", "sections_id": "410" },
+		{ "sections_dept": "chem", "sections_id": "411" },
+		{ "sections_dept": "chem", "sections_id": "412" },
+		{ "sections_dept": "chem", "sections_id": "413" },
+		{ "sections_dept": "chem", "sections_id": "416" },
+		{ "sections_dept": "chem", "sections_id": "417" },
+		{ "sections_dept": "chem", "sections_id": "418" },
+		{ "sections_dept": "chem", "sections_id": "427" },
+		{ "sections_dept": "chem", "sections_id": "435" },
+		{ "sections_dept": "chem", "sections_id": "449" },
+		{ "sections_dept": "chem", "sections_id": "501" },
+		{ "sections_dept": "chem", "sections_id": "502" },
+		{ "sections_dept": "chem", "sections_id": "503" },
+		{ "sections_dept": "chem", "sections_id": "514" },
+		{ "sections_dept": "chem", "sections_id": "524" },
+		{ "sections_dept": "chem", "sections_id": "526" },
+		{ "sections_dept": "chem", "sections_id": "527" },
+		{ "sections_dept": "chem", "sections_id": "529" },
+		{ "sections_dept": "chem", "sections_id": "533" },
+		{ "sections_dept": "chem", "sections_id": "534" },
+		{ "sections_dept": "chem", "sections_id": "563" },
+		{ "sections_dept": "chem", "sections_id": "566" },
+		{ "sections_dept": "chem", "sections_id": "569" },
+		{ "sections_dept": "chem", "sections_id": "573" }
+	]
+}

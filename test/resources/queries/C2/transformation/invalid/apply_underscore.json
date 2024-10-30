@@ -1,0 +1,25 @@
+{
+	"title": "apply has underscore",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"sections_avg": 50
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept", "sections_id", "invalid_key"]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": ["sections_dept", "sections_id"],
+			"APPLY": [
+				{
+					"invalid_key": {
+						"MAX": "sections_avg"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

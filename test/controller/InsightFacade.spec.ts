@@ -1111,6 +1111,8 @@ describe("InsightFacade", function () {
 			}
 		}
 
+		it("[C2/transformation/invalid/apply_underscore.json] apply has underscore", checkQuery);
+
 		it("[C2/rooms/valid/no_groupby.json] Simple rooms example without group by", checkQuery);
 		it("[C2/rooms/valid/simple_example.json] Simple rooms example with group by", checkQuery);
 		it("[C2/sort/valid/sort_down.json] simple sort down", checkQuery);
@@ -1118,6 +1120,11 @@ describe("InsightFacade", function () {
 		it("[C2/transformation/valid/basic_transformations.json] basic transformations", checkQuery);
 		it("[C2/transformation/valid/basic_group.json] basic groups", checkQuery);
 		it("[C2/transformation/valid/multi_apply_tokens.json] transformation with multiple apply tokens", checkQuery);
+		it("[C2/transformation/valid/count.json] transformations with count", checkQuery);
+		it("[C2/transformation/valid/empty_apply.json] transformations with empty apply", checkQuery);
+		it("[C2/transformation/valid/group_multi_keys.json] group has multiple keys", checkQuery);
+		it("[C2/transformation/valid/min_avg.json] transformations with min and avg", checkQuery);
+		it("[C2/transformation/valid/sum_avg.json] transformations with sum and avg", checkQuery);
 
 		it("[Daniel/empty_nested_filters.json] Nested filters have empty value", checkQuery);
 		it("[Daniel/deeply_nested_filters.json] Query with deeply nested filters", checkQuery);
