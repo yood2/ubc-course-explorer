@@ -1121,6 +1121,7 @@ describe("InsightFacade", function () {
 		it("[C2/transformation/valid/basic_group.json] basic groups", checkQuery);
 		it("[C2/transformation/valid/multi_apply_tokens.json] transformation with multiple apply tokens", checkQuery);
 		it("[C2/transformation/valid/count.json] transformations with count", checkQuery);
+		it("[C2/transformation/valid/count2.json] transformations with count 2", checkQuery);
 		it("[C2/transformation/valid/empty_apply.json] transformations with empty apply", checkQuery);
 		it("[C2/transformation/valid/group_multi_keys.json] group has multiple keys", checkQuery);
 		it("[C2/transformation/valid/min_avg.json] transformations with min and avg", checkQuery);
