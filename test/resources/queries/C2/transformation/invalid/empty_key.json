@@ -1,0 +1,25 @@
+{
+	"title": "apply key is empty",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"sections_avg": 50
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept", "sections_id"]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": ["sections_dept", "sections_id"],
+			"APPLY": [
+				{
+					"": {
+						"MAX": "sections_avg"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

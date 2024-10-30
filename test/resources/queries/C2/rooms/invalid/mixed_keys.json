@@ -1,0 +1,38 @@
+{
+	"title": "Simple rooms example but contains keys from section",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"IS": {
+						"rooms_dept": "*Chairs*"
+					}
+				},
+				{
+					"LT": {
+						"rooms_seats": 10
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": ["rooms_fullname", "rooms_shortname", "minSeats"],
+			"ORDER": {
+				"dir": "UP",
+				"keys": ["minSeats"]
+			}
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": ["rooms_fullname", "rooms_shortname"],
+			"APPLY": [
+				{
+					"minSeats": {
+						"MIN": "rooms_seats"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

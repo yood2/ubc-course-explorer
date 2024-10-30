@@ -1,0 +1,34 @@
+{
+	"title": "Simple rooms example but apply key is lower case",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"IS": {
+						"rooms_furniture": "*Chairs*"
+					}
+				},
+				{
+					"LT": {
+						"rooms_seats": 10
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": ["rooms_fullname", "rooms_shortname", "minseats"]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": ["rooms_fullname", "rooms_shortname"],
+			"APPLY": [
+				{
+					"minSeats": {
+						"MIN": "rooms_seats"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

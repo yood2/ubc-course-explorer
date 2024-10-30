@@ -1,0 +1,25 @@
+{
+	"title": "columns has key that isn't in transformations",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"sections_avg": 50
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept", "sections_id", "sections_avg"]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": ["sections_dept", "sections_id"],
+			"APPLY": [
+				{
+					"sectionsAvg": {
+						"MAX": "sections_avg"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

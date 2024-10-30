@@ -179,10 +179,10 @@ function sortUp(keys: string[], result: InsightResult[]): InsightResult[] {
 			const fieldB = b[order as keyof InsightResult];
 
 			if (typeof fieldA === "number" && typeof fieldB === "number") {
-				return fieldA - fieldB;
-			}
-
-			if (typeof fieldA === "string" && typeof fieldB === "string") {
+				if (fieldA !== fieldB) {
+					return fieldA - fieldB;
+				}
+			} else if (typeof fieldA === "string" && typeof fieldB === "string") {
 				if (fieldA < fieldB) {
 					return -1;
 				}
@@ -203,10 +203,10 @@ function sortDown(keys: string[], result: InsightResult[]): InsightResult[] {
 			const fieldB = b[order as keyof InsightResult];
 
 			if (typeof fieldA === "number" && typeof fieldB === "number") {
-				return fieldB - fieldA;
-			}
-
-			if (typeof fieldA === "string" && typeof fieldB === "string") {
+				if (fieldA !== fieldB) {
+					return fieldB - fieldA;
+				}
+			} else if (typeof fieldA === "string" && typeof fieldB === "string") {
 				if (fieldA > fieldB) {
 					return -1;
 				}

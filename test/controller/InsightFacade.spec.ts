@@ -1111,16 +1111,51 @@ describe("InsightFacade", function () {
 			}
 		}
 
-		it("[C2/transformation/invalid/apply_underscore.json] apply has underscore", checkQuery);
-
+		// ROOM TESTS
+		//	- valid room tests
 		it("[C2/rooms/valid/no_groupby.json] Simple rooms example without group by", checkQuery);
-		it("[C2/rooms/valid/simple_example.json] Simple rooms example with group by", checkQuery);
+		it("[C2/rooms/valid/website_example.json] Simple rooms example with group by", checkQuery);
+		it("[C2/rooms/valid/simple_example.json] example from specifications", checkQuery);
+
+		//	- invalid room tests
+		it("[C2/rooms/invalid/mixed_keys.json] Simple rooms example but contains keys from section", checkQuery);
+		it("[C2/rooms/invalid/lowercase_key.json] Simple rooms example but apply key is lower case", checkQuery);
+
+		// SORT TESTS
+		// - valid sort tests
 		it("[C2/sort/valid/sort_down.json] simple sort down", checkQuery);
 		it("[C2/sort/valid/sort_up.json] simple sort up", checkQuery);
+
+		// TRANSFORMATION TESTS
+		//	- invalid transformation tests
+		it("[C2/transformation/invalid/apply_underscore.json] max token takes in sfield", checkQuery);
+		it("[C2/transformation/invalid/max_string.json] apply has underscore", checkQuery);
+		it("[C2/transformation/invalid/columns_key.json] columns has key that isn't in transformations", checkQuery);
+
+		it("[C2/transformation/invalid/different_dataset.json] apply references different dataset", checkQuery);
+		it("[C2/transformation/invalid/duplicate_keys.json] apply contains duplicate keys", checkQuery);
+		it("[C2/transformation/invalid/empty_key.json] apply key is empty", checkQuery);
+		it("[C2/transformation/invalid/invalid_apply_field.json] invalid apply field", checkQuery);
+		it("[C2/transformation/invalid/mixed_apply_keys.json] apply keys references wrong mfield", checkQuery);
+
+		//	- all tokens applied
+		it("[C2/transformation/valid/all_tokens/empty_query.json] empty query with all tokens", checkQuery);
+		it("[C2/transformation/valid/all_tokens/one_row.json] query containing all tokens but only one row", checkQuery);
+		it("[C2/transformation/valid/all_tokens/simple.json] simple query containing all tokens", checkQuery);
+		it("[C2/transformation/valid/all_tokens/only_apply_keys.json] simple query containing only apply keys", checkQuery);
+
+		//	- valid transformation tests
 		it("[C2/transformation/valid/basic_transformations.json] basic transformations", checkQuery);
 		it("[C2/transformation/valid/basic_group.json] basic groups", checkQuery);
 		it("[C2/transformation/valid/multi_apply_tokens.json] transformation with multiple apply tokens", checkQuery);
 		it("[C2/transformation/valid/count.json] transformations with count", checkQuery);
+		it("[C2/transformation/valid/max.json] transformations with max", checkQuery);
+		it("[C2/transformation/valid/min.json] transformations with min", checkQuery);
+		it("[C2/transformation/valid/min2.json] transformations with min 2", checkQuery);
+		it("[C2/transformation/valid/max2.json] transformations with max 2", checkQuery);
+		it("[C2/transformation/valid/max_with_min.json] transformations with max and min", checkQuery);
+		it("[C2/transformation/valid/empty_max.json] transformations with max and empty results", checkQuery);
+		it("[C2/transformation/valid/count2.json] transformations with count 2", checkQuery);
 		it("[C2/transformation/valid/empty_apply.json] transformations with empty apply", checkQuery);
 		it("[C2/transformation/valid/group_multi_keys.json] group has multiple keys", checkQuery);
 		it("[C2/transformation/valid/min_avg.json] transformations with min and avg", checkQuery);

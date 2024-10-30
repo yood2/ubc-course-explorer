@@ -11,7 +11,7 @@ import { Row, Query, Where, ParsedData } from "./InsightFacade.types";
 // import { Row, Query, Where } from "./InsightFacade.types";
 
 import * as fs from "fs-extra";
-import { QueryEngine, parseOptions, parseTransformations } from "./QueryEngine";
+import { QueryEngine } from "./QueryEngine";
 import { addMetadata, readMetadata, removeMetadata, getIds } from "../utils/metadata-utils";
 import {
 	loadDataset,
@@ -121,9 +121,9 @@ export default class InsightFacade implements IInsightFacade {
 
 		const input: Query = query as Query;
 
-		const transformations = parseTransformations(input);
+		const transformations = queryUtil.parseTransformations(input);
 		const result: InsightResult[] = [];
-		const options = parseOptions(input.OPTIONS);
+		const options = queryUtil.parseOptions(input.OPTIONS);
 		// const keys: string[] = options.columns.map((col: string) => col.split("_")[1]);
 		const datasetID = options.datasetID;
 		const where: Where = input.WHERE as Where;
@@ -165,13 +165,6 @@ export default class InsightFacade implements IInsightFacade {
 		finalResult = trimResults(options.columns, finalResult);
 
 		return finalResult;
-
-		/*
-			Todos:
-			- Write tests for invalid sort
-			- Write tests where column keys isn't in group or apply
-			- Write tests where transformation keys are invalid
-		*/
 	}
 
 	/**

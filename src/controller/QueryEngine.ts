@@ -12,28 +12,6 @@ export const roomsFields = {
 	sfields: ["fullname", "shortname", "number", "name", "address", "type", "furniture", "href"],
 };
 
-export function parseTransformations(query: Query): any {
-	if (!Object.hasOwn(query, "TRANSFORMATIONS")) {
-		return {};
-	}
-	return query.TRANSFORMATIONS;
-}
-
-export function parseOptions(options: any): Record<string, any> {
-	const columns = options.COLUMNS as string[];
-	let order: string | { dir: string; keys: string[] } = "";
-
-	if ("ORDER" in options) {
-		order = options.ORDER;
-	}
-
-	return {
-		order: order,
-		columns: columns,
-		datasetID: columns[0].split("_")[0],
-	};
-}
-
 export class QueryEngine {
 	private mfields: string[] = [];
 	private sfields: string[] = [];
@@ -61,14 +39,23 @@ export class QueryEngine {
 	 */
 	private initializeMembers(input: any): void {
 		// take the first key of columns to initialize members
-		const columns = input.OPTIONS.COLUMNS;
-		const colParts = columns[0].split("_");
+		let wholeKey = input.OPTIONS.COLUMNS[0];
+
+		// if column keys doesn't have underscore, then find key in group
+		if (!wholeKey.includes("_")) {
+			if (!Object.hasOwn(input, "TRANSFORMATIONS")) {
+				throw new InsightError("Columns must contain valid fields.");
+			}
+			wholeKey = input.TRANSFORMATIONS.GROUP[0];
+		}
+
+		const keyParts = wholeKey.split("_");
 
 		// get datasetID
-		this.datasetID = colParts[0];
+		this.datasetID = keyParts[0];
 
 		// set m and s fields according to dataset type
-		const key: string = colParts[1];
+		const key: string = keyParts[1];
 		if (sectionFields.mfields.includes(key) || sectionFields.sfields.includes(key)) {
 			this.mfields = sectionFields.mfields;
 			this.sfields = sectionFields.sfields;
@@ -78,6 +65,28 @@ export class QueryEngine {
 		} else {
 			throw new InsightError("Columns must contain valid fields.");
 		}
+	}
+
+	public parseOptions(options: any): Record<string, any> {
+		const columns = options.COLUMNS as string[];
+		let order: string | { dir: string; keys: string[] } = "";
+
+		if ("ORDER" in options) {
+			order = options.ORDER;
+		}
+
+		return {
+			order: order,
+			columns: columns,
+			datasetID: this.datasetID,
+		};
+	}
+
+	public parseTransformations(query: Query): any {
+		if (!Object.hasOwn(query, "TRANSFORMATIONS")) {
+			return {};
+		}
+		return query.TRANSFORMATIONS;
 	}
 
 	private MComparison(where: Where, row: Row, datasetID: string): boolean {

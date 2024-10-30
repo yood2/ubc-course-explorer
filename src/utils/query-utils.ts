@@ -194,15 +194,13 @@ export class ValidateQuery {
 		const two = 2;
 		apply.forEach((applyRule) => {
 			const applyKey = Object.keys(applyRule)[0];
-			if (applyKey in this.transformationKeys) {
-				throw new InsightError("Apply key must be unique!");
-			}
-			this.transformationKeys.push(applyKey);
 
 			// validate apply key
-			if (applyKey.includes("_")) {
-				throw new InsightError("Apply key cannot contain any underscores!");
+			if (applyKey === "" || this.transformationKeys.includes(applyKey) || applyKey.includes("_")) {
+				throw new InsightError("Apply key has invalid formatting!");
 			}
+
+			this.transformationKeys.push(applyKey);
 
 			const ruleDefinition = applyRule[applyKey];
 			const key = ruleDefinition[Object.keys(ruleDefinition)[0]];

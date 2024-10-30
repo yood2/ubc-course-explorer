@@ -1,0 +1,68 @@
+{
+	"title": "query containing all tokens but only one row",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"IS": {
+						"sections_dept": "cpsc"
+					}
+				},
+				{
+					"IS": {
+						"sections_id": "110"
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept", "sections_id", "maxAvg", "minAvg", "totalCount", "averagePass", "sumFail"],
+			"ORDER": {
+				"dir": "UP",
+				"keys": ["sections_dept", "sections_id"]
+			}
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": ["sections_dept", "sections_id"],
+			"APPLY": [
+				{
+					"maxAvg": {
+						"MAX": "sections_avg"
+					}
+				},
+				{
+					"minAvg": {
+						"MIN": "sections_avg"
+					}
+				},
+				{
+					"totalCount": {
+						"COUNT": "sections_uuid"
+					}
+				},
+				{
+					"averagePass": {
+						"AVG": "sections_pass"
+					}
+				},
+				{
+					"sumFail": {
+						"SUM": "sections_fail"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{
+			"sections_dept": "cpsc",
+			"sections_id": "110",
+			"maxAvg": 85.46,
+			"minAvg": 67.79,
+			"totalCount": 58,
+			"averagePass": 171.59,
+			"sumFail": 1576
+		}
+	]
+}
