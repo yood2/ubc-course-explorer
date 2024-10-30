@@ -1,0 +1,206 @@
+{
+	"title": "simple query containing only apply keys",
+	"input": {
+		"WHERE": {
+			"OR": [
+				{
+					"IS": {
+						"sections_dept": "cpsc"
+					}
+				},
+				{
+					"IS": {
+						"sections_dept": "math"
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": ["maxAvg", "minAvg", "totalCount", "averagePass", "sumFail"],
+			"ORDER": {
+				"dir": "UP",
+				"keys": ["totalCount", "maxAvg"]
+			}
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": ["sections_dept", "sections_id"],
+			"APPLY": [
+				{
+					"maxAvg": {
+						"MAX": "sections_avg"
+					}
+				},
+				{
+					"minAvg": {
+						"MIN": "sections_avg"
+					}
+				},
+				{
+					"totalCount": {
+						"COUNT": "sections_uuid"
+					}
+				},
+				{
+					"averagePass": {
+						"AVG": "sections_pass"
+					}
+				},
+				{
+					"sumFail": {
+						"SUM": "sections_fail"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": [
+		{ "maxAvg": 87.8, "minAvg": 87.8, "totalCount": 2, "averagePass": 5, "sumFail": 0 },
+		{ "maxAvg": 86.67, "minAvg": 84.4, "totalCount": 4, "averagePass": 5.5, "sumFail": 0 },
+		{ "maxAvg": 88.68, "minAvg": 88.47, "totalCount": 4, "averagePass": 21, "sumFail": 0 },
+		{ "maxAvg": 90.24, "minAvg": 89.27, "totalCount": 4, "averagePass": 14, "sumFail": 0 },
+		{ "maxAvg": 92.08, "minAvg": 91.73, "totalCount": 4, "averagePass": 12, "sumFail": 0 },
+		{ "maxAvg": 83.36, "minAvg": 79.88, "totalCount": 6, "averagePass": 11.67, "sumFail": 0 },
+		{ "maxAvg": 84.8, "minAvg": 80.89, "totalCount": 6, "averagePass": 14.33, "sumFail": 0 },
+		{ "maxAvg": 86.04, "minAvg": 75.61, "totalCount": 6, "averagePass": 46.67, "sumFail": 6 },
+		{ "maxAvg": 89.6, "minAvg": 83.25, "totalCount": 6, "averagePass": 4.33, "sumFail": 0 },
+		{ "maxAvg": 92, "minAvg": 86, "totalCount": 6, "averagePass": 5.67, "sumFail": 0 },
+		{ "maxAvg": 69.91, "minAvg": 57.78, "totalCount": 8, "averagePass": 19.75, "sumFail": 28 },
+		{ "maxAvg": 71.45, "minAvg": 67.91, "totalCount": 8, "averagePass": 109.75, "sumFail": 102 },
+		{ "maxAvg": 76.93, "minAvg": 66.94, "totalCount": 8, "averagePass": 20.25, "sumFail": 8 },
+		{ "maxAvg": 78.69, "minAvg": 67.25, "totalCount": 8, "averagePass": 16, "sumFail": 8 },
+		{ "maxAvg": 81.67, "minAvg": 73.16, "totalCount": 8, "averagePass": 39.25, "sumFail": 8 },
+		{ "maxAvg": 90.71, "minAvg": 82.55, "totalCount": 8, "averagePass": 12.75, "sumFail": 0 },
+		{ "maxAvg": 91.14, "minAvg": 87.25, "totalCount": 8, "averagePass": 8.75, "sumFail": 0 },
+		{ "maxAvg": 91.22, "minAvg": 83.78, "totalCount": 8, "averagePass": 14.75, "sumFail": 0 },
+		{ "maxAvg": 93.11, "minAvg": 88.8, "totalCount": 8, "averagePass": 6.75, "sumFail": 0 },
+		{ "maxAvg": 97.09, "minAvg": 88, "totalCount": 8, "averagePass": 8.75, "sumFail": 0 },
+		{ "maxAvg": 75.82, "minAvg": 72.4, "totalCount": 10, "averagePass": 173, "sumFail": 144 },
+		{ "maxAvg": 76.38, "minAvg": 72.09, "totalCount": 10, "averagePass": 19.8, "sumFail": 2 },
+		{ "maxAvg": 76.59, "minAvg": 72.39, "totalCount": 10, "averagePass": 21.8, "sumFail": 10 },
+		{ "maxAvg": 80.62, "minAvg": 77.43, "totalCount": 10, "averagePass": 29.2, "sumFail": 2 },
+		{ "maxAvg": 84.16, "minAvg": 72.34, "totalCount": 10, "averagePass": 21.2, "sumFail": 4 },
+		{ "maxAvg": 88, "minAvg": 84.25, "totalCount": 10, "averagePass": 10, "sumFail": 0 },
+		{ "maxAvg": 90, "minAvg": 79.14, "totalCount": 10, "averagePass": 6, "sumFail": 0 },
+		{ "maxAvg": 91.5, "minAvg": 84.56, "totalCount": 10, "averagePass": 6.6, "sumFail": 0 },
+		{ "maxAvg": 91.79, "minAvg": 82.5, "totalCount": 10, "averagePass": 12, "sumFail": 0 },
+		{ "maxAvg": 94.33, "minAvg": 87.5, "totalCount": 10, "averagePass": 6.2, "sumFail": 0 },
+		{ "maxAvg": 95.56, "minAvg": 88.75, "totalCount": 10, "averagePass": 12, "sumFail": 0 },
+		{ "maxAvg": 97.48, "minAvg": 88.75, "totalCount": 10, "averagePass": 11.8, "sumFail": 0 },
+		{ "maxAvg": 89.75, "minAvg": 82.07, "totalCount": 12, "averagePass": 11.33, "sumFail": 0 },
+		{ "maxAvg": 91.75, "minAvg": 81.43, "totalCount": 12, "averagePass": 5.67, "sumFail": 2 },
+		{ "maxAvg": 92.4, "minAvg": 79.17, "totalCount": 12, "averagePass": 7.33, "sumFail": 0 },
+		{ "maxAvg": 94, "minAvg": 83.8, "totalCount": 12, "averagePass": 5.83, "sumFail": 0 },
+		{ "maxAvg": 94.5, "minAvg": 79.25, "totalCount": 12, "averagePass": 11.67, "sumFail": 2 },
+		{ "maxAvg": 96.44, "minAvg": 86.14, "totalCount": 12, "averagePass": 7, "sumFail": 0 },
+		{ "maxAvg": 99.78, "minAvg": 86, "totalCount": 12, "averagePass": 7.17, "sumFail": 0 },
+		{ "maxAvg": 69.62, "minAvg": 63.2, "totalCount": 13, "averagePass": 59.69, "sumFail": 64 },
+		{ "maxAvg": 86.2, "minAvg": 81.06, "totalCount": 14, "averagePass": 16.86, "sumFail": 0 },
+		{ "maxAvg": 87.78, "minAvg": 82.65, "totalCount": 14, "averagePass": 17.29, "sumFail": 2 },
+		{ "maxAvg": 88, "minAvg": 71, "totalCount": 14, "averagePass": 103.57, "sumFail": 62 },
+		{ "maxAvg": 88.8, "minAvg": 75.25, "totalCount": 14, "averagePass": 7.29, "sumFail": 0 },
+		{ "maxAvg": 91.33, "minAvg": 67.38, "totalCount": 14, "averagePass": 4.71, "sumFail": 6 },
+		{ "maxAvg": 93.8, "minAvg": 84.86, "totalCount": 14, "averagePass": 6.86, "sumFail": 0 },
+		{ "maxAvg": 66.26, "minAvg": 58.89, "totalCount": 15, "averagePass": 117.47, "sumFail": 290 },
+		{ "maxAvg": 92.4, "minAvg": 84.5, "totalCount": 15, "averagePass": 12.8, "sumFail": 0 },
+		{ "maxAvg": 89.09, "minAvg": 64, "totalCount": 16, "averagePass": 8.88, "sumFail": 4 },
+		{ "maxAvg": 91.22, "minAvg": 81.12, "totalCount": 16, "averagePass": 41, "sumFail": 0 },
+		{ "maxAvg": 91.38, "minAvg": 61.75, "totalCount": 16, "averagePass": 6.75, "sumFail": 2 },
+		{ "maxAvg": 93.5, "minAvg": 83.08, "totalCount": 16, "averagePass": 6.5, "sumFail": 2 },
+		{ "maxAvg": 93.5, "minAvg": 86.2, "totalCount": 16, "averagePass": 7.25, "sumFail": 0 },
+		{ "maxAvg": 95.67, "minAvg": 85, "totalCount": 16, "averagePass": 6.5, "sumFail": 0 },
+		{ "maxAvg": 96.83, "minAvg": 88, "totalCount": 16, "averagePass": 7, "sumFail": 0 },
+		{ "maxAvg": 95, "minAvg": 75, "totalCount": 17, "averagePass": 2.41, "sumFail": 0 },
+		{ "maxAvg": 72.75, "minAvg": 63.92, "totalCount": 18, "averagePass": 27.78, "sumFail": 34 },
+		{ "maxAvg": 74.01, "minAvg": 63.59, "totalCount": 18, "averagePass": 76.11, "sumFail": 126 },
+		{ "maxAvg": 74.74, "minAvg": 66.66, "totalCount": 18, "averagePass": 28, "sumFail": 38 },
+		{ "maxAvg": 74.84, "minAvg": 67.28, "totalCount": 18, "averagePass": 61.33, "sumFail": 44 },
+		{ "maxAvg": 76.18, "minAvg": 69.9, "totalCount": 18, "averagePass": 34.22, "sumFail": 46 },
+		{ "maxAvg": 77.62, "minAvg": 68.35, "totalCount": 18, "averagePass": 38.89, "sumFail": 46 },
+		{ "maxAvg": 77.68, "minAvg": 71.8, "totalCount": 18, "averagePass": 69.22, "sumFail": 26 },
+		{ "maxAvg": 78.03, "minAvg": 65.67, "totalCount": 18, "averagePass": 48.22, "sumFail": 54 },
+		{ "maxAvg": 78.3, "minAvg": 66.13, "totalCount": 18, "averagePass": 29, "sumFail": 34 },
+		{ "maxAvg": 78.32, "minAvg": 68.77, "totalCount": 18, "averagePass": 42.89, "sumFail": 70 },
+		{ "maxAvg": 79.46, "minAvg": 68.64, "totalCount": 18, "averagePass": 43, "sumFail": 28 },
+		{ "maxAvg": 79.88, "minAvg": 69.47, "totalCount": 18, "averagePass": 31.56, "sumFail": 22 },
+		{ "maxAvg": 80.18, "minAvg": 74.04, "totalCount": 18, "averagePass": 94.56, "sumFail": 16 },
+		{ "maxAvg": 80.72, "minAvg": 64.19, "totalCount": 18, "averagePass": 17.44, "sumFail": 24 },
+		{ "maxAvg": 81.18, "minAvg": 71.75, "totalCount": 18, "averagePass": 41.44, "sumFail": 18 },
+		{ "maxAvg": 81.29, "minAvg": 68.06, "totalCount": 18, "averagePass": 34.33, "sumFail": 28 },
+		{ "maxAvg": 82.63, "minAvg": 69.86, "totalCount": 18, "averagePass": 36.78, "sumFail": 38 },
+		{ "maxAvg": 84.39, "minAvg": 72.83, "totalCount": 18, "averagePass": 54.56, "sumFail": 52 },
+		{ "maxAvg": 86, "minAvg": 72.24, "totalCount": 18, "averagePass": 22.89, "sumFail": 6 },
+		{ "maxAvg": 86.33, "minAvg": 78.87, "totalCount": 18, "averagePass": 19.78, "sumFail": 4 },
+		{ "maxAvg": 86.73, "minAvg": 74.67, "totalCount": 18, "averagePass": 25.56, "sumFail": 0 },
+		{ "maxAvg": 87.71, "minAvg": 77, "totalCount": 18, "averagePass": 20.11, "sumFail": 12 },
+		{ "maxAvg": 88, "minAvg": 81.64, "totalCount": 18, "averagePass": 15.33, "sumFail": 0 },
+		{ "maxAvg": 88.39, "minAvg": 78.93, "totalCount": 18, "averagePass": 56.78, "sumFail": 4 },
+		{ "maxAvg": 88.6, "minAvg": 65.17, "totalCount": 18, "averagePass": 9, "sumFail": 10 },
+		{ "maxAvg": 90.43, "minAvg": 75.36, "totalCount": 18, "averagePass": 7.11, "sumFail": 4 },
+		{ "maxAvg": 91.25, "minAvg": 73.18, "totalCount": 18, "averagePass": 22.89, "sumFail": 6 },
+		{ "maxAvg": 91.56, "minAvg": 80.71, "totalCount": 18, "averagePass": 9.56, "sumFail": 2 },
+		{ "maxAvg": 94.67, "minAvg": 84.56, "totalCount": 18, "averagePass": 8.11, "sumFail": 0 },
+		{ "maxAvg": 96.25, "minAvg": 83.2, "totalCount": 18, "averagePass": 7.22, "sumFail": 0 },
+		{ "maxAvg": 97.25, "minAvg": 80, "totalCount": 18, "averagePass": 6.67, "sumFail": 0 },
+		{ "maxAvg": 73.53, "minAvg": 66.22, "totalCount": 19, "averagePass": 65.16, "sumFail": 132 },
+		{ "maxAvg": 76.73, "minAvg": 66.51, "totalCount": 19, "averagePass": 49.68, "sumFail": 100 },
+		{ "maxAvg": 81.18, "minAvg": 73.3, "totalCount": 19, "averagePass": 57.37, "sumFail": 16 },
+		{ "maxAvg": 73.37, "minAvg": 68.79, "totalCount": 20, "averagePass": 45.6, "sumFail": 86 },
+		{ "maxAvg": 81.23, "minAvg": 60.04, "totalCount": 20, "averagePass": 56.3, "sumFail": 158 },
+		{ "maxAvg": 82.66, "minAvg": 68.4, "totalCount": 20, "averagePass": 83.4, "sumFail": 66 },
+		{ "maxAvg": 83.75, "minAvg": 70.6, "totalCount": 20, "averagePass": 33.05, "sumFail": 18 },
+		{ "maxAvg": 84.08, "minAvg": 67.2, "totalCount": 20, "averagePass": 8.4, "sumFail": 10 },
+		{ "maxAvg": 85.13, "minAvg": 76.52, "totalCount": 20, "averagePass": 97, "sumFail": 26 },
+		{ "maxAvg": 87.64, "minAvg": 72.72, "totalCount": 20, "averagePass": 19, "sumFail": 20 },
+		{ "maxAvg": 89.89, "minAvg": 72.7, "totalCount": 20, "averagePass": 12, "sumFail": 2 },
+		{ "maxAvg": 90.57, "minAvg": 71.91, "totalCount": 20, "averagePass": 10.6, "sumFail": 10 },
+		{ "maxAvg": 92.3, "minAvg": 87.4, "totalCount": 20, "averagePass": 10.5, "sumFail": 0 },
+		{ "maxAvg": 92.63, "minAvg": 75.5, "totalCount": 20, "averagePass": 6.1, "sumFail": 0 },
+		{ "maxAvg": 96.33, "minAvg": 85, "totalCount": 20, "averagePass": 3.8, "sumFail": 0 },
+		{ "maxAvg": 75.54, "minAvg": 65.04, "totalCount": 21, "averagePass": 51.9, "sumFail": 94 },
+		{ "maxAvg": 80.55, "minAvg": 72.75, "totalCount": 22, "averagePass": 71.18, "sumFail": 10 },
+		{ "maxAvg": 76.46, "minAvg": 62.84, "totalCount": 23, "averagePass": 72.09, "sumFail": 148 },
+		{ "maxAvg": 77.67, "minAvg": 63.62, "totalCount": 23, "averagePass": 53.22, "sumFail": 66 },
+		{ "maxAvg": 78.25, "minAvg": 69.38, "totalCount": 23, "averagePass": 48.09, "sumFail": 44 },
+		{ "maxAvg": 85.92, "minAvg": 68.71, "totalCount": 26, "averagePass": 41.81, "sumFail": 12 },
+		{ "maxAvg": 90.25, "minAvg": 67.98, "totalCount": 26, "averagePass": 61, "sumFail": 78 },
+		{ "maxAvg": 76.87, "minAvg": 68.54, "totalCount": 27, "averagePass": 95.26, "sumFail": 140 },
+		{ "maxAvg": 81.82, "minAvg": 68.76, "totalCount": 27, "averagePass": 88.07, "sumFail": 86 },
+		{ "maxAvg": 82.58, "minAvg": 67.85, "totalCount": 27, "averagePass": 62.07, "sumFail": 76 },
+		{ "maxAvg": 78.34, "minAvg": 67.48, "totalCount": 31, "averagePass": 99.74, "sumFail": 186 },
+		{ "maxAvg": 80.08, "minAvg": 64.05, "totalCount": 32, "averagePass": 157.44, "sumFail": 422 },
+		{ "maxAvg": 73.38, "minAvg": 66.34, "totalCount": 33, "averagePass": 137.76, "sumFail": 402 },
+		{ "maxAvg": 75.78, "minAvg": 58.24, "totalCount": 34, "averagePass": 43.59, "sumFail": 160 },
+		{ "maxAvg": 69.94, "minAvg": 51.49, "totalCount": 35, "averagePass": 101.94, "sumFail": 732 },
+		{ "maxAvg": 82.27, "minAvg": 70.46, "totalCount": 35, "averagePass": 113.54, "sumFail": 252 },
+		{ "maxAvg": 71.5, "minAvg": 59.78, "totalCount": 39, "averagePass": 79.33, "sumFail": 500 },
+		{ "maxAvg": 84.6, "minAvg": 72.27, "totalCount": 39, "averagePass": 124.46, "sumFail": 84 },
+		{ "maxAvg": 78.11, "minAvg": 61.79, "totalCount": 41, "averagePass": 87.37, "sumFail": 296 },
+		{ "maxAvg": 85.5, "minAvg": 71.89, "totalCount": 41, "averagePass": 118.93, "sumFail": 88 },
+		{ "maxAvg": 81.76, "minAvg": 64.62, "totalCount": 43, "averagePass": 119.02, "sumFail": 354 },
+		{ "maxAvg": 86.15, "minAvg": 68.13, "totalCount": 46, "averagePass": 122.61, "sumFail": 588 },
+		{ "maxAvg": 75.74, "minAvg": 62.79, "totalCount": 50, "averagePass": 73.36, "sumFail": 284 },
+		{ "maxAvg": 76.58, "minAvg": 61.83, "totalCount": 51, "averagePass": 79.61, "sumFail": 408 },
+		{ "maxAvg": 78.12, "minAvg": 62, "totalCount": 51, "averagePass": 80.16, "sumFail": 424 },
+		{ "maxAvg": 86.47, "minAvg": 65.1, "totalCount": 52, "averagePass": 106.88, "sumFail": 392 },
+		{ "maxAvg": 85.46, "minAvg": 67.79, "totalCount": 58, "averagePass": 171.59, "sumFail": 1576 },
+		{ "maxAvg": 75.79, "minAvg": 55.64, "totalCount": 60, "averagePass": 78.37, "sumFail": 876 },
+		{ "maxAvg": 81.61, "minAvg": 64.03, "totalCount": 61, "averagePass": 50.13, "sumFail": 288 },
+		{ "maxAvg": 81.94, "minAvg": 53.5, "totalCount": 61, "averagePass": 69.93, "sumFail": 462 },
+		{ "maxAvg": 84.56, "minAvg": 67.13, "totalCount": 61, "averagePass": 125.84, "sumFail": 592 },
+		{ "maxAvg": 70, "minAvg": 58.82, "totalCount": 64, "averagePass": 175.75, "sumFail": 1774 },
+		{ "maxAvg": 74.85, "minAvg": 55.3, "totalCount": 66, "averagePass": 156.52, "sumFail": 1082 },
+		{ "maxAvg": 78.93, "minAvg": 57.56, "totalCount": 72, "averagePass": 154.53, "sumFail": 1054 },
+		{ "maxAvg": 91.1, "minAvg": 54.78, "totalCount": 75, "averagePass": 91.76, "sumFail": 814 },
+		{ "maxAvg": 74.26, "minAvg": 62.99, "totalCount": 77, "averagePass": 165.01, "sumFail": 1324 },
+		{ "maxAvg": 77.46, "minAvg": 60.41, "totalCount": 79, "averagePass": 154.61, "sumFail": 894 },
+		{ "maxAvg": 83.19, "minAvg": 59.18, "totalCount": 82, "averagePass": 64.73, "sumFail": 742 },
+		{ "maxAvg": 75, "minAvg": 46.52, "totalCount": 86, "averagePass": 88.7, "sumFail": 1700 },
+		{ "maxAvg": 81.36, "minAvg": 60.91, "totalCount": 89, "averagePass": 175.78, "sumFail": 1744 },
+		{ "maxAvg": 80, "minAvg": 57.35, "totalCount": 97, "averagePass": 207.98, "sumFail": 1666 },
+		{ "maxAvg": 76.12, "minAvg": 50.13, "totalCount": 105, "averagePass": 104.86, "sumFail": 1916 },
+		{ "maxAvg": 78.69, "minAvg": 53.06, "totalCount": 111, "averagePass": 161.95, "sumFail": 1976 },
+		{ "maxAvg": 74.48, "minAvg": 56.6, "totalCount": 113, "averagePass": 155.06, "sumFail": 2298 },
+		{ "maxAvg": 74.85, "minAvg": 56.96, "totalCount": 125, "averagePass": 170.13, "sumFail": 3706 }
+	]
+}

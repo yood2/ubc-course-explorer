@@ -1,0 +1,25 @@
+{
+	"title": "apply references different dataset",
+	"input": {
+		"WHERE": {
+			"GT": {
+				"sections_avg": 50
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept", "sections_id", "overallAvg"]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": ["sections_dept", "sections_id"],
+			"APPLY": [
+				{
+					"overallAvg": {
+						"MAX": "rooms_seats"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
