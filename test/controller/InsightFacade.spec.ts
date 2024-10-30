@@ -1115,7 +1115,8 @@ describe("InsightFacade", function () {
 		it("[C2/transformation/invalid/max_string.json] apply has underscore", checkQuery);
 
 		it("[C2/rooms/valid/no_groupby.json] Simple rooms example without group by", checkQuery);
-		it("[C2/rooms/valid/simple_example.json] Simple rooms example with group by", checkQuery);
+		it("[C2/rooms/valid/website_example.json] Simple rooms example with group by", checkQuery);
+		it("[C2/rooms/valid/simple_example.json] example from specifications", checkQuery);
 		it("[C2/sort/valid/sort_down.json] simple sort down", checkQuery);
 		it("[C2/sort/valid/sort_up.json] simple sort up", checkQuery);
 		it("[C2/transformation/valid/basic_transformations.json] basic transformations", checkQuery);
@@ -1127,7 +1128,7 @@ describe("InsightFacade", function () {
 		it("[C2/transformation/valid/min2.json] transformations with min 2", checkQuery);
 		it("[C2/transformation/valid/max2.json] transformations with max 2", checkQuery);
 		it("[C2/transformation/valid/max_with_min.json] transformations with max and min", checkQuery);
-		it.only("[C2/transformation/valid/empty_max.json] transformations with max and empty results", checkQuery);
+		it("[C2/transformation/valid/empty_max.json] transformations with max and empty results", checkQuery);
 		it("[C2/transformation/valid/count2.json] transformations with count 2", checkQuery);
 		it("[C2/transformation/valid/empty_apply.json] transformations with empty apply", checkQuery);
 		it("[C2/transformation/valid/group_multi_keys.json] group has multiple keys", checkQuery);
