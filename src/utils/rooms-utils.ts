@@ -1,7 +1,7 @@
 import JSZip = require("jszip");
 import * as http from "node:http";
 import { parse } from "parse5";
-import { BuildingRow, GeoData, IndexRow, ProcessResult, Room } from "../controller/InsightFacade.types";
+import { BuildingRow, GeoResponse, IndexRow, ProcessResult, Room } from "../controller/InsightFacade.types";
 
 /**
  * Parses the zip file and extracts room and building data.
@@ -120,7 +120,7 @@ export async function readIndex(index: any): Promise<IndexRow[]> {
 				const td = findByClass(row, "views-field views-field-title")[0];
 				const aTag = findByTag(td, "a")[0];
 				const addressElement = findByClass(row, "views-field views-field-field-building-address")[0];
-				const geo = await fetchData(getText(addressElement));
+				const geo: GeoResponse = await fetchData(getText(addressElement));
 
 				// Skip rows with an error in geo
 				if (geo.error) {
@@ -132,8 +132,8 @@ export async function readIndex(index: any): Promise<IndexRow[]> {
 					shortname: getText(findByClass(row, "views-field views-field-field-building-code")[0]),
 					address: getText(addressElement),
 					href: aTag.attrs[0].value,
-					lat: geo.lat,
-					lon: geo.lon,
+					lat: Number(geo.lat),
+					lon: Number(geo.lon),
 				};
 			})
 		)
@@ -247,7 +247,7 @@ function getText(node: any): string {
 	}
 }
 
-async function fetchData(address: string): Promise<GeoData> {
+async function fetchData(address: string): Promise<GeoResponse> {
 	return new Promise((resolve, reject) => {
 		http
 			.get(
@@ -266,10 +266,10 @@ async function fetchData(address: string): Promise<GeoData> {
 					// parse to json and resolve
 					res.on("end", () => {
 						try {
-							const jsonData = JSON.parse(data);
+							const jsonData: GeoResponse = JSON.parse(data);
 							resolve(jsonData);
 						} catch (_) {
-							reject(new Error("fetchData: Failed to parse JSON"));
+							reject(new Error("fetchData: Failed to parse JSON into GeoResponse"));
 						}
 					});
 				}
