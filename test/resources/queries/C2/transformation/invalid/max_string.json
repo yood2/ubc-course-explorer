@@ -1,0 +1,26 @@
+{
+	"title": "max token takes in sfield",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_instructor": "lee"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_dept", "highestId"],
+			"ORDER": "sections_dept"
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": ["sections_dept"],
+			"APPLY": [
+				{
+					"highestId": {
+						"MAX": "sections_id"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

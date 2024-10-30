@@ -1111,7 +1111,8 @@ describe("InsightFacade", function () {
 			}
 		}
 
-		it("[C2/transformation/invalid/apply_underscore.json] apply has underscore", checkQuery);
+		it("[C2/transformation/invalid/apply_underscore.json] max token takes in sfield", checkQuery);
+		it("[C2/transformation/invalid/max_string.json] apply has underscore", checkQuery);
 
 		it("[C2/rooms/valid/no_groupby.json] Simple rooms example without group by", checkQuery);
 		it("[C2/rooms/valid/simple_example.json] Simple rooms example with group by", checkQuery);
@@ -1121,6 +1122,12 @@ describe("InsightFacade", function () {
 		it("[C2/transformation/valid/basic_group.json] basic groups", checkQuery);
 		it("[C2/transformation/valid/multi_apply_tokens.json] transformation with multiple apply tokens", checkQuery);
 		it("[C2/transformation/valid/count.json] transformations with count", checkQuery);
+		it("[C2/transformation/valid/max.json] transformations with max", checkQuery);
+		it("[C2/transformation/valid/min.json] transformations with min", checkQuery);
+		it("[C2/transformation/valid/min2.json] transformations with min 2", checkQuery);
+		it("[C2/transformation/valid/max2.json] transformations with max 2", checkQuery);
+		it("[C2/transformation/valid/max_with_min.json] transformations with max and min", checkQuery);
+		it.only("[C2/transformation/valid/empty_max.json] transformations with max and empty results", checkQuery);
 		it("[C2/transformation/valid/count2.json] transformations with count 2", checkQuery);
 		it("[C2/transformation/valid/empty_apply.json] transformations with empty apply", checkQuery);
 		it("[C2/transformation/valid/group_multi_keys.json] group has multiple keys", checkQuery);

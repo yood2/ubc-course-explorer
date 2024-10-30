@@ -1,0 +1,26 @@
+{
+	"title": "transformations with max and empty results",
+	"input": {
+		"WHERE": {
+			"IS": {
+				"sections_instructor": "doe"
+			}
+		},
+		"OPTIONS": {
+			"COLUMNS": ["sections_year", "minAudit"],
+			"ORDER": "sections_year"
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": ["sections_year"],
+			"APPLY": [
+				{
+					"minAudit": {
+						"MIN": "sections_audit"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": false,
+	"expected": []
+}
