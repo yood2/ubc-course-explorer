@@ -591,14 +591,6 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		// it("Should reject rooms with failed geolocation requests", async function () {
-		// 	try {
-		// 		expect.fail(`Should have rejected`);
-		// 	} catch (err) {
-		// 		expect(err).to.be.instanceOf(InsightError);
-		// 	}
-		// });
-
 		// MIGHT BE WRONG
 		// it("Should reject invalid folder structure but correct links", async function () {
 		// 	try {

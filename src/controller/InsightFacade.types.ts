@@ -85,7 +85,7 @@ export interface ParsedData {
 	rooms?: { indexRows: any[]; buildingData: Record<string, any[]> };
 }
 
-export interface GeoData {
+export interface GeoResponse {
 	lat?: number;
 	lon?: number;
 	error?: string;
