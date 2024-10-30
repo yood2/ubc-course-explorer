@@ -14,8 +14,6 @@ export async function parseRooms(
 ): Promise<{ indexRows: IndexRow[]; buildingData: Record<string, BuildingRow[]> }> {
 	const indexFile = Object.values(zip.files).find((file) => file.name.endsWith("index.htm"));
 
-	// console.log(zip);
-
 	if (!indexFile) {
 		throw new Error("parseRooms: No index.htm file found.");
 	}
@@ -122,8 +120,9 @@ export async function readIndex(index: any): Promise<IndexRow[]> {
 				const addressElement = findByClass(row, "views-field views-field-field-building-address")[0];
 				const geo: GeoResponse = await fetchData(getText(addressElement));
 
-				// Skip rows with an error in geo
-				if (geo.error) {
+				// Skip rows with an error or if dont have lat and lon at same time
+				if (geo.error || !(geo.lat && geo.lon)) {
+					console.log(geo);
 					return null;
 				}
 
