@@ -21,8 +21,8 @@ export interface Room {
 	number: string;
 	name: string;
 	address: string;
-	lat?: number;
-	lon?: number;
+	lat: number;
+	lon: number;
 	seats: number;
 	type: string;
 	furniture: string;
@@ -34,8 +34,8 @@ export interface IndexRow {
 	shortname: string;
 	address: string;
 	href: string;
-	lat?: number;
-	lon?: number;
+	lat: number;
+	lon: number;
 }
 
 export interface BuildingRow {
@@ -86,6 +86,7 @@ export interface ParsedData {
 }
 
 export interface GeoData {
-	lat: number;
-	lon: number;
+	lat?: number;
+	lon?: number;
+	error?: string;
 }
