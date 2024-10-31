@@ -5,26 +5,39 @@ import * as path from "path";
 
 const dataDir = "data/meta";
 
-// async function ensureDataDirectoryExists(): Promise<void> {
-// 	await fs.ensureDir(dataDir);
-// }
-
 export async function readMetadata(): Promise<InsightDataset[]> {
 	await fs.ensureDir(dataDir);
 
-	const datasets: InsightDataset[] = [];
-	const files = fs.readdirSync(dataDir);
+	const files = await fs.readdir(dataDir);
+	const datasetPromises = files.map(async (file) => {
+		const filePath = path.join(dataDir, file);
+		const content = await fs.readFile(filePath, "utf-8");
+		return JSON.parse(content) as InsightDataset;
+	});
 
-	for (const file of files) {
-		if (file.endsWith(".json")) {
-			const filePath = path.join(dataDir, file);
-			const content = fs.readFileSync(filePath, "utf-8");
-			datasets.push(JSON.parse(content) as InsightDataset);
-		}
-	}
-
+	const datasets = await Promise.all(datasetPromises);
 	return datasets;
 }
+
+export async function writeMetadata(dataset: InsightDataset): Promise<void> {
+	const filePath = path.join(dataDir, `${removeForbiddenCharacters(dataset.id)}.json`);
+	const length = 2;
+	await fs.writeFile(filePath, JSON.stringify(dataset, null, length), "utf-8");
+}
+
+export async function removeMetadata(datasetId: string): Promise<void> {
+	const filePath = path.join(dataDir, `${datasetId}.json`);
+	await fs.unlink(filePath);
+}
+
+export async function getIds(): Promise<string[]> {
+	const datasets = await readMetadata();
+	return datasets.map((dataset) => dataset.id);
+}
+
+// async function ensureDataDirectoryExists(): Promise<void> {
+// 	await fs.ensureDir(dataDir);
+// }
 
 // export async function readMetadata(): Promise<InsightDataset[]> {
 // 	try {
@@ -53,12 +66,6 @@ export async function readMetadata(): Promise<InsightDataset[]> {
 // 	}
 // }
 
-export async function writeMetadata(dataset: InsightDataset): Promise<void> {
-	const filePath = path.join(dataDir, `${removeForbiddenCharacters(dataset.id)}.json`);
-	const length = 2;
-	fs.writeFileSync(filePath, JSON.stringify(dataset, null, length), "utf-8");
-}
-
 // export async function writeMetadata(data: InsightDataset): Promise<void> {
 // 	try {
 // 		await ensureDataDirectoryExists();
@@ -69,13 +76,6 @@ export async function writeMetadata(dataset: InsightDataset): Promise<void> {
 // 		throw new Error(`writeMetadata: ${(e as Error).message}`);
 // 	}
 // }
-
-export async function removeMetadata(datasetId: string): Promise<void> {
-	const filePath = path.join(dataDir, `${datasetId}.json`);
-	if (fs.existsSync(filePath)) {
-		fs.unlinkSync(filePath);
-	}
-}
 
 // export async function removeMetadata(id: string): Promise<boolean> {
 // 	try {
@@ -89,11 +89,6 @@ export async function removeMetadata(datasetId: string): Promise<void> {
 // 		throw new Error(`removeMetadata: ${(e as Error).message}`);
 // 	}
 // }
-
-export async function getIds(): Promise<string[]> {
-	const datasets = await readMetadata();
-	return datasets.map((dataset) => dataset.id);
-}
 
 // export async function getIds(): Promise<string[]> {
 // 	try {

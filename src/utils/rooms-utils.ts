@@ -18,6 +18,11 @@ export async function parseRooms(
 	}
 
 	const indexRows = await readIndex(indexFile);
+
+	if (indexRows.length === 0) {
+		throw new Error("parseRooms: index has no valid rows");
+	}
+
 	const buildingData = await parseBuildingData(indexRows, zip);
 
 	if (Object.keys(buildingData).length === 0) {
@@ -34,10 +39,6 @@ export async function parseRooms(
  * @param buildingData Parsed building data.
  */
 export function validateRooms(indexRows: IndexRow[], buildingData: Record<string, BuildingRow[]>): void {
-	if (!indexRows.length) {
-		throw new Error("validateRooms: No valid index rows found.");
-	}
-
 	const validatedIndexRows = new Set<IndexRow>();
 	indexRows.forEach((row) => {
 		if (!validatedIndexRows.has(row)) {
@@ -84,23 +85,32 @@ export function processRooms(indexRows: IndexRow[], buildingData: Record<string,
 
 export async function readIndex(index: any): Promise<IndexRow[]> {
 	const file = await index.async("string");
+
 	const document = parse(file);
 
 	const table = findByClass(document, "views-table cols-5 table")[0];
+
 	const tbody = findByTag(table, "tbody")[0];
+
 	const trows = findByTag(tbody, "tr");
+
+	if (trows.length === 0) {
+		throw new Error(`readIndex: no tr tags`);
+	}
 
 	const indexRows: IndexRow[] = (
 		await Promise.all(
 			trows.map(async (row) => {
 				const td = findByClass(row, "views-field views-field-title")[0];
+
+				if (!td || !(td.nodeName === "td")) {
+					return null;
+				}
+
 				const aTag = findByTag(td, "a")[0];
 
 				// make sure address is in td tag with specific class
 				const addressElement = findByClass(row, "views-field views-field-field-building-address")[0];
-				if (!(addressElement.nodeName === "td")) {
-					return null;
-				}
 
 				const geo: GeoResponse = await fetchData(getText(addressElement));
 				if (geo.error || !(geo.lat && geo.lon)) {

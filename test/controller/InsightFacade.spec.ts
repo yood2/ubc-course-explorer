@@ -575,6 +575,26 @@ describe("InsightFacade", function () {
 		});
 
 		// REJECT
+		it("Should reject if index has no valid rows", async function () {
+			try {
+				const indexNoValidRows = await getContentFromArchives("rooms/index_no_valid_rows.zip");
+				await facade.addDataset("indexNoValidRows", indexNoValidRows, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("Should reject if index not td tag", async function () {
+			try {
+				const indexNotTd = await getContentFromArchives("rooms/index_not_td.zip");
+				await facade.addDataset("indexNotTd", indexNotTd, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
 		it("Should reject if room values not in td tag", async function () {
 			try {
 				const notTd = await getContentFromArchives("rooms/building_values_not_td.zip");
