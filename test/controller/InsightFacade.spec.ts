@@ -1204,6 +1204,8 @@ describe("InsightFacade", function () {
 		//	- invalid room tests
 		it("[C2/rooms/invalid/mixed_keys.json] Simple rooms example but contains keys from section", checkQuery);
 		it("[C2/rooms/invalid/lowercase_key.json] Simple rooms example but apply key is lower case", checkQuery);
+		it("[C2/rooms/invalid/multiple_fields.json] Simple rooms example but contain multiple fields", checkQuery);
+		it("[C2/rooms/invalid/empty_object_AND.json] AND contains empty object", checkQuery);
 
 		// SORT TESTS
 		// - valid sort tests

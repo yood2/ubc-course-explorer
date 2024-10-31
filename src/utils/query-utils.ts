@@ -144,11 +144,16 @@ export class ValidateQuery {
 	 * @throws Error if transforamtions is not valid
 	 */
 	private validateTransformationStructure(input: any): void {
+		const two = 2;
 		if (!Object.hasOwn(input, "TRANSFORMATIONS")) {
 			return;
 		}
 
 		const transformations = input.TRANSFORMATIONS;
+
+		if (Object.keys(transformations).length !== two) {
+			throw new InsightError("transformations doesn't contain only group and apply");
+		}
 
 		if (!Object.hasOwn(transformations, "GROUP") || !Object.hasOwn(transformations, "APPLY")) {
 			throw new InsightError("TRANSFORMATIONS must have 'GROUP' and 'APPLY' fields.");
@@ -165,7 +170,10 @@ export class ValidateQuery {
 		if (!Array.isArray(apply)) {
 			throw new InsightError("APPLY must be an array.");
 		}
+		this.validateApplyStructure(apply);
+	}
 
+	private validateApplyStructure(apply: any[]): void {
 		apply.forEach((applyRule) => {
 			if (typeof applyRule !== "object" || Object.keys(applyRule).length !== 1) {
 				throw new InsightError("Each APPLY rule must be a single object with one applykey.");

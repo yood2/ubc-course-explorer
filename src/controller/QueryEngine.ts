@@ -223,6 +223,12 @@ export class QueryEngine {
 		return this.MComparison(where, row, datasetID);
 	}
 
+	private validate_logic_size(filter: any[]): void {
+		if (filter.length === 0) {
+			throw new InsightError("And has to have a filter!");
+		}
+	}
+
 	public matchQuery(where: Where, row: Row): boolean {
 		const filterKey = Object.keys(where)[0];
 		const filter = where[filterKey];
@@ -236,10 +242,11 @@ export class QueryEngine {
 
 		// Check if 'where' is an And
 		if (filterKey === "AND") {
-			if (filter.length === 0) {
-				throw new InsightError("And has to have a filter!");
-			}
+			this.validate_logic_size(filter);
 			for (const subFilter of filter) {
+				if (typeof subFilter !== "object" || subFilter === null || Object.keys(subFilter).length === 0) {
+					throw new InsightError("And is not properly formatted!");
+				}
 				if (!this.matchQuery(subFilter, row)) {
 					return false;
 				}
@@ -249,10 +256,11 @@ export class QueryEngine {
 
 		// Check if where is an Or
 		if (filterKey === "OR") {
-			if (filter.length === 0) {
-				throw new InsightError("OR has to have a filter!");
-			}
+			this.validate_logic_size(filter);
 			for (const subFilter of filter) {
+				if (typeof subFilter !== "object" || subFilter === null || Object.keys(subFilter).length === 0) {
+					throw new InsightError("OR is not properly formatted!");
+				}
 				if (this.matchQuery(subFilter, row)) {
 					return true;
 				}

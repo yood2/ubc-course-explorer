@@ -1,0 +1,31 @@
+{
+	"title": "AND contains empty object",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{},
+				{
+					"LT": {
+						"rooms_seats": 10
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": ["rooms_fullname", "rooms_shortname", "minSeats"]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": ["rooms_fullname", "rooms_shortname"],
+			"APPLY": [
+				{
+					"minSeats": {
+						"MIN": "rooms_seats"
+					}
+				}
+			],
+			"TEST": []
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}
