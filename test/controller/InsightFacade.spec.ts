@@ -364,7 +364,7 @@ describe("InsightFacade", function () {
 		});
 
 		after(async function () {
-			// await clearDisk();
+			await clearDisk();
 		});
 
 		/**
@@ -515,6 +515,16 @@ describe("InsightFacade", function () {
 				const mixedTags = await getContentFromArchives("rooms/building_mixed_tag_vals.zip");
 				const result = await facade.addDataset("mixedTags", mixedTags, InsightDatasetKind.Rooms);
 				expect(result).to.deep.equal(["mixedTags"]);
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		it("Should accept dataset with valid room but no vals", async function () {
+			try {
+				const validRoomNoVals = await getContentFromArchives("rooms/valid_room_no_vals.zip");
+				const result = await facade.addDataset("validRoomNoVals", validRoomNoVals, InsightDatasetKind.Rooms);
+				expect(result).to.deep.equal(["validRoomNoVals"]);
 			} catch (err) {
 				expect.fail(`Unexpected Error: ${(err as Error).message}`);
 			}
