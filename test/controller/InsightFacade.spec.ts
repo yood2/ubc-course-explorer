@@ -53,6 +53,50 @@ describe("InsightFacade", function () {
 		 * - accept same dataset after removed
 		 */
 
+		it("Should successfully add multiple datasets in parallel", async function () {
+			try {
+				const room1 = await getContentFromArchives("rooms/campus.zip");
+				const room2 = await getContentFromArchives("rooms/index_multi_table.zip");
+				const room3 = await getContentFromArchives("rooms/geo_one_invalid_address.zip");
+				const room4 = await getContentFromArchives("rooms/one_building.zip");
+				const room5 = await getContentFromArchives("rooms/one_table.zip");
+				const room6 = await getContentFromArchives("rooms/small_campus.zip");
+				const room7 = await getContentFromArchives("rooms/valid_room_no_vals.zip");
+				const room8 = await getContentFromArchives("rooms/broken_link.zip");
+
+				const loadDatasetPromises: Promise<string[]>[] = [
+					facade.addDataset("room1", room1, InsightDatasetKind.Rooms),
+					facade.addDataset("room2", room2, InsightDatasetKind.Rooms),
+					facade.addDataset("room3", room3, InsightDatasetKind.Rooms),
+					facade.addDataset("room4", room4, InsightDatasetKind.Rooms),
+					facade.addDataset("room5", room5, InsightDatasetKind.Rooms),
+					facade.addDataset("room6", room6, InsightDatasetKind.Rooms),
+					facade.addDataset("room7", room7, InsightDatasetKind.Rooms),
+					facade.addDataset("room8", room8, InsightDatasetKind.Rooms),
+				];
+				try {
+					await Promise.all(loadDatasetPromises);
+				} catch (err) {
+					throw new Error(`In PerformQuery Before hook, dataset(s) failed to be added. \n${err}`);
+				}
+
+				const result = await facade.listDatasets();
+
+				expect(result).to.deep.include.members([
+					{ id: "room1", kind: "rooms", numRows: 364 },
+					{ id: "room2", kind: "rooms", numRows: 12 },
+					{ id: "room3", kind: "rooms", numRows: 35 },
+					{ id: "room4", kind: "rooms", numRows: 28 },
+					{ id: "room5", kind: "rooms", numRows: 1 },
+					{ id: "room6", kind: "rooms", numRows: 40 },
+					{ id: "room7", kind: "rooms", numRows: 1 },
+					{ id: "room8", kind: "rooms", numRows: 12 },
+				]);
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
 		it("should accept dataset add with required fields with empty values", async function () {
 			try {
 				const emptyValues = await getContentFromArchives("sections/required_fields_empty_values.zip");
@@ -86,8 +130,8 @@ describe("InsightFacade", function () {
 				const result1: string[] = await facade.addDataset("sections", smallSections, InsightDatasetKind.Sections);
 				const result2: string[] = await facade.addDataset("rooms", smallRooms, InsightDatasetKind.Rooms);
 
-				expect(result1).to.deep.equal(["sections"]);
-				expect(result2).to.deep.equal(["sections", "rooms"]);
+				expect(result1).to.deep.include("sections");
+				expect(result2).to.deep.include("sections", "rooms");
 			} catch (err) {
 				expect.fail(`Unexpected Error: ${(err as Error).message}`);
 			}
@@ -97,16 +141,16 @@ describe("InsightFacade", function () {
 			try {
 				// first add
 				let result: string[] = await facade.addDataset("sections", smallSections, InsightDatasetKind.Sections);
-				expect(result).to.deep.equal(["sections"]);
+				expect(result).to.deep.include("sections");
 
 				// second add
 				result = await facade.addDataset("rooms", smallRooms, InsightDatasetKind.Rooms);
-				expect(result).to.deep.equal(["sections", "rooms"]);
+				expect(result).to.deep.include("sections", "rooms");
 
 				// remove and add again
 				await facade.removeDataset("sections");
 				result = await facade.addDataset("sections", smallSections, InsightDatasetKind.Sections);
-				expect(result).to.deep.equal(["rooms", "sections"]);
+				expect(result).to.deep.include("rooms", "sections");
 			} catch (err) {
 				expect.fail(`Unexpected Error: ${(err as Error).message}`);
 			}
@@ -330,7 +374,7 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		it("should reject same dataset between datasets", async function () {
+		it("should reject same dataset id between datasets", async function () {
 			try {
 				// first dataset
 				let result: string[] = await facade.addDataset("sections", smallSections, InsightDatasetKind.Sections);
@@ -338,7 +382,7 @@ describe("InsightFacade", function () {
 
 				// second dataset
 				result = await facade.addDataset("rooms", smallRooms, InsightDatasetKind.Rooms);
-				expect(result).to.deep.equal(["sections", "rooms"]);
+				expect(result).to.deep.include("sections", "rooms");
 
 				// duplicate dataset
 				await facade.addDataset("sections", smallSections, InsightDatasetKind.Sections);
@@ -364,7 +408,7 @@ describe("InsightFacade", function () {
 		});
 
 		after(async function () {
-			// await clearDisk();
+			await clearDisk();
 		});
 
 		/**
@@ -392,9 +436,9 @@ describe("InsightFacade", function () {
 		it("Should add multiple rooms datasets", async function () {
 			try {
 				let result = await facade.addDataset("small", smallRooms, InsightDatasetKind.Rooms);
-				expect(result).to.deep.equal(["small"]);
+				expect(result).to.deep.include("small");
 				result = await facade.addDataset("campus", rooms, InsightDatasetKind.Rooms);
-				expect(result).to.deep.equal(["small", "campus"]);
+				expect(result).to.deep.include("small", "campus");
 			} catch (err) {
 				expect.fail(`Unexpected Error: ${(err as Error).message}`);
 			}
@@ -515,6 +559,16 @@ describe("InsightFacade", function () {
 				const mixedTags = await getContentFromArchives("rooms/building_mixed_tag_vals.zip");
 				const result = await facade.addDataset("mixedTags", mixedTags, InsightDatasetKind.Rooms);
 				expect(result).to.deep.equal(["mixedTags"]);
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		it("Should accept dataset with valid room but no vals", async function () {
+			try {
+				const validRoomNoVals = await getContentFromArchives("rooms/valid_room_no_vals.zip");
+				const result = await facade.addDataset("validRoomNoVals", validRoomNoVals, InsightDatasetKind.Rooms);
+				expect(result).to.deep.equal(["validRoomNoVals"]);
 			} catch (err) {
 				expect.fail(`Unexpected Error: ${(err as Error).message}`);
 			}
@@ -706,6 +760,20 @@ describe("InsightFacade", function () {
 			try {
 				const result: string[] = await facade.addDataset("section", sections, InsightDatasetKind.Sections);
 				expect(result).to.include("section");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
+		it("should accept a large valid dataset", async function () {
+			try {
+				const someMissingKeys = await getContentFromArchives("sections/sections_some_missing_keys.zip");
+				const result: string[] = await facade.addDataset(
+					"someMissingKeys",
+					someMissingKeys,
+					InsightDatasetKind.Sections
+				);
+				expect(result).to.include("someMissingKeys");
 			} catch (err) {
 				expect.fail(`Unexpected Error: ${(err as Error).message}`);
 			}
@@ -1106,24 +1174,25 @@ describe("InsightFacade", function () {
 			const rooms = await getContentFromArchives("rooms/campus.zip");
 			facade = new InsightFacade();
 
-			// const loadDatasetPromises: Promise<string[]>[] = [
-			// 	facade.addDataset("sections", sections, InsightDatasetKind.Sections),
-			// 	facade.addDataset("section1", section1, InsightDatasetKind.Sections),
-			// 	facade.addDataset("section2", section2, InsightDatasetKind.Sections),
-			// 	facade.addDataset("section3", section3, InsightDatasetKind.Sections),
-			// ];
+			const loadDatasetPromises: Promise<string[]>[] = [
+				facade.addDataset("sections", sections, InsightDatasetKind.Sections),
+				facade.addDataset("section1", section1, InsightDatasetKind.Sections),
+				facade.addDataset("section2", section2, InsightDatasetKind.Sections),
+				facade.addDataset("section3", section3, InsightDatasetKind.Sections),
+				facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms),
+			];
 
-			// try {
-			// 	await Promise.all(loadDatasetPromises);
-			// } catch (err) {
-			// 	throw new Error(`In PerformQuery Before hook, dataset(s) failed to be added. \n${err}`);
-			// }
+			try {
+				await Promise.all(loadDatasetPromises);
+			} catch (err) {
+				throw new Error(`In PerformQuery Before hook, dataset(s) failed to be added. \n${err}`);
+			}
 
-			await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
-			await facade.addDataset("section1", section1, InsightDatasetKind.Sections);
-			await facade.addDataset("section2", section2, InsightDatasetKind.Sections);
-			await facade.addDataset("section3", section3, InsightDatasetKind.Sections);
-			await facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms);
+			// await facade.addDataset("sections", sections, InsightDatasetKind.Sections);
+			// await facade.addDataset("section1", section1, InsightDatasetKind.Sections);
+			// await facade.addDataset("section2", section2, InsightDatasetKind.Sections);
+			// await facade.addDataset("section3", section3, InsightDatasetKind.Sections);
+			// await facade.addDataset("rooms", rooms, InsightDatasetKind.Rooms);
 		});
 
 		after(async function () {

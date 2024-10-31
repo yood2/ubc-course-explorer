@@ -51,7 +51,7 @@ export async function processSections(files: JSZip.JSZipObject[]): Promise<Proce
 
 			for (const section of preSections) {
 				if (!isValidCourseSection(section)) {
-					throw new Error(`Invalid course section in file ${file.name}`);
+					continue;
 				}
 				processedSections.push(processCourseSection(section));
 			}
@@ -75,8 +75,12 @@ export async function processSections(files: JSZip.JSZipObject[]): Promise<Proce
  * @returns True if valid, otherwise false.
  */
 function isValidCourseSection(section: PreProcessedSection): boolean {
-	const requiredFields = ["id", "Course", "Title", "Professor", "Subject", "Year", "Avg", "Pass", "Fail", "Audit"];
-	return requiredFields.every((field) => field in section);
+	try {
+		const requiredFields = ["id", "Course", "Title", "Professor", "Subject", "Year", "Avg", "Pass", "Fail", "Audit"];
+		return requiredFields.every((field) => field in section);
+	} catch (e) {
+		throw new Error(`isValidCourseSection: Unexpected error ${(e as Error).message}`);
+	}
 }
 
 /**
