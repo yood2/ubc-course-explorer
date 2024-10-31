@@ -13,41 +13,15 @@ export async function parseRooms(
 	zip: JSZip
 ): Promise<{ indexRows: IndexRow[]; buildingData: Record<string, BuildingRow[]> }> {
 	const indexFile = Object.values(zip.files).find((file) => file.name.endsWith("index.htm"));
-
 	if (!indexFile) {
 		throw new Error("parseRooms: No index.htm file found.");
 	}
 
 	const indexRows = await readIndex(indexFile);
-
-	// Gather building data based on the parsed index rows
-	const buildingData: Record<string, BuildingRow[]> = {};
-	await Promise.all(
-		indexRows.map(async (indexRow) => {
-			const link = indexRow.href;
-
-			// Look for the corresponding file in zip by stripping the first 2 characters
-			const length = 2;
-			const formattedLink = Object.keys(zip.files).find((path) => path.endsWith(link.slice(length)));
-
-			if (!formattedLink) {
-				// Skip if the file does not exist or does not end in .htm
-				return;
-			}
-
-			const buildingFile = zip.file(formattedLink);
-
-			if (buildingFile) {
-				const buildingRows = await readBuilding(buildingFile);
-				buildingData[indexRow.shortname] = buildingRows;
-			} else {
-				buildingData[indexRow.shortname] = []; // No rooms found
-			}
-		})
-	);
+	const buildingData = await parseBuildingData(indexRows, zip);
 
 	if (Object.keys(buildingData).length === 0) {
-		throw new Error("parseRooms: no valid rooms");
+		throw new Error("parseRooms: Dataset has no valid rooms.");
 	}
 
 	return { indexRows, buildingData };
@@ -64,11 +38,8 @@ export function validateRooms(indexRows: IndexRow[], buildingData: Record<string
 		throw new Error("validateRooms: No valid index rows found.");
 	}
 
-	for (const indexRow of indexRows) {
-		if (!buildingData[indexRow.shortname] || buildingData[indexRow.shortname].length === 0) {
-			// console.warn(`validateRooms: No rooms found for building ${indexRow.shortname}.`);
-		}
-	}
+	indexRows.forEach(validateIndexRow);
+	Object.entries(buildingData).forEach(([_, rows]) => rows.forEach(validateBuildingRow));
 }
 
 /**
@@ -122,7 +93,6 @@ export async function readIndex(index: any): Promise<IndexRow[]> {
 
 				// Skip rows with an error or if dont have lat and lon at same time
 				if (geo.error || !(geo.lat && geo.lon)) {
-					console.log(geo);
 					return null;
 				}
 
@@ -277,4 +247,62 @@ async function fetchData(address: string): Promise<GeoResponse> {
 				reject(error);
 			});
 	});
+}
+
+async function parseBuildingData(indexRows: IndexRow[], zip: JSZip): Promise<Record<string, BuildingRow[]>> {
+	const buildingData: Record<string, BuildingRow[]> = {};
+
+	await Promise.all(
+		indexRows.map(async (indexRow) => {
+			const length = 2;
+			const formattedLink = Object.keys(zip.files).find((path) => path.endsWith(indexRow.href.slice(length)));
+			if (!formattedLink) {
+				return;
+			}
+
+			const buildingFile = zip.file(formattedLink);
+			if (buildingFile) {
+				const buildingRows = await readBuilding(buildingFile);
+				buildingData[indexRow.shortname] = buildingRows;
+			}
+		})
+	);
+
+	return buildingData;
+}
+
+function validateIndexRow(row: IndexRow): void {
+	if (typeof row.fullname !== "string") {
+		throw new Error("IndexRow fullname must be a string.");
+	}
+	if (typeof row.shortname !== "string") {
+		throw new Error("IndexRow shortname must be a string.");
+	}
+	if (typeof row.address !== "string") {
+		throw new Error("IndexRow address must be a string.");
+	}
+	if (typeof row.href !== "string") {
+		throw new Error("IndexRow href must be a string.");
+	}
+	if (typeof row.lat !== "number") {
+		throw new Error("IndexRow lat must be a number.");
+	}
+	if (typeof row.lon !== "number") {
+		throw new Error("IndexRow lon must be a number.");
+	}
+}
+
+function validateBuildingRow(row: BuildingRow): void {
+	if (typeof row.number !== "string") {
+		throw new Error("BuildingRow number must be a string.");
+	}
+	if (typeof row.seats !== "string") {
+		throw new Error("BuildingRow seats must be a string.");
+	}
+	if (typeof row.type !== "string") {
+		throw new Error("BuildingRow type must be a string.");
+	}
+	if (typeof row.furniture !== "string") {
+		throw new Error("BuildingRow furniture must be a string.");
+	}
 }

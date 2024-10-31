@@ -349,7 +349,7 @@ describe("InsightFacade", function () {
 		});
 	});
 
-	describe("addDataset - Rooms", function () {
+	describe.only("addDataset - Rooms", function () {
 		let rooms: string;
 		let smallRooms: string;
 
@@ -500,7 +500,7 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		it.only("Should accept dataset with one valid and two invalid geo responses", async function () {
+		it("Should accept dataset with one valid and two invalid geo responses", async function () {
 			try {
 				const geoOneInvalidAddress = await getContentFromArchives("rooms/geo_2_invalid_1_valid.zip");
 				const result = await facade.addDataset("geoOneInvalidAddress", geoOneInvalidAddress, InsightDatasetKind.Rooms);
@@ -1148,6 +1148,7 @@ describe("InsightFacade", function () {
 		it("[C2/rooms/valid/no_groupby.json] Simple rooms example without group by", checkQuery);
 		it("[C2/rooms/valid/website_example.json] Simple rooms example with group by", checkQuery);
 		it("[C2/rooms/valid/simple_example.json] example from specifications", checkQuery);
+		it("[Daniel/simple_geo_query.json] Simple geo query", checkQuery);
 
 		//	- invalid room tests
 		it("[C2/rooms/invalid/mixed_keys.json] Simple rooms example but contains keys from section", checkQuery);
