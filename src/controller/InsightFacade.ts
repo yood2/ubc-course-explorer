@@ -62,6 +62,10 @@ export default class InsightFacade implements IInsightFacade {
 			await processor.validate(parsed, kind);
 			const { rows, totalRows } = await processor.process(parsed, kind);
 
+			if (totalRows === 0) {
+				throw new Error(`addDataset: empty dataset`);
+			}
+
 			// Writing
 			const fileId = removeForbiddenCharacters(id);
 			const filePath = `data/${fileId}.json`;

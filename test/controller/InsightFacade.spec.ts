@@ -510,7 +510,27 @@ describe("InsightFacade", function () {
 			}
 		});
 
+		it("Should accept dataset with td vals for one room and wrong tags for other rooms", async function () {
+			try {
+				const mixedTags = await getContentFromArchives("rooms/building_mixed_tag_vals.zip");
+				const result = await facade.addDataset("mixedTags", mixedTags, InsightDatasetKind.Rooms);
+				expect(result).to.deep.equal(["mixedTags"]);
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
 		// REJECT
+		it("Should reject if room values not in td tag", async function () {
+			try {
+				const notTd = await getContentFromArchives("rooms/building_values_not_td.zip");
+				await facade.addDataset("notTd", notTd, InsightDatasetKind.Sections);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
 		it("Should reject rooms dataset when kinds is sections", async function () {
 			try {
 				const wrongKindRooms = await getContentFromArchives("rooms/one_building.zip");

@@ -95,9 +95,13 @@ export async function readIndex(index: any): Promise<IndexRow[]> {
 			trows.map(async (row) => {
 				const td = findByClass(row, "views-field views-field-title")[0];
 				const aTag = findByTag(td, "a")[0];
-				const addressElement = findByClass(row, "views-field views-field-field-building-address")[0];
 
-				// Parallelize fetch calls using Promise.all for efficiency
+				// make sure address is in td tag with specific class
+				const addressElement = findByClass(row, "views-field views-field-field-building-address")[0];
+				if (!(addressElement.nodeName === "td")) {
+					return null;
+				}
+
 				const geo: GeoResponse = await fetchData(getText(addressElement));
 				if (geo.error || !(geo.lat && geo.lon)) {
 					return null;
@@ -129,13 +133,13 @@ export async function readBuilding(building: any): Promise<BuildingRow[]> {
 	const buildingRows: BuildingRow[] = [];
 
 	for (const row of trows) {
-		const number = findByTag(findByClass(row, "views-field views-field-field-room-number")[0], "a");
-		const seats = findByClass(row, "views-field views-field-field-room-capacity");
-		const furniture = findByClass(row, "views-field views-field-field-room-furniture");
-		const type = findByClass(row, "views-field views-field-field-room-type");
+		const number = findByTag(findByTag(findByClass(row, "views-field views-field-field-room-number")[0], "td")[0], "a");
+		const seats = findByTag(findByClass(row, "views-field views-field-field-room-capacity")[0], "td");
+		const furniture = findByTag(findByClass(row, "views-field views-field-field-room-furniture")[0], "td");
+		const type = findByTag(findByClass(row, "views-field views-field-field-room-type")[0], "td");
 
 		if (!number.length || !seats.length || !furniture.length || !type.length) {
-			throw new Error("readBuilding: Tag not found");
+			continue;
 		}
 
 		const room: BuildingRow = {
