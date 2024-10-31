@@ -140,7 +140,7 @@ export async function readBuilding(building: any): Promise<BuildingRow[]> {
 
 		const room: BuildingRow = {
 			number: getText(number[0]),
-			seats: getText(seats[0]),
+			seats: Number(getText(seats[0])),
 			furniture: getText(furniture[0]),
 			type: getText(type[0]),
 		};
@@ -302,8 +302,8 @@ function validateBuildingRow(row: BuildingRow): void {
 	if (typeof row.number !== "string") {
 		throw new Error("BuildingRow number must be a string.");
 	}
-	if (typeof row.seats !== "string") {
-		throw new Error("BuildingRow seats must be a string.");
+	if (typeof row.seats !== "number") {
+		throw new Error("BuildingRow seats must be a number.");
 	}
 	if (typeof row.type !== "string") {
 		throw new Error("BuildingRow type must be a string.");

@@ -511,6 +511,16 @@ describe("InsightFacade", function () {
 		});
 
 		// REJECT
+		it("Should reject rooms dataset when kinds is sections", async function () {
+			try {
+				const wrongKindRooms = await getContentFromArchives("rooms/one_building.zip");
+				await facade.addDataset("wrongKindRooms", wrongKindRooms, InsightDatasetKind.Sections);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
 		it("Should reject dataset with only invalid georesponses", async function () {
 			try {
 				const geoInvalidResponse = await getContentFromArchives("rooms/geo_invalid_response.zip");
