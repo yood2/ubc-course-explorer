@@ -349,7 +349,7 @@ describe("InsightFacade", function () {
 		});
 	});
 
-	describe.only("addDataset - Rooms", function () {
+	describe("addDataset - Rooms", function () {
 		let rooms: string;
 		let smallRooms: string;
 
