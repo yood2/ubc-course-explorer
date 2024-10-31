@@ -12,7 +12,7 @@ import { Row, Query, Where, ParsedData } from "./InsightFacade.types";
 
 import * as fs from "fs-extra";
 import { QueryEngine } from "./QueryEngine";
-import { addMetadata, readMetadata, removeMetadata, getIds } from "../utils/metadata-utils";
+import { readMetadata, removeMetadata, getIds, writeMetadata } from "../utils/persist-utils";
 import {
 	loadDataset,
 	makeAttribute,
@@ -48,7 +48,7 @@ export default class InsightFacade implements IInsightFacade {
 		try {
 			// Check for valid id
 			checkId(id);
-			const ids = await getIds();
+			const ids = await getIds(); // read all metadata
 			if (ids.includes(id)) {
 				throw new InsightError("Id already exists");
 			}
@@ -69,11 +69,11 @@ export default class InsightFacade implements IInsightFacade {
 			// Writing
 			const fileId = removeForbiddenCharacters(id);
 			const filePath = `data/${fileId}.json`;
+
 			await fs.promises.mkdir("data/", { recursive: true });
 			await fs.promises.writeFile(filePath, JSON.stringify({ rows: rows }));
 
-			// Add meta data to internal model
-			await addMetadata({
+			await writeMetadata({
 				id: id,
 				kind: kind,
 				numRows: totalRows,
