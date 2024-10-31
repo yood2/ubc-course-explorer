@@ -641,6 +641,16 @@ describe("InsightFacade", function () {
 			}
 		});
 
+		it.only("Should reject table with missing type tag", async function () {
+			try {
+				const multipleValidTables = await getContentFromArchives("rooms/multiple_valid_tables.zip");
+				await facade.addDataset("multipleValidTables", multipleValidTables, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
 		// MIGHT BE WRONG
 		// it("Should reject invalid folder structure but correct links", async function () {
 		// 	try {
@@ -1178,6 +1188,7 @@ describe("InsightFacade", function () {
 		it("[C2/rooms/valid/no_groupby.json] Simple rooms example without group by", checkQuery);
 		it("[C2/rooms/valid/website_example.json] Simple rooms example with group by", checkQuery);
 		it("[C2/rooms/valid/simple_example.json] example from specifications", checkQuery);
+		it("[C2/rooms/valid/lat_lon.json] Test lat and lon", checkQuery);
 		it("[Daniel/simple_geo_query.json] Simple geo query", checkQuery);
 
 		//	- invalid room tests
