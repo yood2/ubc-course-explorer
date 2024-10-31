@@ -1,0 +1,35 @@
+{
+	"title": "Simple rooms example but contain multiple fields",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"IS": {
+						"rooms_furniture": "*Chairs*"
+					}
+				},
+				{
+					"LT": {
+						"rooms_seats": 10
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": ["rooms_fullname", "rooms_shortname", "minSeats"]
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": ["rooms_fullname", "rooms_shortname"],
+			"APPLY": [
+				{
+					"minSeats": {
+						"MIN": "rooms_seats"
+					}
+				}
+			],
+			"TEST": []
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

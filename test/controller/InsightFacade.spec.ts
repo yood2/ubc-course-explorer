@@ -641,6 +641,26 @@ describe("InsightFacade", function () {
 			}
 		});
 
+		it("Should reject table with multiple valid tables", async function () {
+			try {
+				const multipleValidTables = await getContentFromArchives("rooms/multiple_valid_tables.zip");
+				await facade.addDataset("multipleValidTables", multipleValidTables, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("Should reject table with multiple furniture attributes in the same table", async function () {
+			try {
+				const duplicateFurniture = await getContentFromArchives("rooms/duplicate_furniture.zip");
+				await facade.addDataset("duplicateFurniture", duplicateFurniture, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
 		// MIGHT BE WRONG
 		// it("Should reject invalid folder structure but correct links", async function () {
 		// 	try {
@@ -1178,11 +1198,14 @@ describe("InsightFacade", function () {
 		it("[C2/rooms/valid/no_groupby.json] Simple rooms example without group by", checkQuery);
 		it("[C2/rooms/valid/website_example.json] Simple rooms example with group by", checkQuery);
 		it("[C2/rooms/valid/simple_example.json] example from specifications", checkQuery);
+		it("[C2/rooms/valid/lat_lon.json] Test lat and lon", checkQuery);
 		it("[Daniel/simple_geo_query.json] Simple geo query", checkQuery);
 
 		//	- invalid room tests
 		it("[C2/rooms/invalid/mixed_keys.json] Simple rooms example but contains keys from section", checkQuery);
 		it("[C2/rooms/invalid/lowercase_key.json] Simple rooms example but apply key is lower case", checkQuery);
+		it("[C2/rooms/invalid/multiple_fields.json] Simple rooms example but contain multiple fields", checkQuery);
+		it("[C2/rooms/invalid/empty_object_AND.json] AND contains empty object", checkQuery);
 
 		// SORT TESTS
 		// - valid sort tests
