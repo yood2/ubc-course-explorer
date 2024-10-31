@@ -641,10 +641,20 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		it.only("Should reject table with missing type tag", async function () {
+		it("Should reject table with multiple valid tables", async function () {
 			try {
 				const multipleValidTables = await getContentFromArchives("rooms/multiple_valid_tables.zip");
 				await facade.addDataset("multipleValidTables", multipleValidTables, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("Should reject table with multiple furniture attributes in the same table", async function () {
+			try {
+				const duplicateFurniture = await getContentFromArchives("rooms/duplicate_furniture.zip");
+				await facade.addDataset("duplicateFurniture", duplicateFurniture, InsightDatasetKind.Rooms);
 				expect.fail(`Should have rejected`);
 			} catch (err) {
 				expect(err).to.be.instanceOf(InsightError);
