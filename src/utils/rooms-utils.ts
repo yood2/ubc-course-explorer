@@ -139,7 +139,7 @@ export async function readBuilding(building: any): Promise<BuildingRow[]> {
 		const type = findByTag(findByClass(row, "views-field views-field-field-room-type")[0], "td");
 
 		if (!number.length || !seats.length || !furniture.length || !type.length) {
-			throw new Error("readBuilding: Tag not found");
+			continue;
 		}
 
 		const room: BuildingRow = {
