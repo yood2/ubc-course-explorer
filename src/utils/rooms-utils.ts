@@ -34,12 +34,19 @@ export async function parseRooms(
  * @param buildingData Parsed building data.
  */
 export function validateRooms(indexRows: IndexRow[], buildingData: Record<string, BuildingRow[]>): void {
-	if (indexRows.length === 0) {
+	if (!indexRows.length) {
 		throw new Error("validateRooms: No valid index rows found.");
 	}
 
-	indexRows.forEach(validateIndexRow);
-	Object.entries(buildingData).forEach(([_, rows]) => rows.forEach(validateBuildingRow));
+	const validatedIndexRows = new Set<IndexRow>();
+	indexRows.forEach((row) => {
+		if (!validatedIndexRows.has(row)) {
+			validateIndexRow(row);
+			validatedIndexRows.add(row);
+		}
+	});
+
+	Object.values(buildingData).forEach((rows) => rows.forEach(validateBuildingRow));
 }
 
 /**
@@ -89,9 +96,9 @@ export async function readIndex(index: any): Promise<IndexRow[]> {
 				const td = findByClass(row, "views-field views-field-title")[0];
 				const aTag = findByTag(td, "a")[0];
 				const addressElement = findByClass(row, "views-field views-field-field-building-address")[0];
-				const geo: GeoResponse = await fetchData(getText(addressElement));
 
-				// Skip rows with an error or if dont have lat and lon at same time
+				// Parallelize fetch calls using Promise.all for efficiency
+				const geo: GeoResponse = await fetchData(getText(addressElement));
 				if (geo.error || !(geo.lat && geo.lon)) {
 					return null;
 				}
@@ -252,19 +259,18 @@ async function fetchData(address: string): Promise<GeoResponse> {
 async function parseBuildingData(indexRows: IndexRow[], zip: JSZip): Promise<Record<string, BuildingRow[]>> {
 	const buildingData: Record<string, BuildingRow[]> = {};
 
+	// Use a map for faster file path lookup
+	const zipFileMap = new Map(Object.keys(zip.files).map((key) => [key, zip.files[key]]));
+
 	await Promise.all(
 		indexRows.map(async (indexRow) => {
 			const length = 2;
-			const formattedLink = Object.keys(zip.files).find((path) => path.endsWith(indexRow.href.slice(length)));
+			const formattedLink = zipFileMap.get(indexRow.href.slice(length));
 			if (!formattedLink) {
 				return;
 			}
-
-			const buildingFile = zip.file(formattedLink);
-			if (buildingFile) {
-				const buildingRows = await readBuilding(buildingFile);
-				buildingData[indexRow.shortname] = buildingRows;
-			}
+			const buildingRows = await readBuilding(formattedLink);
+			buildingData[indexRow.shortname] = buildingRows;
 		})
 	);
 
