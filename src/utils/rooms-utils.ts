@@ -13,43 +13,15 @@ export async function parseRooms(
 	zip: JSZip
 ): Promise<{ indexRows: IndexRow[]; buildingData: Record<string, BuildingRow[]> }> {
 	const indexFile = Object.values(zip.files).find((file) => file.name.endsWith("index.htm"));
-
-	// console.log(zip);
-
 	if (!indexFile) {
 		throw new Error("parseRooms: No index.htm file found.");
 	}
 
 	const indexRows = await readIndex(indexFile);
-
-	// Gather building data based on the parsed index rows
-	const buildingData: Record<string, BuildingRow[]> = {};
-	await Promise.all(
-		indexRows.map(async (indexRow) => {
-			const link = indexRow.href;
-
-			// Look for the corresponding file in zip by stripping the first 2 characters
-			const length = 2;
-			const formattedLink = Object.keys(zip.files).find((path) => path.endsWith(link.slice(length)));
-
-			if (!formattedLink) {
-				// Skip if the file does not exist or does not end in .htm
-				return;
-			}
-
-			const buildingFile = zip.file(formattedLink);
-
-			if (buildingFile) {
-				const buildingRows = await readBuilding(buildingFile);
-				buildingData[indexRow.shortname] = buildingRows;
-			} else {
-				buildingData[indexRow.shortname] = []; // No rooms found
-			}
-		})
-	);
+	const buildingData = await parseBuildingData(indexRows, zip);
 
 	if (Object.keys(buildingData).length === 0) {
-		throw new Error("parseRooms: no valid rooms");
+		throw new Error("parseRooms: Dataset has no valid rooms.");
 	}
 
 	return { indexRows, buildingData };
@@ -62,15 +34,19 @@ export async function parseRooms(
  * @param buildingData Parsed building data.
  */
 export function validateRooms(indexRows: IndexRow[], buildingData: Record<string, BuildingRow[]>): void {
-	if (indexRows.length === 0) {
+	if (!indexRows.length) {
 		throw new Error("validateRooms: No valid index rows found.");
 	}
 
-	for (const indexRow of indexRows) {
-		if (!buildingData[indexRow.shortname] || buildingData[indexRow.shortname].length === 0) {
-			// console.warn(`validateRooms: No rooms found for building ${indexRow.shortname}.`);
+	const validatedIndexRows = new Set<IndexRow>();
+	indexRows.forEach((row) => {
+		if (!validatedIndexRows.has(row)) {
+			validateIndexRow(row);
+			validatedIndexRows.add(row);
 		}
-	}
+	});
+
+	Object.values(buildingData).forEach((rows) => rows.forEach(validateBuildingRow));
 }
 
 /**
@@ -120,10 +96,10 @@ export async function readIndex(index: any): Promise<IndexRow[]> {
 				const td = findByClass(row, "views-field views-field-title")[0];
 				const aTag = findByTag(td, "a")[0];
 				const addressElement = findByClass(row, "views-field views-field-field-building-address")[0];
-				const geo: GeoResponse = await fetchData(getText(addressElement));
 
-				// Skip rows with an error in geo
-				if (geo.error) {
+				// Parallelize fetch calls using Promise.all for efficiency
+				const geo: GeoResponse = await fetchData(getText(addressElement));
+				if (geo.error || !(geo.lat && geo.lon)) {
 					return null;
 				}
 
@@ -164,7 +140,7 @@ export async function readBuilding(building: any): Promise<BuildingRow[]> {
 
 		const room: BuildingRow = {
 			number: getText(number[0]),
-			seats: getText(seats[0]),
+			seats: Number(getText(seats[0])),
 			furniture: getText(furniture[0]),
 			type: getText(type[0]),
 		};
@@ -278,4 +254,61 @@ async function fetchData(address: string): Promise<GeoResponse> {
 				reject(error);
 			});
 	});
+}
+
+async function parseBuildingData(indexRows: IndexRow[], zip: JSZip): Promise<Record<string, BuildingRow[]>> {
+	const buildingData: Record<string, BuildingRow[]> = {};
+
+	// Use a map for faster file path lookup
+	const zipFileMap = new Map(Object.keys(zip.files).map((key) => [key, zip.files[key]]));
+
+	await Promise.all(
+		indexRows.map(async (indexRow) => {
+			const length = 2;
+			const formattedLink = zipFileMap.get(indexRow.href.slice(length));
+			if (!formattedLink) {
+				return;
+			}
+			const buildingRows = await readBuilding(formattedLink);
+			buildingData[indexRow.shortname] = buildingRows;
+		})
+	);
+
+	return buildingData;
+}
+
+function validateIndexRow(row: IndexRow): void {
+	if (typeof row.fullname !== "string") {
+		throw new Error("IndexRow fullname must be a string.");
+	}
+	if (typeof row.shortname !== "string") {
+		throw new Error("IndexRow shortname must be a string.");
+	}
+	if (typeof row.address !== "string") {
+		throw new Error("IndexRow address must be a string.");
+	}
+	if (typeof row.href !== "string") {
+		throw new Error("IndexRow href must be a string.");
+	}
+	if (typeof row.lat !== "number") {
+		throw new Error("IndexRow lat must be a number.");
+	}
+	if (typeof row.lon !== "number") {
+		throw new Error("IndexRow lon must be a number.");
+	}
+}
+
+function validateBuildingRow(row: BuildingRow): void {
+	if (typeof row.number !== "string") {
+		throw new Error("BuildingRow number must be a string.");
+	}
+	if (typeof row.seats !== "number") {
+		throw new Error("BuildingRow seats must be a number.");
+	}
+	if (typeof row.type !== "string") {
+		throw new Error("BuildingRow type must be a string.");
+	}
+	if (typeof row.furniture !== "string") {
+		throw new Error("BuildingRow furniture must be a string.");
+	}
 }

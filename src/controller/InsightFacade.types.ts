@@ -40,7 +40,7 @@ export interface IndexRow {
 
 export interface BuildingRow {
 	number: string;
-	seats: string;
+	seats: number;
 	type: string;
 	furniture: string;
 }

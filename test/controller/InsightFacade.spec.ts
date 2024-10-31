@@ -364,7 +364,7 @@ describe("InsightFacade", function () {
 		});
 
 		after(async function () {
-			await clearDisk();
+			// await clearDisk();
 		});
 
 		/**
@@ -500,7 +500,37 @@ describe("InsightFacade", function () {
 			}
 		});
 
+		it("Should accept dataset with one valid and two invalid geo responses", async function () {
+			try {
+				const geoOneInvalidAddress = await getContentFromArchives("rooms/geo_2_invalid_1_valid.zip");
+				const result = await facade.addDataset("geoOneInvalidAddress", geoOneInvalidAddress, InsightDatasetKind.Rooms);
+				expect(result).to.deep.equal(["geoOneInvalidAddress"]);
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
 		// REJECT
+		it("Should reject rooms dataset when kinds is sections", async function () {
+			try {
+				const wrongKindRooms = await getContentFromArchives("rooms/one_building.zip");
+				await facade.addDataset("wrongKindRooms", wrongKindRooms, InsightDatasetKind.Sections);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
+		it("Should reject dataset with only invalid georesponses", async function () {
+			try {
+				const geoInvalidResponse = await getContentFromArchives("rooms/geo_invalid_response.zip");
+				await facade.addDataset("geoInvalidResponse", geoInvalidResponse, InsightDatasetKind.Rooms);
+				expect.fail(`Should have rejected`);
+			} catch (err) {
+				expect(err).to.be.instanceOf(InsightError);
+			}
+		});
+
 		it("Should reject dataset with only invalid addresses", async function () {
 			try {
 				const geoAllInvalidAddress = await getContentFromArchives("rooms/geo_all_invalid_address.zip");
@@ -1128,6 +1158,7 @@ describe("InsightFacade", function () {
 		it("[C2/rooms/valid/no_groupby.json] Simple rooms example without group by", checkQuery);
 		it("[C2/rooms/valid/website_example.json] Simple rooms example with group by", checkQuery);
 		it("[C2/rooms/valid/simple_example.json] example from specifications", checkQuery);
+		it("[Daniel/simple_geo_query.json] Simple geo query", checkQuery);
 
 		//	- invalid room tests
 		it("[C2/rooms/invalid/mixed_keys.json] Simple rooms example but contains keys from section", checkQuery);
