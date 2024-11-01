@@ -1299,7 +1299,9 @@ describe("InsightFacade", function () {
 		it("[C2/rooms/valid/simple_example.json] example from specifications", checkQuery);
 		it("[C2/rooms/valid/lat_lon.json] Test lat and lon", checkQuery);
 		it("[Daniel/simple_geo_query.json] Simple geo query", checkQuery);
-		it("[Daniel/group_no_values.json] Groupby with no returns just be valid query", checkQuery);
+		it("[Daniel/group_no_values.json] GROUP with no values should fail", checkQuery);
+		it("[Daniel/group_apply_no_values.json] GROUP and APPLY with no values should fail", checkQuery);
+		it("[Daniel/all_columns.json] Return all columns", checkQuery);
 
 		//	- invalid room tests
 		it("[C2/rooms/invalid/mixed_keys.json] Simple rooms example but contains keys from section", checkQuery);

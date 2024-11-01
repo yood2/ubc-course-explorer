@@ -1,5 +1,5 @@
 {
-	"title": "Empty GROUP",
+	"title": "GROUP and APPLY empty values",
 	"input": {
 		"WHERE": {
 			"AND": [
@@ -24,13 +24,7 @@
 		},
 		"TRANSFORMATIONS": {
 			"GROUP": [],
-			"APPLY": [
-				{
-					"minSeats": {
-						"MIN": "rooms_seats"
-					}
-				}
-			]
+			"APPLY": []
 		}
 	},
 	"errorExpected": true,
