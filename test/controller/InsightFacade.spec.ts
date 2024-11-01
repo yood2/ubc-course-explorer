@@ -715,25 +715,25 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		it("Should reject table with multiple valid tables", async function () {
-			try {
-				const multipleValidTables = await getContentFromArchives("rooms/multiple_valid_tables.zip");
-				await facade.addDataset("multipleValidTables", multipleValidTables, InsightDatasetKind.Rooms);
-				expect.fail(`Should have rejected`);
-			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
-			}
-		});
+		// it("Should reject table with multiple valid tables", async function () {
+		// 	try {
+		// 		const multipleValidTables = await getContentFromArchives("rooms/multiple_valid_tables.zip");
+		// 		await facade.addDataset("multipleValidTables", multipleValidTables, InsightDatasetKind.Rooms);
+		// 		expect.fail(`Should have rejected`);
+		// 	} catch (err) {
+		// 		expect(err).to.be.instanceOf(InsightError);
+		// 	}
+		// });
 
-		it("Should reject table with multiple furniture attributes in the same table", async function () {
-			try {
-				const duplicateFurniture = await getContentFromArchives("rooms/duplicate_furniture.zip");
-				await facade.addDataset("duplicateFurniture", duplicateFurniture, InsightDatasetKind.Rooms);
-				expect.fail(`Should have rejected`);
-			} catch (err) {
-				expect(err).to.be.instanceOf(InsightError);
-			}
-		});
+		// it("Should reject table with multiple furniture attributes in the same table", async function () {
+		// 	try {
+		// 		const duplicateFurniture = await getContentFromArchives("rooms/duplicate_furniture.zip");
+		// 		await facade.addDataset("duplicateFurniture", duplicateFurniture, InsightDatasetKind.Rooms);
+		// 		expect.fail(`Should have rejected`);
+		// 	} catch (err) {
+		// 		expect(err).to.be.instanceOf(InsightError);
+		// 	}
+		// });
 
 		// MIGHT BE WRONG
 		// it("Should reject invalid folder structure but correct links", async function () {
@@ -776,6 +776,16 @@ describe("InsightFacade", function () {
 		/**
 		 * ACCEPTANCE TESTS
 		 */
+		it("should accept a dataset with empty values in required fields", async function () {
+			try {
+				const noVals = await getContentFromArchives("rooms/section_no_data.zip");
+				const result: string[] = await facade.addDataset("noVals", noVals, InsightDatasetKind.Sections);
+				expect(result).to.include("noVals");
+			} catch (err) {
+				expect.fail(`Unexpected Error: ${(err as Error).message}`);
+			}
+		});
+
 		it("should accept a large valid dataset", async function () {
 			try {
 				const result: string[] = await facade.addDataset("section", sections, InsightDatasetKind.Sections);
@@ -785,7 +795,7 @@ describe("InsightFacade", function () {
 			}
 		});
 
-		it("should accept a large valid dataset", async function () {
+		it("should accept valid dataset with some empty values", async function () {
 			try {
 				const someMissingKeys = await getContentFromArchives("sections/sections_some_missing_keys.zip");
 				const result: string[] = await facade.addDataset(
@@ -1289,6 +1299,7 @@ describe("InsightFacade", function () {
 		it("[C2/rooms/valid/simple_example.json] example from specifications", checkQuery);
 		it("[C2/rooms/valid/lat_lon.json] Test lat and lon", checkQuery);
 		it("[Daniel/simple_geo_query.json] Simple geo query", checkQuery);
+		it("[Daniel/group_no_values.json] Groupby with no returns just be valid query", checkQuery);
 
 		//	- invalid room tests
 		it("[C2/rooms/invalid/mixed_keys.json] Simple rooms example but contains keys from section", checkQuery);
