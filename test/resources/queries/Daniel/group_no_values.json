@@ -1,0 +1,38 @@
+{
+	"title": "Empty GROUP",
+	"input": {
+		"WHERE": {
+			"AND": [
+				{
+					"IS": {
+						"rooms_furniture": "*Chairs*"
+					}
+				},
+				{
+					"LT": {
+						"rooms_seats": 1
+					}
+				}
+			]
+		},
+		"OPTIONS": {
+			"COLUMNS": ["rooms_fullname", "rooms_shortname", "minSeats"],
+			"ORDER": {
+				"dir": "UP",
+				"keys": ["minSeats"]
+			}
+		},
+		"TRANSFORMATIONS": {
+			"GROUP": [],
+			"APPLY": [
+				{
+					"minSeats": {
+						"MIN": "rooms_seats"
+					}
+				}
+			]
+		}
+	},
+	"errorExpected": true,
+	"expected": "InsightError"
+}

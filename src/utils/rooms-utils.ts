@@ -64,18 +64,21 @@ export function processRooms(indexRows: IndexRow[], buildingData: Record<string,
 		const buildingRows = buildingData[indexRow.shortname] || [];
 
 		for (const buildingRow of buildingRows) {
+			const shortName = `${indexRow.shortname}_${buildingRow.number}`;
+			const href = `http://students.ubc.ca/campus/discover/buildings-and-classrooms/room/${indexRow.shortname}-${buildingRow.number}`;
+
 			rooms.push({
 				fullname: indexRow.fullname,
 				shortname: indexRow.shortname,
 				number: buildingRow.number,
-				name: `${indexRow.shortname}_${buildingRow.number}`,
+				name: shortName,
 				address: indexRow.address,
 				lat: indexRow.lat,
 				lon: indexRow.lon,
 				seats: Number(buildingRow.seats),
 				type: buildingRow.type,
 				furniture: buildingRow.furniture,
-				href: indexRow.href,
+				href: href,
 			});
 		}
 	}
