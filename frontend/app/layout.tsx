@@ -31,10 +31,8 @@ export default function RootLayout({
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<SidebarProvider>
 					<AppSidebar />
-					<main>
-						<SidebarTrigger />
-						<div>{children}</div>
-					</main>
+					<SidebarTrigger />
+					<div className="space-y-8 py-8">{children}</div>
 				</SidebarProvider>
 			</body>
 		</html>
