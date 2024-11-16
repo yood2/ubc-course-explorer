@@ -1,7 +1,7 @@
 #### Quickstart
 
 1. `yarn install`
-2. `npm run dev1`
+2. `npm run dev`
 
 ##### References
 
