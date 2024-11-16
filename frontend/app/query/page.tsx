@@ -1,8 +1,10 @@
-import AddDataset from "@/components/add-dataset/add-dataset";
+"use client";
+
+import Debug from "@/components/debug/debug";
 
 export default function Query() {
 	return (
-		<div className="container mx-auto py-8">
+		<div>
 			<p>Query Stuff Here</p>
 		</div>
 	);
