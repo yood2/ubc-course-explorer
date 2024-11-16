@@ -4,6 +4,7 @@ import { AppSidebar } from "../components/sidebar/app-sidebar";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { InsightProvider } from "./context/context";
 
 const geistSans = localFont({
 	src: "./fonts/GeistVF.woff",
@@ -32,7 +33,11 @@ export default function RootLayout({
 				<SidebarProvider>
 					<AppSidebar />
 					<SidebarTrigger />
-					<div className="space-y-8 py-8">{children}</div>
+					<InsightProvider>
+						<div className="min-h-screen bg-background font-sans antialiased max-w-2xl mx-auto py-8 sm:py-16 px-8 space-y-8 py-8">
+							{children}
+						</div>
+					</InsightProvider>
 				</SidebarProvider>
 			</body>
 		</html>
