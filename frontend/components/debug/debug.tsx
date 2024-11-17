@@ -11,11 +11,23 @@ import { Bug } from "lucide-react";
 import { useInsightContext } from "@/context/context";
 import { InsightDataset, InsightDatasetKind } from "@/types/schema";
 
-const DummyDataset: InsightDataset = {
-	id: "test",
-	kind: InsightDatasetKind.Sections,
-	numRows: 1,
-};
+const DummyDatasets = [
+	{
+		id: "test1",
+		kind: InsightDatasetKind.Sections,
+		numRows: 1,
+	},
+	{
+		id: "test2",
+		kind: InsightDatasetKind.Sections,
+		numRows: 1,
+	},
+	{
+		id: "test3",
+		kind: InsightDatasetKind.Sections,
+		numRows: 1,
+	},
+];
 
 const DummyQuery = [
 	{
@@ -36,8 +48,8 @@ export default function Debug() {
 	const { datasets, queryResults, setDatasets, setQueryResults } = useInsightContext();
 
 	const HandleDummyData = () => {
-		setDatasets([DummyDataset]);
-		setQueryResults(DummyQuery);
+		setDatasets(DummyDatasets);
+		// setQueryResults(DummyQuery);
 	};
 
 	const HandleDataReset = () => {
