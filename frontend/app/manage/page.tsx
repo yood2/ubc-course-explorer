@@ -1,9 +1,12 @@
+"use client";
+
 import AddDataset from "@/components/add-dataset/add-dataset";
+import Debug from "@/components/debug/debug";
 
 export default function Home() {
 	return (
-		<div className="container mx-auto py-8">
-			<p>Dataset Management Here</p>
+		<div>
+			<h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Manage</h3>
 			<AddDataset />
 		</div>
 	);

@@ -1,9 +1,12 @@
-import AddDataset from "@/components/add-dataset/add-dataset";
+"use client";
+
+import { DataTable } from "@/components/data-table/data-table";
+import QueryForm from "@/components/query-form/query-form";
 
 export default function Query() {
 	return (
-		<div className="container mx-auto py-8">
-			<p>Query Stuff Here</p>
+		<div>
+			<QueryForm />
 		</div>
 	);
 }
