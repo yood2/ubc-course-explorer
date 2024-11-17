@@ -28,7 +28,7 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-				<div className="min-h-screen bg-background font-sans antialiased max-w-2xl mx-auto py-8 sm:py-16 px-8 space-y-8 py-8">
+				<div className="min-h-screen bg-background font-sans antialiased max-w-4xl mx-auto py-8 sm:py-16 px-8 space-y-8 py-8">
 					<InsightProvider>
 						<Menu />
 						{children}

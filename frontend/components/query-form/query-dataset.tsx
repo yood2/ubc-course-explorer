@@ -9,36 +9,48 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useInsightContext } from "@/context/context";
 
-export function QueryDataset() {
-	const [open, setOpen] = React.useState(false);
-	const [value, setValue] = React.useState("");
-	const { datasets } = useInsightContext();
+interface QueryDatasetProps {
+	selectedDataset: string;
+	setSelectedDataset: React.Dispatch<React.SetStateAction<string>>;
+}
+
+export function QueryDataset({ selectedDataset, setSelectedDataset }: QueryDatasetProps) {
+	const [open, setOpen] = React.useState(false); // popover open/close state
+	const [searchTerm, setSearchTerm] = React.useState(""); // for filtering datasets
+	const { datasets } = useInsightContext(); // list of datasets from context
+
+	// Filter datasets based on the search term
+	const filteredDatasets = datasets.filter((dataset) => dataset.toLowerCase().includes(searchTerm));
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
 				<Button variant="outline" role="combobox" aria-expanded={open} className="w-[200px] justify-between">
-					{value ? datasets.find((dataset) => dataset.id === value)?.id : "Select dataset..."}
+					{selectedDataset || "Select dataset..."}
 					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent className="w-[200px] p-0">
 				<Command>
-					<CommandInput placeholder="Search dataset..." />
+					<CommandInput
+						placeholder="Search dataset..."
+						value={searchTerm}
+						onInput={(e) => setSearchTerm(e.currentTarget.value)}
+					/>
 					<CommandList>
 						<CommandEmpty>No dataset found.</CommandEmpty>
 						<CommandGroup>
-							{datasets.map((dataset) => (
+							{filteredDatasets.map((dataset) => (
 								<CommandItem
-									key={dataset.id}
-									value={dataset.id}
+									key={dataset}
+									value={dataset}
 									onSelect={(currentValue) => {
-										setValue(currentValue === value ? "" : currentValue);
+										setSelectedDataset(currentValue === selectedDataset ? "" : currentValue);
 										setOpen(false);
 									}}
 								>
-									<Check className={cn("mr-2 h-4 w-4", value === dataset.id ? "opacity-100" : "opacity-0")} />
-									{dataset.id}
+									<Check className={cn("mr-2 h-4 w-4", selectedDataset === dataset ? "opacity-100" : "opacity-0")} />
+									{dataset}
 								</CommandItem>
 							))}
 						</CommandGroup>

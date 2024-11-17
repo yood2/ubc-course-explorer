@@ -4,8 +4,8 @@ import { createContext, useState, useContext } from "react";
 import { InsightDataset } from "@/types/schema";
 
 interface InsightContextType {
-	datasets: InsightDataset[];
-	setDatasets: (datasets: InsightDataset[]) => void;
+	datasets: string[];
+	setDatasets: (datasets: string[]) => void;
 	queryResults: any[];
 	setQueryResults: (results: any) => void;
 }
@@ -13,7 +13,7 @@ interface InsightContextType {
 const InsightContext = createContext<InsightContextType | undefined>(undefined);
 
 export const InsightProvider = ({ children }: any) => {
-	const [datasets, setDatasets] = useState<InsightDataset[]>([]);
+	const [datasets, setDatasets] = useState<string[]>(["test"]);
 	const [queryResults, setQueryResults] = useState([]);
 
 	return (

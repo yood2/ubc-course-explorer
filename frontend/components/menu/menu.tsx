@@ -1,7 +1,6 @@
-"use client";
-
 import { House, Folder, ScanSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import Debug from "../debug/debug";
 
 export default function Menu() {
@@ -9,25 +8,25 @@ export default function Menu() {
 		<>
 			<div className="flex items-center justify-between">
 				<div className="flex flex-1 items-center space-x-2">
-					<a href="/">
+					<Link href="/">
 						<Button variant="outline" size="sm" className="h-8 lg:flex">
 							<House />
 							Home
 						</Button>
-					</a>
-					<a href="/manage">
+					</Link>
+					<Link href="/manage">
 						<Button variant="outline" size="sm" className="h-8 lg:flex">
 							<Folder />
 							Manage
 						</Button>
-					</a>
-					<a href="/query">
+					</Link>
+					<Link href="/query">
 						{" "}
 						<Button variant="outline" size="sm" className="h-8 lg:flex">
 							<ScanSearch />
 							Query
 						</Button>
-					</a>
+					</Link>
 					<Debug />
 				</div>
 			</div>
