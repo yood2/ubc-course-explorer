@@ -1,11 +1,12 @@
 "use client";
 
-import Debug from "@/components/debug/debug";
+import { DataTable } from "@/components/data-table/data-table";
+import QueryForm from "@/components/query-form/query-form";
 
 export default function Query() {
 	return (
 		<div>
-			<p>Query Stuff Here</p>
+			<QueryForm />
 		</div>
 	);
 }
