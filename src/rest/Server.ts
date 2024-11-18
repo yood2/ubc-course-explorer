@@ -90,8 +90,8 @@ export default class Server {
 		this.express.get("/echo/:msg", EchoService.echo);
 
 		// for managing datasets
-		this.express.post("/datasets/:dataset_id", DatasetsService.addDataset);
-		this.express.delete("/datasets/:dataset_id", DatasetsService.removeDataset);
+		this.express.put("/dataset/:id/:kind", DatasetsService.addDataset);
+		this.express.delete("/dataset/:id", DatasetsService.removeDataset);
 		this.express.get("/datasets", DatasetsService.listDatasets);
 
 		// for querying
