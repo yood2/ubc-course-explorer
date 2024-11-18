@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import Log from "@ubccpsc310/folder-test/build/Log";
 import InsightFacade from "../controller/InsightFacade";
-import { InsightDatasetKind } from "../controller/IInsightFacade";
+import { InsightDatasetKind, InsightError, NotFoundError } from "../controller/IInsightFacade";
 
 export default class DatasetsService {
 	public static async addDataset(req: Request, res: Response): Promise<void> {
@@ -13,8 +13,8 @@ export default class DatasetsService {
 			}
 
 			const content = req.body.toString("base64");
-			const datasetId = req.params.dataset_id;
-			const kind = req.query.kind;
+			const datasetId = req.params.id;
+			const kind = req.params.kind;
 
 			if (typeof kind !== "string" || !Object.values(InsightDatasetKind).includes(kind as InsightDatasetKind)) {
 				res.status(StatusCodes.BAD_REQUEST).json({ error: "Missing or invalid dataset kind!" });
@@ -33,7 +33,7 @@ export default class DatasetsService {
 
 	public static async removeDataset(req: Request, res: Response): Promise<void> {
 		try {
-			const datasetId = req.params.dataset_id;
+			const datasetId = req.params.id;
 
 			Log.info(`Server::DatasetsService(..) - dataset id: ${datasetId}`);
 			const insightFacade = new InsightFacade();
@@ -41,7 +41,11 @@ export default class DatasetsService {
 			res.status(StatusCodes.OK).json({ result: response });
 		} catch (err) {
 			const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
-			res.status(StatusCodes.BAD_REQUEST).json({ error: errorMessage });
+			if (err instanceof InsightError) {
+				res.status(StatusCodes.BAD_REQUEST).json({ error: errorMessage });
+			} else if (err instanceof NotFoundError) {
+				res.status(StatusCodes.NOT_FOUND).json({ error: errorMessage });
+			}
 		}
 	}
 
