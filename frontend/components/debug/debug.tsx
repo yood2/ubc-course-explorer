@@ -54,18 +54,19 @@ export default function Debug() {
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Current State</DialogTitle>
-					<DialogDescription>
-						Datasets:{JSON.stringify(datasets, null, 2)}
+					<div>
+						<pre>Datasets:{JSON.stringify(datasets, null, 2)}</pre>
 						<br />
-						Query Results:{JSON.stringify(queryResults, null, 2)}
+						<pre>Query Results:{JSON.stringify(queryResults, null, 2)}</pre>
+
 						<br />
-						<Button variant="outline" onClick={HandleDummyData}>
-							Load Dummy Data
-						</Button>
-						<Button variant="outline" onClick={HandleDataReset}>
-							Clear Data
-						</Button>
-					</DialogDescription>
+					</div>
+					<Button variant="outline" onClick={HandleDummyData}>
+						Load Dummy Data
+					</Button>
+					<Button variant="outline" onClick={HandleDataReset}>
+						Clear Data
+					</Button>
 				</DialogHeader>
 			</DialogContent>
 		</Dialog>
