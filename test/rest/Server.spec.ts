@@ -5,7 +5,7 @@ import Log from "@ubccpsc310/folder-test/build/Log";
 import { clearDisk, loadTestQuery } from "../TestUtil";
 import * as fs from "fs-extra";
 
-describe.only("Facade C3", function () {
+describe("Facade C3", function () {
 	before(async function () {
 		// const smallSections = await getContentFromArchives("sections/one_section.zip");
 		// const smallRooms = await getContentFromArchives("rooms/one_building.zip");
@@ -28,6 +28,33 @@ describe.only("Facade C3", function () {
 		const SERVER_URL = "http://localhost:4321/";
 		const ENDPOINT_URL = "dataset/mysections/sections";
 		const ZIP_FILE_DATA = await fs.readFile("test/resources/archives/sections/one_section.zip");
+
+		try {
+			return request(SERVER_URL)
+				.put(ENDPOINT_URL)
+				.send(ZIP_FILE_DATA)
+				.set("Content-Type", "application/x-zip-compressed")
+				.then(function (res: Response) {
+					// some logging here please!
+					Log.info(res.text);
+					expect(res.status).to.be.equal(StatusCodes.OK);
+				})
+				.catch(function (err: Error) {
+					Log.error(err.message);
+					// some logging here please!
+					expect.fail();
+				});
+		} catch (err) {
+			Log.error(err);
+			// and some more logging here!
+		}
+	});
+
+	// Sample on how to format PUT requests
+	it("PUT test for rooms dataset", async function () {
+		const SERVER_URL = "http://localhost:4321/";
+		const ENDPOINT_URL = "dataset/myrooms/rooms";
+		const ZIP_FILE_DATA = await fs.readFile("test/resources/archives/rooms/campus.zip");
 
 		try {
 			return request(SERVER_URL)
