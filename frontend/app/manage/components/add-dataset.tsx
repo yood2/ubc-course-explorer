@@ -28,7 +28,7 @@ export default function AddDataset() {
 
 		try {
 			const content = await file.arrayBuffer();
-			addDataset(content, datasetId, kind);
+			await addDataset(content, datasetId, kind);
 			await reloadDatasets();
 		} catch (error) {
 			console.error("Error submitting dataset:", error);
