@@ -5,9 +5,10 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useInsightContext } from "@/context/context";
+import { addDataset } from "@/app/utils/api-utils";
 
 export default function AddDataset() {
-	const { setDatasets } = useInsightContext();
+	const { reloadDatasets } = useInsightContext();
 	const [file, setFile] = useState<File | null>(null);
 	const [datasetId, setDatasetId] = useState<string>("");
 	const [kind, setKind] = useState<string>("sections");
@@ -26,24 +27,9 @@ export default function AddDataset() {
 		}
 
 		try {
-			const fileBuffer = await file.arrayBuffer();
-
-			const response = await fetch(`http://localhost:4321/datasets/${datasetId}?kind=${kind}`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/octet-stream",
-				},
-				body: fileBuffer,
-			});
-
-			if (response.ok) {
-				const result = await response.json();
-				setDatasets(result.result);
-				alert(`Dataset added successfully: ${JSON.stringify(result)}`);
-			} else {
-				const error = await response.json();
-				alert(`Error: ${error.error}`);
-			}
+			const content = await file.arrayBuffer();
+			addDataset(content, datasetId, kind);
+			await reloadDatasets();
 		} catch (error) {
 			console.error("Error submitting dataset:", error);
 			alert("An unexpected error occurred.");
