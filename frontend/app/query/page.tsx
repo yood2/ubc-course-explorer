@@ -11,7 +11,7 @@ export default function Query() {
 	return (
 		<>
 			<h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Query</h3>
-			<QueryForm />
+			{/* <QueryForm /> */}
 			<DataTable data={queryResults} columns={columns} />
 		</>
 	);
