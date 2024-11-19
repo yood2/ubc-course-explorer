@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { Check, PlusCircle, RotateCcw } from "lucide-react";
 import { useState } from "react";
@@ -17,25 +19,31 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 
-export function QueryOptions() {
-	const [selectedValues, setSelectedValues] = useState<string[]>([]);
-	const options = [];
+interface QueryColumnsProps {
+	selectedDataset: string;
+	selectedColumns: string[];
+	setSelectedColumns: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
+export function QueryColumns({ selectedDataset, selectedColumns, setSelectedColumns }: QueryColumnsProps) {
+	const options = ["id", "title", "instructor", "dept", "year", "avg", "pass", "fail", "audit"];
 
 	const toggleSelection = (option: string) => {
-		setSelectedValues((prev) => (prev.includes(option) ? prev.filter((value) => value !== option) : [...prev, option]));
+		setSelectedColumns((prev) =>
+			prev.includes(option) ? prev.filter((value) => value !== option) : [...prev, option]
+		);
 	};
 
 	return (
 		<Popover>
 			<PopoverTrigger asChild>
-				<Button variant="outline" className="h-8">
-					<PlusCircle className="mr-2" />
-					Options
-					{selectedValues.length > 0 && (
+				<Button variant="outline" className="" disabled={selectedDataset === ""}>
+					Columns <PlusCircle />
+					{selectedColumns.length > 0 && (
 						<>
 							<Separator orientation="vertical" className="mx-2 h-4" />
 							<div className="space-x-1 lg:flex">
-								{selectedValues.map((option) => (
+								{selectedColumns.map((option) => (
 									<Badge variant="secondary" key={option} className="rounded-sm px-1 font-normal">
 										{option}
 									</Badge>
@@ -51,18 +59,18 @@ export function QueryOptions() {
 					<CommandList>
 						<CommandEmpty>No results found.</CommandEmpty>
 						<CommandGroup>
-							{selectedValues.length > 0 && (
+							{selectedColumns.length > 0 && (
 								<>
 									<CommandSeparator />
 									<CommandGroup>
-										<CommandItem onSelect={() => setSelectedValues([])} className="justify-center text-center">
+										<CommandItem onSelect={() => setSelectedColumns([])} className="justify-center text-center">
 											<RotateCcw /> Clear
 										</CommandItem>
 									</CommandGroup>
 								</>
 							)}
 							{options.map((option) => {
-								const isSelected = selectedValues.includes(option);
+								const isSelected = selectedColumns.includes(option);
 								return (
 									<CommandItem key={option} onSelect={() => toggleSelection(option)}>
 										<div

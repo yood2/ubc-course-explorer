@@ -1,3 +1,5 @@
+"use client";
+
 import {
 	Dialog,
 	DialogContent,
@@ -11,23 +13,7 @@ import { Bug } from "lucide-react";
 import { useInsightContext } from "@/context/context";
 import { InsightDataset, InsightDatasetKind } from "@/types/schema";
 
-const DummyDatasets = [
-	{
-		id: "test1",
-		kind: InsightDatasetKind.Sections,
-		numRows: 1,
-	},
-	{
-		id: "test2",
-		kind: InsightDatasetKind.Sections,
-		numRows: 1,
-	},
-	{
-		id: "test3",
-		kind: InsightDatasetKind.Sections,
-		numRows: 1,
-	},
-];
+const DummyDatasets = ["test", "test2"];
 
 const DummyQuery = [
 	{
@@ -68,23 +54,19 @@ export default function Debug() {
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Current State</DialogTitle>
-					<DialogDescription>
-						<p>
-							Datasets:
-							<pre>{JSON.stringify(datasets, null, 2)}</pre>
-							<br />
-						</p>
-						<p>
-							Query Results:
-							<pre>{JSON.stringify(queryResults, null, 2)}</pre>
-						</p>
-						<Button variant="outline" onClick={HandleDummyData}>
-							Load Dummy Data
-						</Button>
-						<Button variant="outline" onClick={HandleDataReset}>
-							Clear Data
-						</Button>
-					</DialogDescription>
+					<div>
+						<pre>Datasets:{JSON.stringify(datasets, null, 2)}</pre>
+						<br />
+						<pre>Query Results:{JSON.stringify(queryResults, null, 2)}</pre>
+
+						<br />
+					</div>
+					<Button variant="outline" onClick={HandleDummyData}>
+						Load Dummy Data
+					</Button>
+					<Button variant="outline" onClick={HandleDataReset}>
+						Clear Data
+					</Button>
 				</DialogHeader>
 			</DialogContent>
 		</Dialog>
