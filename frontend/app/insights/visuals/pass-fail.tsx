@@ -46,7 +46,10 @@ export function PassFail({ data }: PassFailProps) {
 						</BarChart>
 					</ChartContainer>
 				) : (
-					<p>No data returned.</p>
+					<>
+						<CardTitle>No data was returned!</CardTitle>
+						<CardDescription>Query was successful but no data was returned! Try a different course.</CardDescription>
+					</>
 				)}
 			</CardContent>
 		</Card>

@@ -10,6 +10,7 @@ import { InsightType } from "./insight-form/insight-type";
 import { Button } from "@/components/ui/button";
 import { performQuery } from "../utils/api-utils";
 import { PassFail } from "./visuals/pass-fail";
+import { AuditParticipation } from "./visuals/audit-participation";
 
 export default function Insights() {
 	const [selectedDataset, setSelectedDataset] = useState<string>("");
@@ -37,7 +38,12 @@ export default function Insights() {
 	};
 
 	const handleSubmit = () => {
-		const newQuery = passFailQueryGenerator(selectedDataset, selectedYear, selectedDept, selectedId);
+		let newQuery: Object = {};
+		if (selectedType === "pass/fail") {
+			newQuery = passFailQueryGenerator(selectedDataset, selectedYear, selectedDept, selectedId);
+		} else if (selectedType === "audit participation") {
+			newQuery = auditQueryGenerator(selectedDataset, selectedYear, selectedDept, selectedId);
+		}
 		setQuery(newQuery);
 		handleQuery(newQuery);
 	};
@@ -58,8 +64,9 @@ export default function Insights() {
 				</div>
 			</div>
 			<PassFail data={insightResults} />
-			{/* <pre>{JSON.stringify(query, null, 2)}</pre>
-			<pre>{JSON.stringify(insightResults, null, 2)}</pre> */}
+			<AuditParticipation />
+			{/* <pre>{JSON.stringify(query, null, 2)}</pre> */}
+			{/* <pre>{JSON.stringify(insightResults, null, 2)}</pre> */}
 		</>
 	);
 }
@@ -98,6 +105,43 @@ function passFailQueryGenerator(
 		},
 		OPTIONS: {
 			COLUMNS: [idCol, deptCol, failCol, passCol],
+			ORDER: failCol,
+		},
+	};
+
+	return query;
+}
+
+function auditQueryGenerator(selectedDataset: string, selectedYear: number, selectedDept: string, selectedId: string) {
+	const yearCol = `${selectedDataset}_year`;
+	const deptCol = `${selectedDataset}_dept`;
+	const idCol = `${selectedDataset}_id`;
+	const failCol = `${selectedDataset}_fail`;
+	const passCol = `${selectedDataset}_pass`;
+	const auditCol = `${selectedDataset}_pass`;
+
+	const query = {
+		WHERE: {
+			AND: [
+				{
+					EQ: {
+						[yearCol]: selectedYear,
+					},
+				},
+				{
+					IS: {
+						[deptCol]: selectedDept,
+					},
+				},
+				{
+					IS: {
+						[idCol]: selectedId,
+					},
+				},
+			],
+		},
+		OPTIONS: {
+			COLUMNS: [idCol, deptCol, failCol, passCol, auditCol],
 			ORDER: failCol,
 		},
 	};
