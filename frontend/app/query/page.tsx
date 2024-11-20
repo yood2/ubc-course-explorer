@@ -9,7 +9,6 @@ import { QueryOrder } from "./components/query-form/query-order";
 import { QueryTable } from "./components/data-table/query-table";
 import { Button } from "@/components/ui/button";
 import { performQuery } from "../utils/api-utils";
-import DataVisuals from "./components/data-visuals/data-visuals";
 
 export default function Query() {
 	const { queryResults, setQueryResults } = useInsightContext();
