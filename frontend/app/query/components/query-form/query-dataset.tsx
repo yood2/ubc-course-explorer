@@ -19,8 +19,10 @@ export function QueryDataset({ selectedDataset, setSelectedDataset }: QueryDatas
 	const [searchTerm, setSearchTerm] = React.useState(""); // for filtering datasets
 	const { datasets } = useInsightContext(); // list of datasets from context
 
+	const ids = datasets.map((dataset) => dataset.id);
+
 	// Filter datasets based on the search term
-	const filteredDatasets = datasets.filter((dataset) => dataset.toLowerCase().includes(searchTerm));
+	const filteredDatasets = ids.filter((id) => id.includes(searchTerm));
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>

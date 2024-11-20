@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { Check, PlusCircle, RotateCcw } from "lucide-react";
-import { useState } from "react";
 
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
