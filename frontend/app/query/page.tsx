@@ -8,6 +8,7 @@ import { QueryDataset } from "./components/query-form/query-dataset";
 import { QueryColumns } from "./components/query-form/query-columns";
 import { QueryFilter } from "./components/query-form/query-filter";
 import { QueryOrder } from "./components/query-form/query-order";
+import { QueryTable } from "./components/data-table/query-table";
 import { Button } from "@/components/ui/button";
 import { performQuery } from "../utils/api-utils";
 
@@ -43,7 +44,7 @@ export default function Query() {
 				return;
 			} else {
 				setQueryResults(result);
-				alert(`success: ${JSON.stringify(result)}`);
+				alert(`success!`);
 			}
 		} catch (e) {
 			alert("caught error");
@@ -53,24 +54,26 @@ export default function Query() {
 	return (
 		<>
 			<h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Query</h3>
-			<div>
-				<QueryDataset selectedDataset={selectedDataset} setSelectedDataset={setSelectedDataset} />
-				<QueryColumns
-					selectedDataset={selectedDataset}
-					selectedColumns={selectedColumns}
-					setSelectedColumns={setSelectedColumns}
-				/>
-				<QueryOrder
-					selectedColumns={selectedColumns}
-					selectedOrder={selectedOrder}
-					setSelectedOrder={setSelectedOrder}
-				/>
-				<QueryFilter selectedOrder={selectedOrder} filters={filters} setFilters={setFilters} />
-				<Button onClick={handleQuery}>Query</Button>
+			<div className="space-y-2">
+				<div className="space-x-2">
+					<QueryDataset selectedDataset={selectedDataset} setSelectedDataset={setSelectedDataset} />
+					<QueryColumns
+						selectedDataset={selectedDataset}
+						selectedColumns={selectedColumns}
+						setSelectedColumns={setSelectedColumns}
+					/>
+					<QueryOrder
+						selectedColumns={selectedColumns}
+						selectedOrder={selectedOrder}
+						setSelectedOrder={setSelectedOrder}
+					/>
+				</div>
+				<div className="space-x-2">
+					<QueryFilter selectedOrder={selectedOrder} filters={filters} setFilters={setFilters} />
+					<Button onClick={handleQuery}>Query</Button>
+				</div>
 			</div>
-			<DataTable data={queryResults} columns={columns} />
-			<pre>{JSON.stringify(query, null, 2)}</pre>
-			<pre>{JSON.stringify(queryResults, null, 2)}</pre>
+			<QueryTable data={queryResults} />
 		</>
 	);
 }
