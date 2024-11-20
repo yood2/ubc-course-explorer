@@ -11,37 +11,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Bug } from "lucide-react";
 import { useInsightContext } from "@/context/context";
-import { InsightDataset, InsightDatasetKind } from "@/types/schema";
-
-const DummyDatasets = ["test", "test2"];
-
-const DummyQuery = [
-	{
-		sections_dept: "math",
-		sections_avg: 97.09,
-	},
-	{
-		sections_dept: "math",
-		sections_avg: 97.09,
-	},
-	{
-		sections_dept: "epse",
-		sections_avg: 97.09,
-	},
-];
 
 export default function Debug() {
-	const { datasets, queryResults, setDatasets, setQueryResults } = useInsightContext();
-
-	const HandleDummyData = () => {
-		setDatasets(DummyDatasets);
-		// setQueryResults(DummyQuery);
-	};
-
-	const HandleDataReset = () => {
-		setDatasets([]);
-		setQueryResults([]);
-	};
+	const { datasets, queryResults } = useInsightContext();
 
 	return (
 		<Dialog>
@@ -61,12 +33,6 @@ export default function Debug() {
 
 						<br />
 					</div>
-					<Button variant="outline" onClick={HandleDummyData}>
-						Load Dummy Data
-					</Button>
-					<Button variant="outline" onClick={HandleDataReset}>
-						Clear Data
-					</Button>
 				</DialogHeader>
 			</DialogContent>
 		</Dialog>
