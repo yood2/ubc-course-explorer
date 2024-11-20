@@ -7,50 +7,47 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { useInsightContext } from "@/context/context";
 
-interface QueryDatasetProps {
-	selectedDataset: string;
-	setSelectedDataset: React.Dispatch<React.SetStateAction<string>>;
+interface InsightTypeProps {
+	selectedType: string;
+	setSelectedType: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export function QueryDataset({ selectedDataset, setSelectedDataset }: QueryDatasetProps) {
-	const [open, setOpen] = React.useState(false); // popover open/close state
-	const [searchTerm, setSearchTerm] = React.useState(""); // for filtering datasets
-	const { datasets } = useInsightContext(); // list of datasets from context
+const options = ["pass/fail", "audit participation"];
 
-	// Filter datasets based on the search term
-	const filteredDatasets = datasets.filter((dataset) => dataset.toLowerCase().includes(searchTerm));
+export function InsightType({ selectedType, setSelectedType }: InsightTypeProps) {
+	const [open, setOpen] = React.useState(false); // Popover open/close state
+	const [searchTerm, setSearchTerm] = React.useState(""); // For filtering datasets
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
 				<Button variant="outline" role="combobox" aria-expanded={open} className="w-[200px] justify-between">
-					{selectedDataset || "Select dataset..."}
+					{selectedType || "Select option..."}
 					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent className="w-[200px] p-0">
 				<Command>
 					<CommandInput
-						placeholder="Search dataset..."
+						placeholder="Search option..."
 						value={searchTerm}
 						onInput={(e) => setSearchTerm(e.currentTarget.value)}
 					/>
 					<CommandList>
-						<CommandEmpty>No dataset found.</CommandEmpty>
+						{options.length === 0 && <CommandEmpty>No year found.</CommandEmpty>}
 						<CommandGroup>
-							{filteredDatasets.map((dataset) => (
+							{options.map((option: string) => (
 								<CommandItem
-									key={dataset}
-									value={dataset}
+									key={option}
+									value={option} // Ensure value is a string
 									onSelect={(currentValue) => {
-										setSelectedDataset(currentValue === selectedDataset ? "" : currentValue);
+										setSelectedType(currentValue === selectedType ? "" : currentValue);
 										setOpen(false);
 									}}
 								>
-									<Check className={cn("mr-2 h-4 w-4", selectedDataset === dataset ? "opacity-100" : "opacity-0")} />
-									{dataset}
+									<Check className={cn("mr-2 h-4 w-4", selectedType === option ? "opacity-100" : "opacity-0")} />
+									{option}
 								</CommandItem>
 							))}
 						</CommandGroup>

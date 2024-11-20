@@ -1,6 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
 
-import { labels, priorities, statuses } from "@/components/data/data";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
 

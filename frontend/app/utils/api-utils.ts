@@ -43,3 +43,21 @@ export async function listDatasets() {
 		return { error: error.error || "An error occurred while listing datasets" };
 	}
 }
+
+export async function performQuery(query: object) {
+	const response = await fetch(`http://localhost:4321/query`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(query),
+	});
+
+	if (response.ok) {
+		const result = await response.json();
+		return { result: result.result };
+	} else {
+		const error = await response.json();
+		return { error: error.error || "An error occurred while querying the dataset" };
+	}
+}

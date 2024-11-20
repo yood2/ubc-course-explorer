@@ -25,7 +25,7 @@ const InsightContext = createContext<InsightContextType | undefined>(undefined);
 
 export const InsightProvider = ({ children }: any) => {
 	const [datasets, setDatasets] = useState<InsightDataset[]>([]);
-	const [queryResults, setQueryResults] = useState([]);
+	const [queryResults, setQueryResults] = useState<[]>([]);
 
 	const loadDatasets = async () => {
 		try {
