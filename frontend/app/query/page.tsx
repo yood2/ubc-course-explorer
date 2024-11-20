@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { DataTable } from "@/components/data-table/data-table";
-import { columns } from "./components/data-table/columns";
+import { useState, useEffect } from "react";
 import { useInsightContext } from "@/context/context";
 import { QueryDataset } from "./components/query-form/query-dataset";
 import { QueryColumns } from "./components/query-form/query-columns";
@@ -11,21 +9,17 @@ import { QueryOrder } from "./components/query-form/query-order";
 import { QueryTable } from "./components/data-table/query-table";
 import { Button } from "@/components/ui/button";
 import { performQuery } from "../utils/api-utils";
+import DataVisuals from "./components/data-visuals/data-visuals";
 
 export default function Query() {
 	const { queryResults, setQueryResults } = useInsightContext();
 	const [selectedDataset, setSelectedDataset] = useState<string>("");
 	const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
 	const [selectedOrder, setSelectedOrder] = useState<string>("");
-	const [filters, setFilters] = useState<{}>({
-		GT: {
-			sections_avg: 99,
-		},
-	});
-	const [query, setQuery] = useState<{}>({});
+	const [filters, setFilters] = useState<{}>({});
 
 	const handleQuery = async () => {
-		const prefixedColumns = selectedColumns.map((column) => `${selectedDataset}_${column}`);
+		const prefixedColumns = prefixColumns(selectedColumns, selectedDataset);
 
 		const newQuery = {
 			WHERE: filters,
@@ -35,16 +29,15 @@ export default function Query() {
 			},
 		};
 
-		setQuery(newQuery);
-
 		try {
 			const { result, error } = await performQuery(newQuery);
 			if (error) {
-				alert(`error: ${error.message}`);
+				console.log(error);
+				alert(`${error}`);
 				return;
 			} else {
 				setQueryResults(result);
-				alert(`success!`);
+				alert(`Query successful!`);
 			}
 		} catch (e) {
 			alert("caught error");
@@ -56,7 +49,11 @@ export default function Query() {
 			<h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Query</h3>
 			<div className="space-y-2">
 				<div className="space-x-2">
-					<QueryDataset selectedDataset={selectedDataset} setSelectedDataset={setSelectedDataset} />
+					<QueryDataset
+						selectedDataset={selectedDataset}
+						setSelectedDataset={setSelectedDataset}
+						setFilters={setFilters}
+					/>
 					<QueryColumns
 						selectedDataset={selectedDataset}
 						selectedColumns={selectedColumns}
@@ -73,7 +70,21 @@ export default function Query() {
 					<Button onClick={handleQuery}>Query</Button>
 				</div>
 			</div>
+			{queryResults.length > 0 && <QuerySummary />}
+		</>
+	);
+}
+
+function QuerySummary() {
+	const { queryResults } = useInsightContext();
+	return (
+		<>
+			<h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Summary</h3>
 			<QueryTable data={queryResults} />
 		</>
 	);
+}
+
+function prefixColumns(cols: string[], prefix: string) {
+	return cols.map((col) => `${prefix}_${col}`);
 }

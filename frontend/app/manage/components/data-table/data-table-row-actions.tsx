@@ -30,7 +30,7 @@ export function DataTableRowActions<TData>({ row }: DataTableRowActionsProps<TDa
 			if (error) {
 				alert(`Failed to remove dataset id ${id}: ${error}`);
 			} else {
-				alert(`Dataset removed`);
+				alert(`${id} was successfully removed.`);
 				reloadDatasets();
 			}
 		} catch (e) {

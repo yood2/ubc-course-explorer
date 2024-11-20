@@ -12,17 +12,29 @@ import { useInsightContext } from "@/context/context";
 interface QueryDatasetProps {
 	selectedDataset: string;
 	setSelectedDataset: React.Dispatch<React.SetStateAction<string>>;
+	setFilters: React.Dispatch<React.SetStateAction<{}>>;
 }
 
-export function QueryDataset({ selectedDataset, setSelectedDataset }: QueryDatasetProps) {
+export function QueryDataset({ selectedDataset, setSelectedDataset, setFilters }: QueryDatasetProps) {
 	const [open, setOpen] = React.useState(false); // popover open/close state
 	const [searchTerm, setSearchTerm] = React.useState(""); // for filtering datasets
 	const { datasets } = useInsightContext(); // list of datasets from context
 
 	const ids = datasets.map((dataset) => dataset.id);
 
-	// Filter datasets based on the search term
 	const filteredDatasets = ids.filter((id) => id.includes(searchTerm));
+
+	const changeDefaultFilter = (prefix: string) => {
+		const defaultKey = `${prefix}_avg`;
+		const defaultFilter = {
+			GT: {
+				[defaultKey]: 95,
+			},
+		};
+		console.log(`${JSON.stringify(defaultFilter)}`);
+
+		setFilters(defaultFilter);
+	};
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -48,6 +60,7 @@ export function QueryDataset({ selectedDataset, setSelectedDataset }: QueryDatas
 									value={dataset}
 									onSelect={(currentValue) => {
 										setSelectedDataset(currentValue === selectedDataset ? "" : currentValue);
+										changeDefaultFilter(currentValue);
 										setOpen(false);
 									}}
 								>

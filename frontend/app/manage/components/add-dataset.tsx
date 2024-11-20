@@ -16,7 +16,12 @@ export default function AddDataset() {
 	const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const uploadedFile = event.target.files?.[0];
 		if (uploadedFile) {
-			setFile(uploadedFile);
+			if (uploadedFile.type === "aplication/zip" || uploadedFile.name.endsWith(".zip")) {
+				setFile(uploadedFile);
+			} else {
+				alert("Please upload valid .zip file.");
+				event.target.value = "";
+			}
 		}
 	};
 
@@ -28,7 +33,12 @@ export default function AddDataset() {
 
 		try {
 			const content = await file.arrayBuffer();
-			await addDataset(content, datasetId, kind);
+			const res = await addDataset(content, datasetId, kind);
+			if (res.error) {
+				alert(`${res.error}`);
+			} else {
+				alert(`Successfully added ${datasetId}`);
+			}
 			await reloadDatasets();
 		} catch (error) {
 			console.error("Error submitting dataset:", error);

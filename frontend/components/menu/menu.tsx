@@ -1,4 +1,4 @@
-import { House, Folder, ScanSearch } from "lucide-react";
+import { House, Folder, ScanSearch, ChartColumn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Debug from "../debug/debug";
@@ -20,8 +20,13 @@ export default function Menu() {
 							Manage
 						</Button>
 					</Link>
+					<Link href="/insights">
+						<Button variant="outline" size="sm" className="h-8 lg:flex">
+							<ChartColumn />
+							Insights
+						</Button>
+					</Link>
 					<Link href="/query">
-						{" "}
 						<Button variant="outline" size="sm" className="h-8 lg:flex">
 							<ScanSearch />
 							Query

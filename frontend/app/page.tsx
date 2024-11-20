@@ -1,3 +1,5 @@
+import ExampleChart from "./query/components/data-visuals/example";
+
 export default function Home() {
 	return (
 		<div>
