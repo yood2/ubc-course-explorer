@@ -76,4 +76,20 @@ export default class DatasetsService {
 			res.status(StatusCodes.BAD_REQUEST).json({ error: errorMessage });
 		}
 	}
+
+	public static async getMetadata(req: Request, res: Response): Promise<void> {
+		try {
+			if (!req.body || typeof req.body !== "object" || req.body.length === 0) {
+				res.status(StatusCodes.BAD_REQUEST).json({ error: "Request body is empty or invalid" });
+				return;
+			}
+			Log.info(`Server::DatasetsService(..) - querying dataset`);
+			const insightFacade = new InsightFacade();
+			const response = await insightFacade.performQuery(req.body);
+			res.status(StatusCodes.OK).json({ result: response });
+		} catch (err) {
+			const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
+			res.status(StatusCodes.BAD_REQUEST).json({ error: errorMessage });
+		}
+	}
 }
