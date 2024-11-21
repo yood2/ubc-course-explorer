@@ -98,6 +98,6 @@ export default class Server {
 		this.express.post("/query", DatasetsService.queryDataset);
 
 		// personal endpoints
-		this.express.post("/personal/dataset/data/:id", DatasetsService.getMetadata);
+		this.express.get("/personal/metadata/:id", DatasetsService.getMetadata);
 	}
 }
