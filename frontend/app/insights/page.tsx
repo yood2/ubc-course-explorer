@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { PassFailChart } from "@/components/bar-charts/pass-fail-chart";
 import { InsightDataset } from "./insight-form/insight-dataset";
 import { InsightYear } from "./insight-form/insight-year";
 import { InsightDept } from "./insight-form/insight-dept";
@@ -11,6 +10,14 @@ import { Button } from "@/components/ui/button";
 import { performQuery } from "../utils/api-utils";
 import { PassFail } from "./visuals/pass-fail";
 import { AuditParticipation } from "./visuals/audit-participation";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function Insights() {
 	const [selectedDataset, setSelectedDataset] = useState<string>("");
@@ -20,6 +27,7 @@ export default function Insights() {
 	const [selectedType, setSelectedType] = useState<string>("");
 	const [query, setQuery] = useState<{}>({});
 	const [insightResults, setInsightResults] = useState<[]>([]);
+	const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
 	const handleQuery = async (newQuery: Object) => {
 		try {
@@ -54,13 +62,32 @@ export default function Insights() {
 			<div className="space-y-2">
 				<div className="space-x-2">
 					<InsightYear selectedYear={selectedYear} setSelectedYear={setSelectedYear} />
-					<InsightDept selectedDept={selectedDept} setSelectedDept={setSelectedDept} />
+					<InsightDept selectedYear={selectedYear} selectedDept={selectedDept} setSelectedDept={setSelectedDept} />
 					<InsightId selectedDept={selectedDept} selectedId={selectedId} setSelectedId={setSelectedId} />
 				</div>
 				<div className="space-x-2">
-					<InsightDataset selectedDataset={selectedDataset} setSelectedDataset={setSelectedDataset} />
-					<InsightType selectedType={selectedType} setSelectedType={setSelectedType} />
-					<Button onClick={handleSubmit}>Submit</Button>
+					<InsightDataset
+						selectedId={selectedId}
+						selectedDataset={selectedDataset}
+						setSelectedDataset={setSelectedDataset}
+					/>
+					<InsightType
+						selectedDataset={selectedDataset}
+						selectedType={selectedType}
+						setSelectedType={setSelectedType}
+					/>
+					<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+						<DialogTrigger asChild>
+							<Button>Submit</Button>
+						</DialogTrigger>
+						<DialogContent className="w-[300px]">
+							<DialogHeader>
+								<DialogTitle>Getting Insights</DialogTitle>
+							</DialogHeader>
+							<DialogDescription>Would you like to get insights with the following settings?</DialogDescription>
+							<Button onClick={handleSubmit}>Confirm</Button>
+						</DialogContent>
+					</Dialog>
 				</div>
 			</div>
 			<PassFail data={insightResults} />

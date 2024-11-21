@@ -10,11 +10,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { courses } from "./courses_by_dept";
 
 interface InsightDeptProps {
+	selectedYear: number;
 	selectedDept: string;
 	setSelectedDept: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export function InsightDept({ selectedDept, setSelectedDept }: InsightDeptProps) {
+export function InsightDept({ selectedYear, selectedDept, setSelectedDept }: InsightDeptProps) {
 	const [open, setOpen] = React.useState(false); // Popover open/close state
 	const [searchTerm, setSearchTerm] = React.useState(""); // For filtering datasets
 
@@ -23,7 +24,13 @@ export function InsightDept({ selectedDept, setSelectedDept }: InsightDeptProps)
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
-				<Button variant="outline" role="combobox" aria-expanded={open} className="w-[200px] justify-between">
+				<Button
+					disabled={selectedYear === 0}
+					variant="outline"
+					role="combobox"
+					aria-expanded={open}
+					className="w-[200px] justify-between"
+				>
 					{selectedDept || "Select dept..."}
 					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 				</Button>

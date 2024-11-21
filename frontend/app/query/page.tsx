@@ -76,7 +76,6 @@ export default function Query() {
 						setSelectedOrder={setSelectedOrder}
 					/>
 					<QueryFilter selectedOrder={selectedOrder} filters={filters} setFilters={setFilters} />
-					{/* <Button onClick={handleQuery}>Query</Button> */}
 					<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 						<DialogTrigger asChild>
 							<Button disabled={selectedDataset === "" || selectedColumns.length < 1 || selectedOrder === ""}>
