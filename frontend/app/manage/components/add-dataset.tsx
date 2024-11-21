@@ -6,12 +6,21 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useInsightContext } from "@/context/context";
 import { addDataset } from "@/app/utils/api-utils";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function AddDataset() {
 	const { reloadDatasets } = useInsightContext();
 	const [file, setFile] = useState<File | null>(null);
 	const [datasetId, setDatasetId] = useState<string>("");
 	const [kind, setKind] = useState<string>("sections");
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 	const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const uploadedFile = event.target.files?.[0];
@@ -40,6 +49,7 @@ export default function AddDataset() {
 				alert(`Successfully added ${datasetId}`);
 			}
 			await reloadDatasets();
+			setIsDialogOpen(false); // Close the dialog
 		} catch (error) {
 			console.error("Error submitting dataset:", error);
 			alert("An unexpected error occurred.");
@@ -56,18 +66,23 @@ export default function AddDataset() {
 				onChange={(e) => setDatasetId(e.target.value)}
 			/>
 
-			<Label htmlFor="dataset-kind">Dataset Kind</Label>
-			<Input
-				id="dataset-kind"
-				placeholder="Enter Dataset Kind (e.g., sections, rooms)"
-				value={kind}
-				onChange={(e) => setKind(e.target.value)}
-			/>
-
 			<Label htmlFor="dataset">Upload Dataset</Label>
 			<Input id="dataset" type="file" onChange={handleUpload} />
 
-			<Button onClick={handleSubmit}>Submit</Button>
+			<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+				<DialogTrigger asChild>
+					<Button disabled={file === null || datasetId === ""}>Submit</Button>
+				</DialogTrigger>
+				<DialogContent className="w-[300px]">
+					<DialogHeader>
+						<DialogTitle>Adding Dataset</DialogTitle>
+					</DialogHeader>
+					<DialogDescription>
+						Are you sure you want to add dataset "{datasetId}" from "{file?.name}?"
+					</DialogDescription>
+					<Button onClick={handleSubmit}>Confirm</Button>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }
