@@ -58,13 +58,13 @@ export default function Query() {
 						selectedColumns={selectedColumns}
 						setSelectedColumns={setSelectedColumns}
 					/>
+				</div>
+				<div className="space-x-2">
 					<QueryOrder
 						selectedColumns={selectedColumns}
 						selectedOrder={selectedOrder}
 						setSelectedOrder={setSelectedOrder}
 					/>
-				</div>
-				<div className="space-x-2">
 					<QueryFilter selectedOrder={selectedOrder} filters={filters} setFilters={setFilters} />
 					<Button onClick={handleQuery}>Query</Button>
 				</div>
