@@ -9,13 +9,14 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface InsightYearProps {
+	selectedDataset: string;
 	selectedYear: number;
 	setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const years = [2015, 1900, 2008, 2010, 2016, 2013, 2014, 2009, 2011, 2007, 2012];
 
-export function InsightYear({ selectedYear, setSelectedYear }: InsightYearProps) {
+export function InsightYear({ selectedDataset, selectedYear, setSelectedYear }: InsightYearProps) {
 	const [open, setOpen] = React.useState(false); // Popover open/close state
 	const [searchTerm, setSearchTerm] = React.useState(""); // For filtering datasets
 
@@ -25,7 +26,13 @@ export function InsightYear({ selectedYear, setSelectedYear }: InsightYearProps)
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
-				<Button variant="outline" role="combobox" aria-expanded={open} className="w-[200px] justify-between">
+				<Button
+					disabled={selectedDataset === ""}
+					variant="outline"
+					role="combobox"
+					aria-expanded={open}
+					className="w-[200px] justify-between"
+				>
 					{selectedYear || "Select year..."}
 					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 				</Button>

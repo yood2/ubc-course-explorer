@@ -61,16 +61,16 @@ export default function Insights() {
 			<h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">Insights</h3>
 			<div className="space-y-2">
 				<div className="space-x-2">
-					<InsightYear selectedYear={selectedYear} setSelectedYear={setSelectedYear} />
+					<InsightDataset selectedDataset={selectedDataset} setSelectedDataset={setSelectedDataset} />
+					<InsightYear
+						selectedDataset={selectedDataset}
+						selectedYear={selectedYear}
+						setSelectedYear={setSelectedYear}
+					/>
 					<InsightDept selectedYear={selectedYear} selectedDept={selectedDept} setSelectedDept={setSelectedDept} />
-					<InsightId selectedDept={selectedDept} selectedId={selectedId} setSelectedId={setSelectedId} />
 				</div>
 				<div className="space-x-2">
-					<InsightDataset
-						selectedId={selectedId}
-						selectedDataset={selectedDataset}
-						setSelectedDataset={setSelectedDataset}
-					/>
+					<InsightId selectedDept={selectedDept} selectedId={selectedId} setSelectedId={setSelectedId} />
 					<InsightType
 						selectedDataset={selectedDataset}
 						selectedType={selectedType}
@@ -78,7 +78,17 @@ export default function Insights() {
 					/>
 					<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 						<DialogTrigger asChild>
-							<Button>Submit</Button>
+							<Button
+								disabled={
+									selectedDataset === "" ||
+									selectedYear === 0 ||
+									selectedDept === "" ||
+									selectedId === "" ||
+									selectedType === ""
+								}
+							>
+								Submit
+							</Button>
 						</DialogTrigger>
 						<DialogContent className="w-[300px]">
 							<DialogHeader>

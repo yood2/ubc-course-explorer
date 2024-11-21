@@ -10,12 +10,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useInsightContext } from "@/context/context";
 
 interface QueryDatasetProps {
-	selectedId: string;
 	selectedDataset: string;
 	setSelectedDataset: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export function InsightDataset({ selectedId, selectedDataset, setSelectedDataset }: QueryDatasetProps) {
+export function InsightDataset({ selectedDataset, setSelectedDataset }: QueryDatasetProps) {
 	const [open, setOpen] = React.useState(false); // popover open/close state
 	const [searchTerm, setSearchTerm] = React.useState(""); // for filtering datasets
 	const { datasets } = useInsightContext(); // list of datasets from context
@@ -27,13 +26,7 @@ export function InsightDataset({ selectedId, selectedDataset, setSelectedDataset
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
-				<Button
-					disabled={selectedId === ""}
-					variant="outline"
-					role="combobox"
-					aria-expanded={open}
-					className="w-[200px] justify-between"
-				>
+				<Button variant="outline" role="combobox" aria-expanded={open} className="w-[200px] justify-between">
 					{selectedDataset || "Select dataset..."}
 					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 				</Button>
