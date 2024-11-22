@@ -25,6 +25,12 @@ export default function Menu() {
 							Insights
 						</Button>
 					</Link>
+					<Link href="/trendline-per-course">
+						<Button variant="outline" size="sm" className="h-8 lg:flex">
+							<ChartColumn />
+							Trendlines
+						</Button>
+					</Link>
 					<Link href="/query">
 						<Button variant="outline" size="sm" className="h-8 lg:flex">
 							<ScanSearch />

@@ -1,7 +1,4 @@
-"use client";
-
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	ChartConfig,
@@ -15,11 +12,11 @@ import {
 const chartConfig = {
 	pass: {
 		label: "Pass",
-		color: "hsl(var(--chart-1))",
+		color: "hsl(var(--chart-1))", // Adjust this color to a green shade
 	},
 	fail: {
 		label: "Fail",
-		color: "hsl(var(--chart-2))",
+		color: "hsl(var(--chart-2))", // Adjust this color to a red shade
 	},
 } satisfies ChartConfig;
 
@@ -39,13 +36,16 @@ export function PassFail({ data }: PassFailProps) {
 			<CardContent>
 				{chartData.length > 0 ? (
 					<ChartContainer config={chartConfig}>
-						<BarChart accessibilityLayer data={chartData}>
-							<CartesianGrid vertical={false} />
+						<BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+							<CartesianGrid strokeDasharray="3 3" />
 							<XAxis dataKey="course" tick={false} tickLine={false} tickMargin={10} axisLine={false} />
-							<Bar dataKey="pass" stackId="a" fill="var(--color-pass)" radius={[0, 0, 4, 4]} barSize={60} />
-							<Bar dataKey="fail" stackId="a" fill="var(--color-fail)" radius={[4, 4, 0, 0]} barSize={60} />
-							<ChartLegend content={<ChartLegendContent />} />
-							<ChartTooltip content={<ChartTooltipContent indicator="line" />} cursor={false} defaultIndex={0} />
+							<YAxis />
+							<Tooltip content={<ChartTooltipContent indicator="line" />} cursor={false} defaultIndex={0} />
+							<Legend content={<ChartLegendContent />} />
+							{/* Fail Bar (on the left), slightly offset to the left */}
+							<Bar dataKey="fail" fill="red" barSize={30} />
+							{/* Pass Bar (on the right), slightly offset to the right */}
+							<Bar dataKey="pass" fill="green" barSize={30} />
 						</BarChart>
 					</ChartContainer>
 				) : (
