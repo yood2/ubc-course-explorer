@@ -1,9 +1,16 @@
 "use client";
 
-import { Bar, BarChart, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import {
+	ChartConfig,
+	ChartContainer,
+	ChartTooltip,
+	ChartTooltipContent,
+	ChartLegend,
+	ChartLegendContent,
+} from "@/components/ui/chart";
 
 const chartConfig = {
 	pass: {
@@ -33,15 +40,11 @@ export function PassFail({ data }: PassFailProps) {
 				{chartData.length > 0 ? (
 					<ChartContainer config={chartConfig}>
 						<BarChart accessibilityLayer data={chartData}>
-							<XAxis
-								dataKey="course"
-								tickLine={false}
-								tickMargin={10}
-								axisLine={false}
-								tickFormatter={(value) => value.toUpperCase()}
-							/>
-							<Bar dataKey="pass" stackId="a" fill="var(--color-pass)" radius={[0, 0, 4, 4]} />
-							<Bar dataKey="fail" stackId="a" fill="var(--color-fail)" radius={[4, 4, 0, 0]} />
+							<CartesianGrid vertical={false} />
+							<XAxis dataKey="course" tick={false} tickLine={false} tickMargin={10} axisLine={false} />
+							<Bar dataKey="pass" stackId="a" fill="var(--color-pass)" radius={[0, 0, 4, 4]} barSize={60} />
+							<Bar dataKey="fail" stackId="a" fill="var(--color-fail)" radius={[4, 4, 0, 0]} barSize={60} />
+							<ChartLegend content={<ChartLegendContent />} />
 							<ChartTooltip content={<ChartTooltipContent indicator="line" />} cursor={false} defaultIndex={0} />
 						</BarChart>
 					</ChartContainer>
@@ -61,6 +64,7 @@ function stripData(original: Object[]) {
 		const newObject: { [key: string]: any } = {};
 		let dept = "";
 		let id = "";
+		let instructor = "";
 
 		for (const [key, value] of Object.entries(item)) {
 			const strippedKey: string = key.split("_")[1];
@@ -69,12 +73,17 @@ function stripData(original: Object[]) {
 				dept = value as string;
 			} else if (strippedKey === "id") {
 				id = value as string;
+			} else if (strippedKey === "instructor") {
+				instructor = value as string;
 			} else {
 				newObject[strippedKey] = value;
 			}
 		}
 
-		if (dept && id) {
+		// Combine course and instructor for the XAxis
+		if (dept && id && instructor) {
+			newObject.course = `${dept} ${id} - ${instructor}`;
+		} else if (dept && id) {
 			newObject.course = `${dept} ${id}`;
 		}
 

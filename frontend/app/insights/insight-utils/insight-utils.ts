@@ -56,6 +56,8 @@ export function queryGenerator(
 	const failCol = `${selectedDataset}_fail`;
 	const passCol = `${selectedDataset}_pass`;
 	const auditCol = `${selectedDataset}_audit`;
+	const instructorCol = `${selectedDataset}_instructor`;
+	const uuidCol = `${selectedDataset}_uuid`;
 
 	const query = {
 		WHERE: {
@@ -78,7 +80,7 @@ export function queryGenerator(
 			],
 		},
 		OPTIONS: {
-			COLUMNS: [idCol, deptCol, failCol, passCol, auditCol],
+			COLUMNS: [idCol, deptCol, failCol, passCol, auditCol, instructorCol, uuidCol],
 			ORDER: failCol,
 		},
 	};
