@@ -31,7 +31,6 @@ export function QueryDataset({ selectedDataset, setSelectedDataset, setFilters }
 				[defaultKey]: 95,
 			},
 		};
-		console.log(`${JSON.stringify(defaultFilter)}`);
 
 		setFilters(defaultFilter);
 	};
