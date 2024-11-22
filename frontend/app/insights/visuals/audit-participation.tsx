@@ -63,7 +63,7 @@ export function AuditParticipation({ data, datasetId }: AuditParticipationProps)
 				>
 					<PieChart>
 						<ChartTooltip content={<ChartTooltipContent hideLabel />} />
-						<Pie data={chartData} dataKey="value" label nameKey="name"></Pie>
+						<Pie data={chartData} dataKey="value"></Pie>
 					</PieChart>
 				</ChartContainer>
 			</CardContent>
