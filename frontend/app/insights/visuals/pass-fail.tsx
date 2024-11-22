@@ -80,7 +80,6 @@ function stripData(original: Object[]) {
 			}
 		}
 
-		// Combine course and instructor for the XAxis
 		if (dept && id && instructor) {
 			newObject.course = `${dept} ${id} - ${instructor}`;
 		} else if (dept && id) {

@@ -16,10 +16,9 @@ interface InsightYearProps {
 }
 
 export function InsightYear({ selectedDataset, years, selectedYear, setSelectedYear }: InsightYearProps) {
-	const [open, setOpen] = React.useState(false); // Popover open/close state
-	const [searchTerm, setSearchTerm] = React.useState(""); // For filtering datasets
+	const [open, setOpen] = React.useState(false);
+	const [searchTerm, setSearchTerm] = React.useState("");
 
-	// Filter years based on search term
 	const filteredYears = years.filter((year) => year.toString().includes(searchTerm.trim()));
 
 	return (
@@ -49,10 +48,10 @@ export function InsightYear({ selectedDataset, years, selectedYear, setSelectedY
 							{filteredYears.map((year) => (
 								<CommandItem
 									key={year}
-									value={year.toString()} // Ensure value is a string
+									value={year.toString()}
 									onSelect={(currentValue) => {
-										const selectedValue = parseInt(currentValue, 10); // Parse back to number
-										setSelectedYear(selectedValue === selectedYear ? 0 : selectedValue); // Toggle selection
+										const selectedValue = parseInt(currentValue, 10);
+										setSelectedYear(selectedValue === selectedYear ? 0 : selectedValue);
 										setOpen(false);
 									}}
 								>

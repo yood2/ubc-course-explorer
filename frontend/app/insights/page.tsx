@@ -174,40 +174,32 @@ export default function Insights() {
 function personalInsights(result: any[], selectedDataset: string) {
 	if (result.length === 0) return {};
 
-	// Initialize trackers
-	let highestAvg: any = { avg: -Infinity }; // Track the object with the highest average
-	let mostFails: any = { fails: -Infinity }; // Track the object with the most fails
-	const deptCounts: Record<string, number> = {}; // Track department frequencies
+	let highestAvg: any = { avg: -Infinity };
+	let mostFails: any = { fails: -Infinity };
+	const deptCounts: Record<string, number> = {};
 
-	// Keys for dynamic access
 	const passKey = `${selectedDataset}_pass`;
 	const failKey = `${selectedDataset}_fail`;
 	const deptKey = `${selectedDataset}_dept`;
 
-	// Process each result
 	result.forEach((row) => {
-		// Calculate the average for this course
 		const totalStudents = (row[passKey] || 0) + (row[failKey] || 0);
 		const avg = totalStudents > 0 ? (row[passKey] || 0) / totalStudents : 0;
 
-		// Update highestAvg if this average is higher
 		if (avg > (highestAvg.avg || 0)) {
 			highestAvg = { ...row, avg };
 		}
 
-		// Update mostFails if this course has more fails
 		if ((row[failKey] || 0) > (mostFails.fails || 0)) {
 			mostFails = { ...row, fails: row[failKey] };
 		}
 
-		// Count department occurrences
 		const dept = row[deptKey];
 		if (dept) {
 			deptCounts[dept] = (deptCounts[dept] || 0) + 1;
 		}
 	});
 
-	// Determine the most common department
 	const mostCommonDept = Object.keys(deptCounts).reduce((a, b) => (deptCounts[a] > deptCounts[b] ? a : b));
 
 	return { highestAvg, mostFails, mostCommonDept, selectedDataset };

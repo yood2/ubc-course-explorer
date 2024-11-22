@@ -47,18 +47,13 @@ export function Averages({ data, selectedDataset }: AveragesProps) {
 						}}
 					>
 						<CartesianGrid vertical={false} />
-						<YAxis
-							domain={[0, 100]} // Set the Y-axis range explicitly
-							tickLine={false}
-							axisLine={false}
-							tickMargin={8}
-						/>
+						<YAxis domain={[0, 100]} tickLine={false} axisLine={false} tickMargin={8} />
 						<XAxis
 							dataKey="instructor"
 							tickLine={false}
 							axisLine={false}
 							tickMargin={8}
-							tickFormatter={(value) => value.split(",")[0]} // Display only the first part of the instructor's name
+							tickFormatter={(value) => value.split(",")[0]}
 						/>
 						<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
 						<Area
