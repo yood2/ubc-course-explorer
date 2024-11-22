@@ -12,19 +12,21 @@ export default function Home() {
 				<CardContent>
 					<ul className="space-y-4 list-disc pl-6">
 						<li>
-							<strong>Manage Page</strong>: Add, remove, and view datasets, with all changes saved for future sessions.
+							<strong>Manage</strong>: Add, remove, and view datasets, with all changes saved for future sessions.
 						</li>
 						<li>
-							<strong>Insights Page</strong>: Get focused insights into specific courses by selecting a year,
-							department, and course ID.
+							<strong>Insights</strong>: Get focused insights into specific courses by selecting a year, department, and
+							course ID.
 						</li>
 						<li>
-							<strong>Query Page</strong>: Use the Course Explorer EBNF language to create custom queries for advanced
-							data analysis.
+							<strong>Insights</strong>: View how course averages change over several years.
 						</li>
 						<li>
-							<strong>Summary Page</strong>: Review a personalized summary of your searches and insights all in one
-							place.
+							<strong>Query</strong>: Use the Course Explorer EBNF language to create custom queries for advanced data
+							analysis.
+						</li>
+						<li>
+							<strong>Summary</strong>: Review a personalized summary of your searches and insights all in one place.
 						</li>
 					</ul>
 				</CardContent>

@@ -1,4 +1,4 @@
-import { House, Folder, ScanSearch, ChartColumn, BookUser } from "lucide-react";
+import { House, Folder, ScanSearch, ChartColumn, BookUser, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -27,7 +27,7 @@ export default function Menu() {
 					</Link>
 					<Link href="/trendline-per-course">
 						<Button variant="outline" size="sm" className="h-8 lg:flex">
-							<ChartColumn />
+							<TrendingUp />
 							Trendlines
 						</Button>
 					</Link>
