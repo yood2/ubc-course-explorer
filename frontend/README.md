@@ -1,12 +1,8 @@
 #### Quickstart
 
 1. `yarn install`
-2. `npm run dev`
+2. `yarn run dev`
 
 ##### References
 
-Components from Shadcn/ui
-
-- Label
-- Form
-- Input
+Prebuilt Components in `frontend/components/ui` from Shadcn/ui!
