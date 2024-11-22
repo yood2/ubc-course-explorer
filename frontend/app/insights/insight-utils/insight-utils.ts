@@ -53,6 +53,7 @@ export function queryGenerator(
 	const yearCol = `${selectedDataset}_year`;
 	const deptCol = `${selectedDataset}_dept`;
 	const idCol = `${selectedDataset}_id`;
+	const avgCol = `${selectedDataset}_avg`;
 	const failCol = `${selectedDataset}_fail`;
 	const passCol = `${selectedDataset}_pass`;
 	const auditCol = `${selectedDataset}_audit`;
@@ -80,7 +81,7 @@ export function queryGenerator(
 			],
 		},
 		OPTIONS: {
-			COLUMNS: [idCol, deptCol, failCol, passCol, auditCol, instructorCol, uuidCol],
+			COLUMNS: [idCol, deptCol, avgCol, failCol, passCol, auditCol, instructorCol, uuidCol],
 			ORDER: failCol,
 		},
 	};

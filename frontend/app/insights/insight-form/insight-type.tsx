@@ -14,7 +14,7 @@ interface InsightTypeProps {
 	setSelectedType: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const options = ["pass/fail", "audit participation"];
+const options = ["pass/fail", "audit participation", "averages"];
 
 export function InsightType({ selectedDataset, selectedType, setSelectedType }: InsightTypeProps) {
 	const [open, setOpen] = React.useState(false); // Popover open/close state
