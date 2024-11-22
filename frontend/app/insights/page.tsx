@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { InsightDataset } from "./insight-form/insight-dataset";
 import { InsightYear } from "./insight-form/insight-year";
 import { InsightDept } from "./insight-form/insight-dept";
@@ -18,6 +18,8 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { getOptions } from "../utils/api-utils";
+import { getYears, getDepts, getIds, passFailQueryGenerator, auditQueryGenerator } from "./insight-utils/insight-utils";
 
 export default function Insights() {
 	const [selectedDataset, setSelectedDataset] = useState<string>("");
@@ -28,12 +30,45 @@ export default function Insights() {
 	const [query, setQuery] = useState<{}>({});
 	const [insightResults, setInsightResults] = useState<[]>([]);
 	const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+	const [options, setOptions] = useState<[]>([]);
+	const [years, setYears] = useState<number[]>([]);
+	const [depts, setDepts] = useState<string[]>([]);
+	const [ids, setIds] = useState<string[]>([]);
+
+	useEffect(() => {
+		const fetchOptions = async () => {
+			try {
+				const options = await requestOptions(selectedDataset);
+				setOptions(options);
+			} catch (error) {
+				console.error("Error fetching options:", error);
+			}
+		};
+
+		if (selectedDataset) {
+			fetchOptions();
+		}
+	}, [selectedDataset]);
+
+	useEffect(() => {
+		const years: number[] = getYears(options, selectedDataset);
+		setYears(years);
+	}, [options]);
+
+	useEffect(() => {
+		const depts: string[] = getDepts(options, selectedDataset, selectedYear);
+		setDepts(depts);
+	}, [selectedYear]);
+
+	useEffect(() => {
+		const ids: string[] = getIds(options, selectedDataset, selectedYear, selectedDept);
+		setIds(ids);
+	}, [selectedDept]);
 
 	const handleQuery = async (newQuery: Object) => {
 		try {
 			const { result, error } = await performQuery(newQuery);
 			if (error) {
-				console.log(error);
 				alert(`${error}`);
 				return;
 			} else {
@@ -54,6 +89,19 @@ export default function Insights() {
 		}
 		setQuery(newQuery);
 		handleQuery(newQuery);
+		setIsDialogOpen(false);
+	};
+
+	const requestOptions = async (selectedDataset: string) => {
+		const { result, error } = await getOptions(selectedDataset);
+		if (error) {
+			console.log(error);
+			alert(`${error}`);
+			return;
+		} else {
+			setOptions(result);
+			return result;
+		}
 	};
 
 	return (
@@ -64,13 +112,19 @@ export default function Insights() {
 					<InsightDataset selectedDataset={selectedDataset} setSelectedDataset={setSelectedDataset} />
 					<InsightYear
 						selectedDataset={selectedDataset}
+						years={years}
 						selectedYear={selectedYear}
 						setSelectedYear={setSelectedYear}
 					/>
-					<InsightDept selectedYear={selectedYear} selectedDept={selectedDept} setSelectedDept={setSelectedDept} />
+					<InsightDept
+						selectedYear={selectedYear}
+						depts={depts}
+						selectedDept={selectedDept}
+						setSelectedDept={setSelectedDept}
+					/>
 				</div>
 				<div className="space-x-2">
-					<InsightId selectedDept={selectedDept} selectedId={selectedId} setSelectedId={setSelectedId} />
+					<InsightId selectedDept={selectedDept} ids={ids} selectedId={selectedId} setSelectedId={setSelectedId} />
 					<InsightType
 						selectedDataset={selectedDataset}
 						selectedType={selectedType}
@@ -100,88 +154,11 @@ export default function Insights() {
 					</Dialog>
 				</div>
 			</div>
-			<PassFail data={insightResults} />
-			<AuditParticipation />
+			{selectedType === "pass/fail" && <PassFail data={insightResults} />}
+
+			{/* <AuditParticipation /> */}
 			{/* <pre>{JSON.stringify(query, null, 2)}</pre> */}
 			{/* <pre>{JSON.stringify(insightResults, null, 2)}</pre> */}
 		</>
 	);
-}
-
-function passFailQueryGenerator(
-	selectedDataset: string,
-	selectedYear: number,
-	selectedDept: string,
-	selectedId: string
-) {
-	const yearCol = `${selectedDataset}_year`;
-	const deptCol = `${selectedDataset}_dept`;
-	const idCol = `${selectedDataset}_id`;
-	const failCol = `${selectedDataset}_fail`;
-	const passCol = `${selectedDataset}_pass`;
-
-	const query = {
-		WHERE: {
-			AND: [
-				{
-					EQ: {
-						[yearCol]: selectedYear,
-					},
-				},
-				{
-					IS: {
-						[deptCol]: selectedDept,
-					},
-				},
-				{
-					IS: {
-						[idCol]: selectedId,
-					},
-				},
-			],
-		},
-		OPTIONS: {
-			COLUMNS: [idCol, deptCol, failCol, passCol],
-			ORDER: failCol,
-		},
-	};
-
-	return query;
-}
-
-function auditQueryGenerator(selectedDataset: string, selectedYear: number, selectedDept: string, selectedId: string) {
-	const yearCol = `${selectedDataset}_year`;
-	const deptCol = `${selectedDataset}_dept`;
-	const idCol = `${selectedDataset}_id`;
-	const failCol = `${selectedDataset}_fail`;
-	const passCol = `${selectedDataset}_pass`;
-	const auditCol = `${selectedDataset}_pass`;
-
-	const query = {
-		WHERE: {
-			AND: [
-				{
-					EQ: {
-						[yearCol]: selectedYear,
-					},
-				},
-				{
-					IS: {
-						[deptCol]: selectedDept,
-					},
-				},
-				{
-					IS: {
-						[idCol]: selectedId,
-					},
-				},
-			],
-		},
-		OPTIONS: {
-			COLUMNS: [idCol, deptCol, failCol, passCol, auditCol],
-			ORDER: failCol,
-		},
-	};
-
-	return query;
 }

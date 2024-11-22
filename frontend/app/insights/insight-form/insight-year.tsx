@@ -10,13 +10,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 
 interface InsightYearProps {
 	selectedDataset: string;
+	years: number[];
 	selectedYear: number;
 	setSelectedYear: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const years = [2015, 1900, 2008, 2010, 2016, 2013, 2014, 2009, 2011, 2007, 2012];
-
-export function InsightYear({ selectedDataset, selectedYear, setSelectedYear }: InsightYearProps) {
+export function InsightYear({ selectedDataset, years, selectedYear, setSelectedYear }: InsightYearProps) {
 	const [open, setOpen] = React.useState(false); // Popover open/close state
 	const [searchTerm, setSearchTerm] = React.useState(""); // For filtering datasets
 

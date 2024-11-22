@@ -7,19 +7,17 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { courses } from "./courses_by_dept";
 
 interface InsightIdProps {
 	selectedDept: string;
+	ids: string[];
 	selectedId: string;
 	setSelectedId: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export function InsightId({ selectedDept, selectedId, setSelectedId }: InsightIdProps) {
+export function InsightId({ selectedDept, ids, selectedId, setSelectedId }: InsightIdProps) {
 	const [open, setOpen] = React.useState(false); // Popover open/close state
 	const [searchTerm, setSearchTerm] = React.useState(""); // For filtering datasets
-
-	const ids = courses[selectedDept] || [];
 
 	const filteredIds = ids.filter((id: string) => id.toLowerCase().includes(searchTerm.trim().toLowerCase()));
 
@@ -50,7 +48,7 @@ export function InsightId({ selectedDept, selectedId, setSelectedId }: InsightId
 							{ids.map((id: string) => (
 								<CommandItem
 									key={id}
-									value={id} // Ensure value is a string
+									value={id}
 									onSelect={(currentValue) => {
 										setSelectedId(currentValue === selectedId ? "" : currentValue);
 										setOpen(false);
