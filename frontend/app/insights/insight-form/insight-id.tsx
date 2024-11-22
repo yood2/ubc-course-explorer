@@ -16,8 +16,8 @@ interface InsightIdProps {
 }
 
 export function InsightId({ selectedDept, ids, selectedId, setSelectedId }: InsightIdProps) {
-	const [open, setOpen] = React.useState(false); // Popover open/close state
-	const [searchTerm, setSearchTerm] = React.useState(""); // For filtering datasets
+	const [open, setOpen] = React.useState(false);
+	const [searchTerm, setSearchTerm] = React.useState("");
 
 	const filteredIds = ids.filter((id: string) => id.toLowerCase().includes(searchTerm.trim().toLowerCase()));
 

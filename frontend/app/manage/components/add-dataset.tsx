@@ -40,6 +40,8 @@ export default function AddDataset() {
 			return;
 		}
 
+		setIsDialogOpen(false);
+
 		try {
 			const content = await file.arrayBuffer();
 			const res = await addDataset(content, datasetId, kind);
@@ -49,7 +51,6 @@ export default function AddDataset() {
 				alert(`Successfully added ${datasetId}`);
 			}
 			await reloadDatasets();
-			setIsDialogOpen(false);
 		} catch (error) {
 			console.error("Error submitting dataset:", error);
 			alert("An unexpected error occurred.");

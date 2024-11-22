@@ -7,6 +7,8 @@ interface InsightContextType {
 	setDatasets: (datasets: InsightDataset[]) => void;
 	queryResults: any[];
 	setQueryResults: (results: any) => void;
+	summary: Summary;
+	setSummary: (summary: any) => void;
 	reloadDatasets: () => Promise<void>;
 }
 
@@ -21,11 +23,30 @@ interface InsightDataset {
 	numRows: number;
 }
 
+interface Summary {
+	highestAvg: {
+		[key: string]: any;
+		avg: number;
+	} | null;
+	mostFails: {
+		[key: string]: any;
+		fails: number;
+	} | null;
+	mostCommonDept: string | null;
+	selectedDataset: string | null;
+}
+
 const InsightContext = createContext<InsightContextType | undefined>(undefined);
 
 export const InsightProvider = ({ children }: any) => {
 	const [datasets, setDatasets] = useState<InsightDataset[]>([]);
 	const [queryResults, setQueryResults] = useState<[]>([]);
+	const [summary, setSummary] = useState<Summary>({
+		highestAvg: null,
+		mostFails: null,
+		mostCommonDept: null,
+		selectedDataset: null,
+	});
 
 	const loadDatasets = async () => {
 		try {
@@ -46,7 +67,15 @@ export const InsightProvider = ({ children }: any) => {
 
 	return (
 		<InsightContext.Provider
-			value={{ datasets, setDatasets, queryResults, setQueryResults, reloadDatasets: loadDatasets }}
+			value={{
+				datasets,
+				setDatasets,
+				queryResults,
+				setQueryResults,
+				summary,
+				setSummary,
+				reloadDatasets: loadDatasets,
+			}}
 		>
 			{children}
 		</InsightContext.Provider>

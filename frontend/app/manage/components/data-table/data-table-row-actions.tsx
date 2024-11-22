@@ -43,7 +43,7 @@ export function DataTableRowActions<TData>({ row }: DataTableRowActionsProps<TDa
 				alert(`${id} was successfully removed.`);
 				reloadDatasets();
 			}
-			setIsDialogOpen(false); // Close the dialog after removing
+			setIsDialogOpen(false);
 		} catch (e) {
 			alert(`Error`);
 		}
@@ -63,7 +63,6 @@ export function DataTableRowActions<TData>({ row }: DataTableRowActionsProps<TDa
 				</DropdownMenuContent>
 			</DropdownMenu>
 
-			{/* Dialog is separated from DropdownMenu */}
 			<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 				<DialogContent className="w-[300px]">
 					<DialogHeader>

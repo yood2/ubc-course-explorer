@@ -16,9 +16,9 @@ interface QueryDatasetProps {
 }
 
 export function QueryDataset({ selectedDataset, setSelectedDataset, setFilters }: QueryDatasetProps) {
-	const [open, setOpen] = React.useState(false); // popover open/close state
-	const [searchTerm, setSearchTerm] = React.useState(""); // for filtering datasets
-	const { datasets } = useInsightContext(); // list of datasets from context
+	const [open, setOpen] = React.useState(false);
+	const [searchTerm, setSearchTerm] = React.useState("");
+	const { datasets } = useInsightContext();
 
 	const ids = datasets.map((dataset) => dataset.id);
 

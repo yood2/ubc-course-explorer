@@ -1,7 +1,6 @@
 import { House, Folder, ScanSearch, ChartColumn, BookUser } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import Debug from "../debug/debug";
 
 export default function Menu() {
 	return (
@@ -38,7 +37,6 @@ export default function Menu() {
 							Summary
 						</Button>
 					</Link>
-					{/* <Debug /> */}
 				</div>
 			</div>
 		</>

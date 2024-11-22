@@ -2,6 +2,7 @@
 
 import { Pie, PieChart } from "recharts";
 
+import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
@@ -13,9 +14,9 @@ function aggregateData(rawData: Object[], datasetId: string) {
 	const auditKey = `${datasetId}_audit`;
 
 	rawData.forEach((row: any) => {
-		const pass = Number(row[passKey] || 0); // Default to 0 if undefined
-		const fail = Number(row[failKey] || 0); // Default to 0 if undefined
-		const audit = Number(row[auditKey] || 0); // Default to 0 if undefined
+		const pass = Number(row[passKey] || 0);
+		const fail = Number(row[failKey] || 0);
+		const audit = Number(row[auditKey] || 0);
 
 		aggregated.enrolled += pass;
 		aggregated.enrolled += fail;
@@ -62,11 +63,15 @@ export function AuditParticipation({ data, datasetId }: AuditParticipationProps)
 				>
 					<PieChart>
 						<ChartTooltip content={<ChartTooltipContent hideLabel />} />
-						<Pie data={chartData} dataKey="value" label nameKey="name" />
+						<Pie data={chartData} dataKey="value"></Pie>
 					</PieChart>
 				</ChartContainer>
 			</CardContent>
 			<CardFooter className="flex-col gap-2 text-sm">
+				<Label>Regular Enrollments</Label>
+				<h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">{chartData[0].value}</h3>
+				<Label>Audit Participants</Label>
+				<h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">{chartData[1].value}</h3>
 				<div className="leading-none text-muted-foreground">*Enrolled students calculated by combining pass/fails.</div>
 			</CardFooter>
 		</Card>

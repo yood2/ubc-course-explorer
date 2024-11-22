@@ -14,11 +14,11 @@ interface InsightTypeProps {
 	setSelectedType: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const options = ["pass/fail", "audit participation"];
+const options = ["pass/fail", "audit participation", "averages"];
 
 export function InsightType({ selectedDataset, selectedType, setSelectedType }: InsightTypeProps) {
-	const [open, setOpen] = React.useState(false); // Popover open/close state
-	const [searchTerm, setSearchTerm] = React.useState(""); // For filtering datasets
+	const [open, setOpen] = React.useState(false);
+	const [searchTerm, setSearchTerm] = React.useState("");
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -47,7 +47,7 @@ export function InsightType({ selectedDataset, selectedType, setSelectedType }: 
 							{options.map((option: string) => (
 								<CommandItem
 									key={option}
-									value={option} // Ensure value is a string
+									value={option}
 									onSelect={(currentValue) => {
 										setSelectedType(currentValue === selectedType ? "" : currentValue);
 										setOpen(false);

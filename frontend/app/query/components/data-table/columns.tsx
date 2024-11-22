@@ -1,19 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 
-// interface test {
-// 	uuid?: string;
-// 	id?: string;
-// 	title?: string;
-// 	instructor?: string;
-// 	dept?: string;
-// 	year?: number;
-// 	avg?: number;
-// 	pass?: number;
-// 	fail?: number;
-// 	audit?: number;
-// }
-
 export const columns: ColumnDef<{
 	uuid?: string;
 	id?: string;
