@@ -1,96 +1,59 @@
 "use client";
 
-import { TrendingUp } from "lucide-react";
 import { Pie, PieChart } from "recharts";
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
-const rawData = [
-	{
-		sections_id: "110",
-		sections_dept: "cpsc",
-		sections_fail: 1,
-		sections_pass: 69,
-	},
-	{
-		sections_id: "110",
-		sections_dept: "cpsc",
-		sections_fail: 6,
-		sections_pass: 23,
-	},
-	{
-		sections_id: "110",
-		sections_dept: "cpsc",
-		sections_fail: 8,
-		sections_pass: 21,
-	},
-	{
-		sections_id: "110",
-		sections_dept: "cpsc",
-		sections_fail: 22,
-		sections_pass: 154,
-	},
-	{
-		sections_id: "110",
-		sections_dept: "cpsc",
-		sections_fail: 25,
-		sections_pass: 104,
-	},
-	{
-		sections_id: "110",
-		sections_dept: "cpsc",
-		sections_fail: 40,
-		sections_pass: 256,
-	},
-	{
-		sections_id: "110",
-		sections_dept: "cpsc",
-		sections_fail: 42,
-		sections_pass: 154,
-	},
-	{
-		sections_id: "110",
-		sections_dept: "cpsc",
-		sections_fail: 46,
-		sections_pass: 185,
-	},
-];
+function aggregateData(rawData: Object[], datasetId: string) {
+	const aggregated = { enrolled: 0, audit: 0 };
 
-// Aggregate data for the PieChart
-function aggregateData(rawData: Object[]) {
-	const aggregated = { pass: 0, fail: 0 };
+	const passKey = `${datasetId}_pass`;
+	const failKey = `${datasetId}_fail`;
+	const auditKey = `${datasetId}_audit`;
 
-	rawData.forEach((row) => {
-		aggregated.pass += row.sections_pass;
-		aggregated.fail += row.sections_fail;
+	rawData.forEach((row: any) => {
+		const pass = Number(row[passKey] || 0); // Default to 0 if undefined
+		const fail = Number(row[failKey] || 0); // Default to 0 if undefined
+		const audit = Number(row[auditKey] || 0); // Default to 0 if undefined
+
+		aggregated.enrolled += pass;
+		aggregated.enrolled += fail;
+		aggregated.audit += audit;
 	});
 
 	return [
-		{ name: "Pass", value: aggregated.pass, fill: "var(--color-pass)" },
-		{ name: "Fail", value: aggregated.fail, fill: "var(--color-fail)" },
+		{ name: "Enrolled", value: aggregated.enrolled, fill: "var(--color-enrolled)" },
+		{ name: "Audit", value: aggregated.audit, fill: "var(--color-audit)" },
 	];
 }
 
 const chartConfig = {
-	pass: {
-		label: "Pass",
+	enrolled: {
+		label: "Enrolled",
 		color: "hsl(var(--chart-1))",
 	},
-	fail: {
-		label: "Fail",
+	audit: {
+		label: "Audit",
 		color: "hsl(var(--chart-2))",
 	},
 } satisfies ChartConfig;
 
-export function AuditParticipation() {
-	const chartData = aggregateData(rawData);
+interface AuditParticipationProps {
+	data: Object[];
+	datasetId: string;
+}
+
+export function AuditParticipation({ data, datasetId }: AuditParticipationProps) {
+	const chartData = aggregateData(data, datasetId);
 
 	return (
 		<Card className="flex flex-col">
 			<CardHeader className="items-center pb-0">
-				<CardTitle>Pass/Fail Distribution</CardTitle>
-				<CardDescription>Aggregated data for all sections</CardDescription>
+				<CardTitle>Audit Participation</CardTitle>
+				<CardDescription>
+					Shows the portion of enrolled students versus the amount of audit participants.
+				</CardDescription>
 			</CardHeader>
 			<CardContent className="flex-1 pb-0">
 				<ChartContainer
@@ -104,10 +67,7 @@ export function AuditParticipation() {
 				</ChartContainer>
 			</CardContent>
 			<CardFooter className="flex-col gap-2 text-sm">
-				<div className="flex items-center gap-2 font-medium leading-none">
-					Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-				</div>
-				<div className="leading-none text-muted-foreground">Aggregated pass/fail data for all sections</div>
+				<div className="leading-none text-muted-foreground">*Enrolled students calculated by combining pass/fails.</div>
 			</CardFooter>
 		</Card>
 	);

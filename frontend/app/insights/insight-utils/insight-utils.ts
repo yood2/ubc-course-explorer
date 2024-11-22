@@ -44,7 +44,7 @@ export function getIds(options: [], datasetId: any, selectedYear: number, select
 	return ids.sort();
 }
 
-export function passFailQueryGenerator(
+export function queryGenerator(
 	selectedDataset: string,
 	selectedYear: number,
 	selectedDept: string,
@@ -55,48 +55,7 @@ export function passFailQueryGenerator(
 	const idCol = `${selectedDataset}_id`;
 	const failCol = `${selectedDataset}_fail`;
 	const passCol = `${selectedDataset}_pass`;
-
-	const query = {
-		WHERE: {
-			AND: [
-				{
-					EQ: {
-						[yearCol]: selectedYear,
-					},
-				},
-				{
-					IS: {
-						[deptCol]: selectedDept,
-					},
-				},
-				{
-					IS: {
-						[idCol]: selectedId,
-					},
-				},
-			],
-		},
-		OPTIONS: {
-			COLUMNS: [idCol, deptCol, failCol, passCol],
-			ORDER: failCol,
-		},
-	};
-
-	return query;
-}
-
-export function auditQueryGenerator(
-	selectedDataset: string,
-	selectedYear: number,
-	selectedDept: string,
-	selectedId: string
-) {
-	const yearCol = `${selectedDataset}_year`;
-	const deptCol = `${selectedDataset}_dept`;
-	const idCol = `${selectedDataset}_id`;
-	const failCol = `${selectedDataset}_fail`;
-	const passCol = `${selectedDataset}_pass`;
-	const auditCol = `${selectedDataset}_pass`;
+	const auditCol = `${selectedDataset}_audit`;
 
 	const query = {
 		WHERE: {

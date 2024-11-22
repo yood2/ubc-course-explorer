@@ -19,7 +19,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { getOptions } from "../utils/api-utils";
-import { getYears, getDepts, getIds, passFailQueryGenerator, auditQueryGenerator } from "./insight-utils/insight-utils";
+import { getYears, getDepts, getIds, queryGenerator } from "./insight-utils/insight-utils";
 
 export default function Insights() {
 	const [selectedDataset, setSelectedDataset] = useState<string>("");
@@ -81,12 +81,7 @@ export default function Insights() {
 	};
 
 	const handleSubmit = () => {
-		let newQuery: Object = {};
-		if (selectedType === "pass/fail") {
-			newQuery = passFailQueryGenerator(selectedDataset, selectedYear, selectedDept, selectedId);
-		} else if (selectedType === "audit participation") {
-			newQuery = auditQueryGenerator(selectedDataset, selectedYear, selectedDept, selectedId);
-		}
+		const newQuery: Object = queryGenerator(selectedDataset, selectedYear, selectedDept, selectedId);
 		setQuery(newQuery);
 		handleQuery(newQuery);
 		setIsDialogOpen(false);
@@ -154,9 +149,10 @@ export default function Insights() {
 					</Dialog>
 				</div>
 			</div>
-			{selectedType === "pass/fail" && <PassFail data={insightResults} />}
-
-			{/* <AuditParticipation /> */}
+			{selectedType === "pass/fail" && insightResults.length !== 0 && <PassFail data={insightResults} />}
+			{selectedType === "audit participation" && insightResults.length !== 0 && (
+				<AuditParticipation data={insightResults} datasetId={selectedDataset} />
+			)}
 			{/* <pre>{JSON.stringify(query, null, 2)}</pre> */}
 			{/* <pre>{JSON.stringify(insightResults, null, 2)}</pre> */}
 		</>
