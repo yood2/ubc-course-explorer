@@ -9,20 +9,27 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface InsightTypeProps {
+	selectedDataset: string;
 	selectedType: string;
 	setSelectedType: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const options = ["pass/fail", "audit participation"];
 
-export function InsightType({ selectedType, setSelectedType }: InsightTypeProps) {
+export function InsightType({ selectedDataset, selectedType, setSelectedType }: InsightTypeProps) {
 	const [open, setOpen] = React.useState(false); // Popover open/close state
 	const [searchTerm, setSearchTerm] = React.useState(""); // For filtering datasets
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
-				<Button variant="outline" role="combobox" aria-expanded={open} className="w-[200px] justify-between">
+				<Button
+					disabled={selectedDataset === ""}
+					variant="outline"
+					role="combobox"
+					aria-expanded={open}
+					className="w-[200px] justify-between"
+				>
 					{selectedType || "Select option..."}
 					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 				</Button>

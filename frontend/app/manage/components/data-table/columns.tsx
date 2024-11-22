@@ -11,17 +11,17 @@ export const columns: ColumnDef<{ id: string; kind: string; numRows: number }>[]
 		enableSorting: false,
 		enableHiding: false,
 	},
-	{
-		accessorKey: "kind",
-		header: ({ column }) => <DataTableColumnHeader column={column} title="kind" />,
-		cell: ({ row }) => {
-			return (
-				<div className="flex space-x-2">
-					<span className="max-w-[500px] truncate font-medium">{row.getValue("kind")}</span>
-				</div>
-			);
-		},
-	},
+	// {
+	// 	accessorKey: "kind",
+	// 	header: ({ column }) => <DataTableColumnHeader column={column} title="kind" />,
+	// 	cell: ({ row }) => {
+	// 		return (
+	// 			<div className="flex space-x-2">
+	// 				<span className="max-w-[500px] truncate font-medium">{row.getValue("kind")}</span>
+	// 			</div>
+	// 		);
+	// 	},
+	// },
 	{
 		accessorKey: "numRows",
 		header: ({ column }) => <DataTableColumnHeader column={column} title="NumRows" />,

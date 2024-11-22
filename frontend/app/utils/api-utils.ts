@@ -1,3 +1,17 @@
+export async function getOptions(datasetId: string) {
+	const response = await fetch(`http://localhost:4321/personal/metadata/${datasetId}`, {
+		method: "GET",
+	});
+
+	if (response.ok) {
+		const result = await response.json();
+		return { result: result.result };
+	} else {
+		const error = await response.json();
+		return { error: error.error || "An error occurred while getting options" };
+	}
+}
+
 export async function addDataset(content: ArrayBuffer, datasetId: string, kind: string) {
 	const response = await fetch(`http://localhost:4321/dataset/${datasetId}/${kind}`, {
 		method: "PUT",

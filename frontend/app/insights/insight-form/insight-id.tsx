@@ -7,26 +7,30 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { courses } from "./courses_by_dept";
 
 interface InsightIdProps {
 	selectedDept: string;
+	ids: string[];
 	selectedId: string;
 	setSelectedId: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export function InsightId({ selectedDept, selectedId, setSelectedId }: InsightIdProps) {
+export function InsightId({ selectedDept, ids, selectedId, setSelectedId }: InsightIdProps) {
 	const [open, setOpen] = React.useState(false); // Popover open/close state
 	const [searchTerm, setSearchTerm] = React.useState(""); // For filtering datasets
-
-	const ids = courses[selectedDept] || [];
 
 	const filteredIds = ids.filter((id: string) => id.toLowerCase().includes(searchTerm.trim().toLowerCase()));
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
-				<Button variant="outline" role="combobox" aria-expanded={open} className="w-[200px] justify-between">
+				<Button
+					disabled={selectedDept === ""}
+					variant="outline"
+					role="combobox"
+					aria-expanded={open}
+					className="w-[200px] justify-between"
+				>
 					{selectedId || "Select id..."}
 					<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 				</Button>
@@ -44,7 +48,7 @@ export function InsightId({ selectedDept, selectedId, setSelectedId }: InsightId
 							{ids.map((id: string) => (
 								<CommandItem
 									key={id}
-									value={id} // Ensure value is a string
+									value={id}
 									onSelect={(currentValue) => {
 										setSelectedId(currentValue === selectedId ? "" : currentValue);
 										setOpen(false);
