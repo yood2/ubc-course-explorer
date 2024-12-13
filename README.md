@@ -1,4 +1,4 @@
-# UBC Course Explorer - Full-stack Web Application for Managing Course Datasets!
+# UBC Course Explorer
 
 This repository contains the frontend and backend implementations for our Course Explorer application, which takes datasets containing course and section information and produces visualizations and querying options.
 
