@@ -5,6 +5,9 @@ This repository contains the frontend and backend implementations for our Course
 - Frontend made using Next.js and Shadcn
 - Backend made using Node.js and Express.js
 
+<img width="966" alt="image" src="https://github.com/user-attachments/assets/d1501e36-7cf5-43f3-9e3e-f971d1a290ce" />
+
+
 ## Configuring your environment
 
 1. In root, run CLI `yarn install`
